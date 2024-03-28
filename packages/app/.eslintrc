@@ -1,0 +1,10 @@
+{
+    "extends": [
+        "@salomaosnff/eslint-config/vue"
+    ],
+    "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/consistent-type-imports": "error",
+        "@typescript-eslint/no-var-requires": "off"
+    }
+}

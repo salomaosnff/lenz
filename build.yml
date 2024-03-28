@@ -1,0 +1,69 @@
+outDir: out
+
+manifest:
+  name: lenz-editor
+  version: 0.0.0
+  description: Editor
+  main: package.nw/app/nw/index.js
+  chromium-args: --mixed-context
+  domain: lenz
+  window:
+    icon: icon.png
+
+app:
+  id: lenz
+  name: Lenz Editor
+  version: 0.0.1
+  description: A simple editor.
+  author: Salomão Neto <contato@sallon.dev>
+
+nw:
+  version: 0.85.0
+  arch: x64
+  flavor: normal
+
+hooks:
+  pre-build:
+    - "pnpm build:core"
+    - "pnpm build:app"
+
+platforms:
+  linux:
+    arch:
+      - amd64
+    launchers:
+      - name: Lenz Editor
+        exec: lenz
+        icon: /usr/share/lenz/icon.png
+        categories:
+          - Development
+          - Utility
+    bin:
+      lenz: "/usr/share/lenz/nw"
+
+    target:
+      plain:
+      deb:
+        build:
+          compression: none
+          compressionLevel: 0
+          compressionStrategy: none
+
+sources:
+  - icon.png
+  - from: packages
+    to: package.nw
+    filter:
+      - "app/package.json"
+      - "app/dist/**"
+      - "app/nw/**"
+
+  - from: packages/extensions
+    to: package.nw/extensions
+
+  - from: packages/app/node_modules/@editor/core
+    to: node_modules/@editor/core
+    filter:
+      - package.json
+      - dist/**
+      - "!**/*.d.ts"

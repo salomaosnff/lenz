@@ -1,0 +1,31 @@
+{
+    "$schema": "../../../json-schemas/extension.json",
+    "id": "file",
+    "name": "Projeto",
+    "description": "Operações de projeto",
+    "version": "0.0.0",
+    "publisher": "Salomão Neto <contato@sallon.dev>",
+    "main": "main.js",
+    "contributes": {
+        "commands": [
+            {
+                "id": "project.new",
+                "title": "Criar projeto em branco",
+                "icon": "mdiFileOutline",
+                "description": "Inicie um projeto do zero"
+            },
+            {
+                "id": "project.open",
+                "title": "Abrir projeto",
+                "icon": "mdiFolderOpenOutline",
+                "description": "Abra um projeto existente"
+            },
+            {
+                "id": "project.new.from-template",
+                "title": "Criar projeto a partir de um modelo",
+                "icon": "mdiFileDocumentMultipleOutline",
+                "description": "Agilize a criação de um novo projeto utilizando um modelo pré-configurado"
+            }
+        ]
+    }
+}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" class="text-[14px] theme--dark w-full h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline';"
+    />
+    <script>
+      const module = require("node:module");
+      const { resolve } = require("node:path");
+
+      const originalResolveFilename = module._resolveFilename;
+      const corePath = require.resolve("@editor/core");
+
+      module._resolveFilename = function (request, ...rest) {
+        if (request === "@editor/core") {
+          return corePath;
+        }
+        return originalResolveFilename(request, ...rest);
+      };
+    </script>
+  </head>
+
+  <body class="w-full h-full">
+    <div id="app" class="w-full h-full"></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
