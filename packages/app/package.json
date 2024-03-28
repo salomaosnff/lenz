@@ -11,7 +11,7 @@
     "http://localhost:5173",
     "*://*"
   ],
-  "domain": "example.com",
+  "domain": "localhost",
   "chromium-args": "--mixed-context --disable-accelerated-video-decode --load-extension='./node_modules/nw-vue-devtools-5/extension'",
   "homepage": "https://example.com",
   "scripts": {
@@ -28,7 +28,8 @@
     "@vueuse/core": "^10.9.0",
     "pinia": "^2.1.7",
     "unocss": "^0.58.5",
-    "vue": "^3.4.21"
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@salomaosnff/eslint-config": "^1.0.4",

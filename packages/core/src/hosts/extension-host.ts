@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile, readdir, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { args } from '../args';
 import { BUILTIN_EXTENSIONS_DIR, EXTENSIONS_DIR } from '../const';
@@ -129,6 +129,7 @@ async function* readExtensions(): AsyncGenerator<ExtensionInstance> {
     }
   }
 
+  await mkdir(EXTENSIONS_DIR, { recursive: true });
   
   // Load User Extensions
   for (const dir of await readdir(EXTENSIONS_DIR)) {

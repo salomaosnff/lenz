@@ -12,7 +12,8 @@
   "homepage": "https://example.com",
   "scripts": {
     "build:core": "pnpm --filter @editor/core run build",
-    "build:app": "pnpm --filter app run build"
+    "build:app": "pnpm --filter app run build",
+    "build": "node builder/index.mjs"
   },
   "peerDependencies": {
     "yargs": "^17.7.2"
