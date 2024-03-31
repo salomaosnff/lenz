@@ -20,7 +20,7 @@ app:
 nw:
   version: 0.85.0
   arch: x64
-  flavor: sdk
+  flavor: normal
 
 hooks:
   pre-build:
@@ -50,7 +50,12 @@ platforms:
         #   compressionStrategy: none
 
 sources:
-  - icon.png
+  - from: packages/app
+    to: .
+    filter:
+      - "splash.html"
+      - "icon.png"
+
   - from: packages
     to: package.nw
     filter:
@@ -61,8 +66,8 @@ sources:
   - from: packages/extensions
     to: package.nw/extensions
 
-  - from: packages/app/node_modules/@editor/core
-    to: node_modules/@editor/core
+  - from: packages/app/node_modules/lenz
+    to: node_modules/lenz
     filter:
       - package.json
       - dist/**

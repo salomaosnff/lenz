@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Lenz Editor</title>
     <meta
       http-equiv="Content-Security-Policy"
       content="script-src 'self' 'unsafe-inline';"
@@ -13,10 +13,10 @@
       const { resolve } = require("node:path");
 
       const originalResolveFilename = module._resolveFilename;
-      const corePath = require.resolve("@editor/core");
+      const corePath = require.resolve("lenz/api");
 
       module._resolveFilename = function (request, ...rest) {
-        if (request === "@editor/core") {
+        if (request === "lenz") {
           return corePath;
         }
         return originalResolveFilename(request, ...rest);

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        background: #000;
+        color: #e0e0e0;
+        font: 14px Arial, sans-serif;
+        overflow: hidden;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+      }
+
+      .right {
+        padding: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="./icon.png" />
+    <div class="right">
+      <h1>Lenz</h1>
+      <p>v1.0.0</p>
+      <p>Carregando <span id="ext"></span>...</p>
+    </div>
+
+    <script>
+      const ext = document.querySelector("#ext");
+
+      window.opener.addEventListener("message", (event) => {
+        if (event.data.type === "load") {
+          ext.textContent = event.data.extension;
+        }
+      });
+    </script>
+  </body>
+</html>

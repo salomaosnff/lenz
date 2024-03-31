@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useTabsStore } from '@/store/tabs';
+import { useViewStore } from '@/store/views';
 import AppIcon from './AppIcon.vue';
 
-const tabsStore = useTabsStore();
+const tabsStore = useViewStore();
 </script>
 
 <template>
@@ -11,10 +11,10 @@ const tabsStore = useTabsStore();
     :class="$style['tabs']"
   >
     <button
-      v-for="tab in tabsStore.tabs"
+      v-for="tab in tabsStore.panelMap.values()"
       :key="tab.id"
       class="w-12 h-12 flex items-center justify-center block"
-      :title="tab.title"
+      :title="tab.name"
     >
       <AppIcon
         v-if="tab.icon"

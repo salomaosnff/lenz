@@ -1,0 +1,31 @@
+{
+    "$schema": "../../../schema.json",
+    "id": "files",
+    "name": "Projeto",
+    "description": "Operações de projeto",
+    "version": "0.0.0",
+    "publisher": "Salomão Neto <contato@sallon.dev>",
+    "main": "main.js",
+    "contributes": {
+        "commands": [
+            {
+                "id": "project.new",
+                "title": "Criar projeto em branco",
+                "icon": "FileOutline",
+                "description": "Inicie um projeto do zero"
+            },
+            {
+                "id": "project.open",
+                "title": "Abrir projeto",
+                "icon": "FolderOpenOutline",
+                "description": "Abra um projeto existente"
+            },
+            {
+                "id": "project.new.from-template",
+                "title": "Criar projeto a partir de um modelo",
+                "icon": "FileDocumentMultipleOutline",
+                "description": "Agilize a criação de um novo projeto utilizando um modelo pré-configurado"
+            }
+        ]
+    }
+}

@@ -3,6 +3,51 @@ import AppTabContent from '@/components/AppTabContent.vue';
 import AppTabs from '@/components/AppTabs.vue';
 import CommandPalete from '@/components/CommandPalete.vue';
 import EditorToolbar from '@/components/EditorToolbar.vue';
+import { useInternal } from '@/composables/lenz';
+import type { Window as NwWindow } from 'nw.gui'
+import type { Disposable } from 'lenz/types';
+import { nextTick } from 'vue';
+import type { ExtensionItem } from 'lenz/internal';
+
+const lenz = useInternal()
+
+const win = nw.Window.get(window);
+
+nw.Window.open('splash.html', {
+  width: 480,
+  height: 200,
+  frame: false,
+  position: 'center',
+}, (w: NwWindow) => {
+  w.setPosition('center')
+  w.setResizable(false)
+  w.setAlwaysOnTop(true)
+  w.setShowInTaskbar(false)
+
+  w.on('loaded', () => {
+    w.show()
+
+    function onExtensionLoad(e: ExtensionItem) {
+      window.postMessage({
+        type: 'load',
+        extension: e.meta.name ?? e.meta.id,
+      }, '*');
+    }
+
+    function onStarted() {
+      lenz.extensions.off('prepare', onExtensionLoad);
+
+      w.close();
+      win.show();
+    }
+
+    lenz.extensions.on('prepare', onExtensionLoad);
+    lenz.extensions.once('start', onStarted);
+
+    nextTick(() => lenz.extensions.start())
+  });
+})
+
 
 </script>
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Icon } from '@editor/core';
+import type { IconMeta } from 'lenz/types';
 import * as mdi from '@mdi/js';
 import { computed } from 'vue';
 
 const props = defineProps<{
-    icon: Icon
+    icon: IconMeta
 }>();
 
 function toPascalCase(str: string) {
@@ -17,18 +17,14 @@ const path = computed(() => {
   const { icon } = props;
 
   if (typeof icon === 'string') {
-    return mdi[icon] ?? '';
+    return mdi[`mdi${icon}`] ?? '';
   }
 
   if (typeof icon !== 'object' || !icon) {
     return '';
   }
 
-  if (icon.source === 'mdi') {
-    return mdi[`mdi${toPascalCase(icon.name)}` as keyof typeof mdi] ?? '';
-  }
-
-  if (icon.source === 'svg') {
+  if (icon.type === 'svg') {
     return icon.path;
   }
 

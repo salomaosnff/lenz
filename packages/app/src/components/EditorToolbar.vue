@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { Tool } from '@/store/toolbar';
-import { useToolbarStore } from '@/store/toolbar';
+import { useToolbarStore } from '@/store/tools';
 import { computed, ref } from 'vue';
 import AppIcon from './AppIcon.vue';
+import type { ToolHostItem } from 'lenz/internal';
 
 const toolbarStore = useToolbarStore();
-const hoveredItem = ref<Tool>();
-const mainTools = computed(() => toolbarStore.tools.filter(tool => !tool.parentId));
-const children = computed(() => hoveredItem.value && toolbarStore.tools.filter(tool => tool.parentId === hoveredItem.value?.id));
-const activeTool = computed(() => toolbarStore.tools.find(tool => tool.id === toolbarStore.activeTool));
+const hoveredItem = ref<ToolHostItem>();
+const mainTools = computed(() => toolbarStore.tools.filter(tool => !tool.meta.parent));
+const children = computed(() => hoveredItem.value && toolbarStore.tools.filter(tool => tool.meta.parent === hoveredItem.value?.meta.id));
+const activeTool = computed(() => toolbarStore.tools.find(tool => tool.meta.id === toolbarStore.activeTool));
 </script>
 
 <template>
@@ -22,23 +22,23 @@ const activeTool = computed(() => toolbarStore.tools.find(tool => tool.id === to
     >
       <button
         v-for="tool in mainTools"
-        :key="tool.id"
+        :key="tool.meta.id"
         class="w-12 h-12 flex items-center justify-center block"
-        :title="activeTool?.parentId === tool.id ? activeTool.title : tool.title"
-        @click="toolbarStore.activate(tool.id)"
+        :title="activeTool?.meta.parent === tool.meta.id ? activeTool.meta.name : tool.meta.name"
+        @click="toolbarStore.activate(tool.meta.id)"
         @pointerenter="hoveredItem = tool"
       >
         <AppIcon
-          v-if="activeTool?.parentId === tool.id"
+          v-if="activeTool?.meta.parent === tool.meta.id"
           class="w-6 h-6"
-          :icon="activeTool.icon"
+          :icon="activeTool.meta.icon"
           fill="yellow"
         />
         <AppIcon
           v-else
           class="w-6 h-6"
-          :icon="tool.icon"
-          :fill="toolbarStore.activeTool === tool.id ? 'yellow' : 'white'"
+          :icon="tool.meta.icon"
+          :fill="toolbarStore.activeTool === tool.meta.id ? 'yellow' : 'white'"
         />
       </button>
     </div>
@@ -48,15 +48,15 @@ const activeTool = computed(() => toolbarStore.tools.find(tool => tool.id === to
     >
       <button
         v-for="tool in children"
-        :key="tool.id"
+        :key="tool.meta.id"
         class="w-12 h-12 flex items-center justify-center block"
-        :title="tool.title"
-        @click="toolbarStore.activate(tool.id)"
+        :title="tool.meta.name"
+        @click="toolbarStore.activate(tool.meta.id)"
       >
         <AppIcon
           class="w-6 h-6"
-          :icon="tool.icon"
-          :fill="toolbarStore.activeTool === tool.id ? 'yellow' : 'white'"
+          :icon="tool.meta.icon"
+          :fill="toolbarStore.activeTool === tool.meta.id ? 'yellow' : 'white'"
         />
       </button>
     </div>

@@ -8,10 +8,10 @@ const commandsStore = useCommandsStore();
 const search = ref('');
 const items = computed(() => {
   if (!search.value) {
-    return commandsStore.commands.filter((command) => command.title);
+    return commandsStore.commands.filter((command) => command.meta.title);
   }
 
-  return commandsStore.commands.filter((command) => command.title?.toLowerCase().includes(search.value.toLowerCase().trim()));
+  return commandsStore.commands.filter((command) => command.meta.title?.toLowerCase().includes(search.value.toLowerCase().trim()));
 });
 
 const inputRef = ref<HTMLInputElement>();
@@ -59,23 +59,23 @@ watchEffect(() => inputRef.value?.focus());
           <TransitionGroup>
             <li
               v-for="item in items"
-              :key="item.id"
+              :key="item.meta.id"
               class="command-palette__item py-2 px-4 cursor-pointer hover:bg--surface flex gap-1 items-center"
-              @click="commandsStore.execute(item.id), isVisible = false"
+              @click="commandsStore.execute(item.meta.id), isVisible = false"
             >
               <AppIcon
-                v-if="item.icon"
-                :icon="item.icon"
+                v-if="item.meta.icon"
+                :icon="item.meta.icon"
                 class="w-7 h-7 inline-block mr-2"
                 fill="white"
               />
               <div class="flex-1">
-                <p>{{ item.title }}</p>
+                <p>{{ item.meta.title }}</p>
                 <p
-                  v-if="item.description"
+                  v-if="item.meta.description"
                   class="opacity-50 text-3"
                 >
-                  {{ item.extension.name }}: {{ item.description }}
+                  {{ item.extension.meta.name ?? item.extension.meta.id }}: {{ item.meta.description }}
                 </p>
               </div>
             </li>

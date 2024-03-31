@@ -1,48 +1,66 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+import { useInternal } from '@/composables/lenz';
 import { defineStore } from 'pinia';
-import { computed, onBeforeUnmount, reactive } from 'vue';
-import type { Disposable, ViewState } from '@editor/core';
+import { computed, customRef } from 'vue';
 
-const { ViewHost, EventHost } = require('@editor/core');
+const lenz = useInternal();
 
 
 export const useViewStore = defineStore('views', () => {
-  const viewMap = reactive(new Map<string, ViewState>());
-  const views = computed(() => Array.from(viewMap.values()));
+  const viewMap = customRef((track, trigger) => {
+    let value = lenz.views.viewMap;
 
-  function setViewRef(id: string, element: HTMLElement) {
-    const oldElement = viewMap.get(id);
+    lenz.views.on('update', () => {
+      value = lenz.views.viewMap;
+      trigger();
+    });
 
-    if (!oldElement?.element?.isSameNode(element)) {
-      ViewHost.setViewElement(id, element);
-    }
-  }
-
-  const disposers = new Set<Disposable>();
-
-  disposers.add(
-    EventHost.on('@app/views:update', (view) => {
-      viewMap.set(view.meta.id, { ...view });
-    }),
-  );
-
-  onBeforeUnmount(() => {
-    disposers.forEach(disposer => disposer.dispose());
+    return {
+      get() {
+        track();
+        return value;
+      },
+      set() {
+        console.warn('viewMap is readonly');
+      },
+    };
   });
+  const panelMap = customRef((track, trigger) => {
+    let value = lenz.views.panelMap;
 
-  function toggleView(id: string) {
-    const view = viewMap.get(id);
+    lenz.views.on('updatePanel', () => {
+      value = lenz.views.panelMap;
+      trigger();
+    });
 
-    if (view?.visible) {
-      ViewHost.hideView(id);
+    return {
+      get() {
+        track();
+        return value;
+      },
+      set() {
+        console.warn('panelMap is readonly');
+      },
+    };
+  })
+
+  const views = computed(() => Array.from(viewMap.value.values()));
+
+  function setViewRef(id: string, element: HTMLElement | null) {
+    const item = lenz.views.getView(id);
+
+    if (element) {
+      item.controller.create?.(element);
     }
     else {
-      ViewHost.showView(id);
+      item.controller.dispose?.();
     }
   }
 
   return {
     setViewRef,
     views,
-    toggleView,
+    panelMap,
+    toggleView: (viewId: string) => lenz.views.toggle(viewId),
   };
 });

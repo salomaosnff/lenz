@@ -1,19 +1,19 @@
-const editor = require('@editor/core');
+const lenz = require('lenz/api');
 
 function activate({ subscriptions }){
     subscriptions.add(
-        editor.commands.registerCommand('project.open', async () => {
+        lenz.commands.registerCommand('project.open', async () => {
             console.log('open folder')
-            const path = await editor.files.showOpenFolderDialog()
+            const path = await lenz.files.showOpenFolderDialog()
 
             console.log(path)
         })
     )
     subscriptions.add(
-        editor.commands.registerCommand('project.new', () => {})
+        lenz.commands.registerCommand('project.new', () => {})
     )
     subscriptions.add(
-        editor.commands.registerCommand('project.new.from-template', () => {})
+        lenz.commands.registerCommand('project.new.from-template', () => {})
     )
 }
 

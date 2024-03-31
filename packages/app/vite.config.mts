@@ -18,7 +18,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: builtinModules.concat('@editor/core')
+      external: builtinModules.concat('lenz')
     }
   }
 });

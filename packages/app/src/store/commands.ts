@@ -1,61 +1,54 @@
-import type { Command, Disposable, ExtensionMetadata } from '@editor/core';
+import { useInternal } from '@/composables/lenz';
+import type { CommandRegistryItem } from 'lenz/internal';
 import { defineStore } from 'pinia';
-import { computed, onBeforeUnmount, reactive } from 'vue';
+import { computed, customRef } from 'vue';
 
-const {
-  EventHost,
-  CommandHost,
-} = require('@editor/core');
-
-export interface CommandItem extends Command {
-  extension: ExtensionMetadata
-}
+const lenz = useInternal();
 
 export const useCommandsStore = defineStore('commands', () => {
-  const disposers = new Set<Disposable>();
-  const commandMap = reactive(new Map()) as Map<string, CommandItem>;
+  const commandMap = customRef((track, trigger) => {
+    let value = lenz.commands.commandMap;
+
+    lenz.commands.on('update', () => {
+      value = lenz.commands.commandMap;
+      trigger();
+    });
+
+    return {
+      get() {
+        track();
+        return value;
+      },
+      set() {
+        console.warn('commandMap is readonly');
+      },
+    };
+  });
+
   const commands = computed(() => {
-    function calculateScore(item: CommandItem) {
+    function calculateScore(item: CommandRegistryItem) {
       let score = 1;
 
-      if (item.title) {
+      if (item.meta.title) {
         score *= 2;
       }
 
-      if (item.description) {
+      if (item.meta.description) {
         score *= 3;
       }
 
-      if (item.icon) {
+      if (item.meta.icon) {
         score *= 4;
       }
 
       return score;
     }
 
-    return Array.from(commandMap.values()).sort((a, b) => calculateScore(b) - calculateScore(a));
-  });
-
-  disposers.add(
-    EventHost.on('@app/commands:init', (command) => {
-      commandMap.set(command.id, command);
-    }),
-  );
-
-  disposers.add(
-    EventHost.on('@app/commands:remove', (id) => {
-      commandMap.delete(id);
-    }),
-  );
-
-  onBeforeUnmount(() => {
-    for (const disposer of disposers) {
-      disposer.dispose();
-    }
+    return Array.from(commandMap.value.values()).sort((a, b) => calculateScore(b) - calculateScore(a));
   });
 
   return {
     commands,
-    execute: CommandHost.execute,
+    execute: (commandId: string, ...args: any[]) => lenz.commands.execute(commandId, ...args),
   };
 });

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useViewStore } from '@/store/views';
-import type { ViewState } from '@editor/core';
+import type { ViewHostItem } from 'lenz/internal';
 
 defineProps<{
-  view: ViewState;
+  view: ViewHostItem;
 }>();
 
 const viewStore = useViewStore();
@@ -16,10 +16,10 @@ const viewStore = useViewStore();
       :style="$style['app-view__header']"
       @click="viewStore.toggleView(view.meta.id)"
     >
-      {{ view.meta.title ?? 'Sem título' }}
+      {{ view.meta.name ?? 'Sem título' }}
     </div>
     <div
-      v-show="view.visible"
+      v-show="view.isVisible"
       :ref="(el: any) => viewStore.setViewRef(view.meta.id, el)"
       class="px-2"
       :class="$style['app-view__content']"

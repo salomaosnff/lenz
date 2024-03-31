@@ -1,0 +1,49 @@
+{
+    "$schema": "./schema.json",
+    "id": "files",
+    "name": "Arquivos",
+    "description": "Plugin para manipulação de arquivos",
+    "publisher": "Salomão Neto <contato@sallon.dev>",
+    "version": "1.2.3",
+    "inject": [
+        "fs.write"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "id": "5",
+                "title": "Teste",
+                "icon": "mdiFile"
+            }
+        ],
+        "providers": [
+            {
+                "id": "fs.write",
+                "name": "Escrever arquivo"
+            }
+        ],
+        "panels": [
+            {
+                "id": "fs.write",
+                "name": "Escrever arquivo",
+                "icon": "mdiFile"
+            }
+        ],
+        "tools": [
+            {
+                "id": "fs.write",
+                "name": "Escrever arquivo",
+                "icon": "mdiFile"
+            }
+        ],
+        "views": {
+            "properties": [
+                {
+                    "id": "fs.write",
+                    "name": "Escrever arquivo",
+                    "icon": "mdiFile"
+                }
+            ]
+        }
+    }
+}
