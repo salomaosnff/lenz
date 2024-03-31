@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import AppTabContent from '@/components/AppTabContent.vue';
+import AppPanel from '@/components/AppPanel.vue';
 import AppTabs from '@/components/AppTabs.vue';
 import CommandPalete from '@/components/CommandPalete.vue';
 import EditorToolbar from '@/components/EditorToolbar.vue';
 import { useInternal } from '@/composables/lenz';
 import type { Window as NwWindow } from 'nw.gui'
-import type { Disposable } from 'lenz/types';
 import { nextTick } from 'vue';
 import type { ExtensionItem } from 'lenz/internal';
 
@@ -56,9 +55,9 @@ nw.Window.open('splash.html', {
     <EditorToolbar />
     <AppTabs />
 
-    <AppTabContent tab-id="main" class="app-pattern" />
+    <AppPanel panel-id="main" class="app-pattern" />
 
-    <AppTabContent tab-id="default" class="bg--background" />
+    <AppPanel panel-id="properties" class="bg--background" />
     <CommandPalete class="theme-vars--dark" />
   </div>
 </template>

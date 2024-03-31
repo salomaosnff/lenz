@@ -1,4 +1,4 @@
-const lenz = require('lenz/api');
+const lenz = require('lenz');
 
 function activate({ subscriptions }){
     subscriptions.add(

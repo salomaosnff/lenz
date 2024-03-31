@@ -1,23 +1,17 @@
 <script setup lang="ts">
-import { useViewStore } from '@/store/views';
 import AppView from './AppView.vue';
 import { computed } from 'vue';
+import { useViewStore } from '../store/views';
 
 const props = withDefaults(
   defineProps<{
-    tabId: string;
+    panelId: string;
   }>(),
-  { tabId: 'default' },
+  { panelId: 'default' },
 );
 
 const viewStore = useViewStore();
-const views = computed(() => {
-  if (props.tabId === 'default') {
-    return viewStore.views.filter((view) => view.meta.tab === 'default' || !view.meta.tab);
-  }
-
-  return viewStore.views.filter((view) => view.meta.tab === props.tabId);
-});
+const views = computed<any[]>(() => viewStore.getPanel(props.panelId)?.views);
 </script>
 <template>
   <div class="flex flex-col">

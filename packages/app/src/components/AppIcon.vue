@@ -7,12 +7,6 @@ const props = defineProps<{
     icon: IconMeta
 }>();
 
-function toPascalCase(str: string) {
-  return str
-    .replace(/(\w)(\w*)/g, (_, g1, g2) => g1.toUpperCase() + g2.toLowerCase())
-    .replace(/[^a-zA-Z0-9]/g, '');
-}
-
 const path = computed(() => {
   const { icon } = props;
 

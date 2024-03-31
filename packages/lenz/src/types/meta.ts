@@ -107,7 +107,7 @@ export interface PanelMeta {
      * @example "Home"
      * @example { "type": "svg", "path": "M0 0h24v24H0z" }
      */
-    icon: IconMeta
+    icon?: IconMeta
 }
 
 export interface ToolMeta {

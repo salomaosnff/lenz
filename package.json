@@ -1,6 +1,7 @@
 {
   "name": "editor",
   "version": "1.0.0",
+  "packageManager": "pnpm@8.15.5",
   "description": "",
   "keywords": [],
   "license": "ISC",
@@ -11,7 +12,7 @@
   "chromium-args": "--mixed-context --load-extension='./node_modules/nw-vue-devtools-5/extension'",
   "homepage": "https://example.com",
   "scripts": {
-    "build:core": "pnpm --filter @editor/core run build",
+    "build:core": "pnpm --filter lenz run build",
     "build:app": "pnpm --filter app run build",
     "build": "node builder/index.mjs"
   },

@@ -42,7 +42,7 @@ export const useViewStore = defineStore('views', () => {
         console.warn('panelMap is readonly');
       },
     };
-  })
+  });
 
   const views = computed(() => Array.from(viewMap.value.values()));
 
@@ -62,5 +62,6 @@ export const useViewStore = defineStore('views', () => {
     views,
     panelMap,
     toggleView: (viewId: string) => lenz.views.toggle(viewId),
+    getPanel: (panelId: string) => lenz.views.getPanel(panelId)
   };
 });

@@ -54,7 +54,10 @@ export class ViewHost extends EventEmitter<{
     hide: [view: ViewHostItem]
 }> {
     #viewMap = new Map<string, ViewHostItem>()
-    #panelMap = new Map<string, PanelMeta>()
+    #panelMap = new Map<string, PanelMeta>([
+        { id: 'main', name: 'Main' },
+        { id: 'properties', name: 'Propriedades' }
+    ].map(p => [p.id, p]))
 
     /**
      * Mapa de visões registradas
