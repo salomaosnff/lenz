@@ -42,13 +42,30 @@ export function showOpenFileDialog(options: OpenFileDialogOptions = {}) {
 interface SaveFileDialogOptions {
   suggest?: string
   accept?: string
+  title?: string
 }
 
-export function showSaveFileDialog(options: SaveFileDialogOptions = {}) {
+interface SaveFolderDialogOptions {
+  suggest?: string
+  folder: true
+  title?: string
+}
+
+type SaveDialogOptions = SaveFileDialogOptions | SaveFolderDialogOptions
+
+function isFolderDialog(options: SaveDialogOptions): options is SaveFolderDialogOptions {
+  return 'folder' in options && options.folder === true;
+}
+
+export function showSaveDialog(options: SaveDialogOptions = {}) {
   return createFileInput(input => {
-    if (options.accept) {
+    input.nwsaveas = options.suggest;
+    input.nwdirectorydesc = options.title;
+    
+    if (isFolderDialog(options)) {
+      input.nwdirectory = true;
+    } else {
       input.accept = options.accept;
-      input.nwsaveas = options.suggest;
     }
   })
 }

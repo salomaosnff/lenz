@@ -1,5 +1,7 @@
 const { NW_URL = "package.nw/app/dist/index.html" } = process.env;
 
+process.chdir(nw.App.getStartPath());
+
 nw.Window.open(
   NW_URL,
   {
@@ -13,3 +15,5 @@ nw.Window.open(
     win.maximize();
   }
 );
+
+globalThis.LENZ_PATH = require.resolve("lenz/api");
