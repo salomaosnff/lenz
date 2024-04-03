@@ -103,6 +103,10 @@ Uma contribuição é um recurso ou personalização que uma extensão adiciona 
 
 Todas as contribuições de uma extensão devem ser declaradas no arquivo de manifesto no campo `contributes` para que o editor possa carregar e exibir as contribuições da extensão.
 
+Veja na figura abaixo o nome das partes do editor para ter uma ideia de onde as contribuições podem ser feitas:
+
+![Editor](./editor.png)
+
 ### Script de Inicialização
 
 Um script de inicialização é um arquivo JavaScript que é executado quando a extensão é carregada pelo editor. O script de inicialização é responsável por registrar os comandos, ferramentas, visualizações, atalhos de teclado e outras contribuições que a extensão faz ao editor. O script de inicialização é especificado no arquivo de manifesto no campo `main`.
