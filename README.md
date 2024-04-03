@@ -63,7 +63,7 @@ O manifesto de uma extensão é um arquivo JSON que contém informações sobre 
 
 Adicionando um manifesto à extensão:
 
-```json
+```json5
 {
     "id": "sua-extensao",
     "name": "Sua Extensão",
@@ -143,7 +143,7 @@ Um comando pode ser executado por meio de um atalho de teclado, um menu, ferrame
 
 Adicionando um novo comando à extensão:
 
-```json
+```json5
 // manifest.json
 {
     // ...
@@ -206,7 +206,7 @@ Uma ferramenta pode ser ativada por meio de um atalho de teclado, um menu, um co
 
 Adicionando uma nova ferramenta ao editor:
 
-```json
+```json5
 // manifest.json
 {
     // ...
@@ -266,7 +266,7 @@ Uma visão pode ser exibida por meio de um atalho de teclado, um menu, um comand
 
 Adicionando uma nova visão ao editor:
 
-```json
+```json5
 // manifest.json
 {
     // ...
@@ -329,7 +329,7 @@ Um atalho de teclado é um tipo de contribuição que representa uma combinaçã
 
 Adicionando um novo atalho de teclado ao editor:
 
-```json
+```json5
 // manifest.json
 {
     // ...
@@ -369,7 +369,7 @@ Um menu é um tipo de contribuição que representa um menu de opções que pode
 
 Adicionando um novo menu ao editor:
 
-```json
+```json5
 // manifest.json
 {
     // ...
@@ -439,7 +439,7 @@ A internacionalização é um tipo de contribuição que permite que uma extens�
 
 Adicionando arquivos de tradução à extensão:
 
-```json
+```json5
 // manifest.json
 {
     // ...
