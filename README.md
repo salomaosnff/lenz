@@ -1,7 +1,5 @@
 ## Visão Geral de Extensões do Editor
 
-### Visão Geral
-
 A API de extensões do editor é composta por um conjunto de interfaces e classes que permitem que você adicione novos recursos ao editor e personalize-o para atender às suas necessidades. Você pode usar a API de extensões para adicionar novos comandos, menus, barras de ferramentas, atalhos de teclado e muito mais.
 
 ### Estrutura de Arquivos de uma Extensão
