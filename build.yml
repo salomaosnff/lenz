@@ -1,9 +1,6 @@
 outDir: out
 
 manifest:
-  name: lenz-editor
-  version: 0.0.0
-  description: Editor
   main: package.nw/app/nw/index.js
   chromium-args: --mixed-context --disable-web-security
   domain: lenz
@@ -34,10 +31,9 @@ platforms:
     launchers:
       - name: Lenz Editor
         exec: lenz
-        icon: /usr/share/lenz/icon.png
+        icon: lenz
         categories:
           - Development
-          - Utility
     bin:
       lenz: "/usr/share/lenz/nw"
 
@@ -48,6 +44,9 @@ platforms:
         #   compression: none
         #   compressionLevel: 0
         #   compressionStrategy: none
+      appImage:
+        run: ./usr/share/lenz/nw
+        icon: icon.png
 
 sources:
   - from: packages/app

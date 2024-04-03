@@ -5,6 +5,7 @@ import { buildDebPackage } from "../targets/deb.mjs";
 import { execHook } from "../hooks.mjs";
 import { join } from "path";
 import { tmpdir } from "os";
+import { buildAppImage } from "../targets/app-image.mjs";
 
 /**
  * Constrói o pacote para a plataforma linux.
@@ -67,6 +68,20 @@ export async function build(files) {
       });
 
       execHook("post-build-linux-deb");
+    }
+
+    if (target.appImage) {
+      execHook("pre-build-linux-app-image");
+
+      const appImageDir = join(config.outDir, "linux", "app-image");
+
+      await buildAppImage({
+        plainDir: tmpDir,
+        dest: appImageDir,
+        appRun: target.appImage.run,
+      });
+
+      execHook("post-build-linux-app-image");
     }
 
     console.log(`Removendo arquivos temporários...`);

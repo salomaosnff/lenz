@@ -264,6 +264,7 @@ export class ExtensionHost extends EventEmitter<{
         await mkdir(USER_EXTENSIONS_DIR, { recursive: true })
 
         const extensions = await this.searchExtensions()
+
         const extensionMap = new Map(extensions.map(extension => [extension.meta.id, extension]))
 
         const dfs = async (extension: ExtensionItem, visited: Set<string> = new Set()) => {

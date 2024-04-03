@@ -120,7 +120,12 @@ function normalize(config) {
       flavor: "normal",
       ...nw,
     },
-    manifest,
+    manifest: {
+      name: app.id,
+      version: app.version,
+      description: app.description,
+      ...manifest,
+    },
     hooks,
     platforms: {
       linux: normalizeLinuxPlatform(app, platforms.linux),

@@ -25,7 +25,7 @@
  */
 
 import { cp, mkdir, mkdtemp, rm, writeFile } from "fs/promises";
-import { join, relative, resolve } from "path";
+import { join, relative } from "path";
 import { launcherFile } from "../linux/launcher.mjs";
 import { spawnSync } from "child_process";
 import { tmpdir } from "os";
@@ -50,7 +50,6 @@ export function controlFile(options) {
 
 /**
  * Cria a estrutura de pastas e arquivos para um pacote deb.
- * @param {Object} files - Arquivos a serem adicionados ao pacote.
  * @param {DebPackageOptions} options - Opções do pacote.
  */
 export async function buildDebPackage(options) {
@@ -64,6 +63,7 @@ export async function buildDebPackage(options) {
   const binFolder = join(tmpDir, "usr", "bin");
   const applicationsFolder = join(tmpDir, "usr", "share", "applications");
   const resourcesFolder = join(tmpDir, "usr", "share", packageName);
+  const iconsFolder = join(tmpDir, "usr", "share", "icons", "hicolor", "256x256", "apps");
 
   const debFile = join(options.dest, `${packageName}-${version}-${arch}-linux.deb`);
 
@@ -75,6 +75,7 @@ export async function buildDebPackage(options) {
     mkdir(resourcesFolder, {
       recursive: true,
     }),
+    mkdir(iconsFolder, { recursive: true }),
   ]);
 
   const control = controlFile({
@@ -90,6 +91,8 @@ export async function buildDebPackage(options) {
 
   console.log("Copiando arquivos...");
   await cp(options.plainDir, resourcesFolder, { recursive: true });
+
+  await cp(join(options.plainDir, 'icon.png'), join(iconsFolder, `${config.app.id}.png`));
 
   console.log("Criando links binários...");
   for (const [name, command] of Object.entries(options.bin)) {

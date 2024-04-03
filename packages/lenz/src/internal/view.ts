@@ -1,5 +1,6 @@
 import EventEmitter from "events";
 import { AsyncOrSync, Disposable, PanelMeta, ViewMeta } from "../types";
+import { ExtensionItem, extensions } from ".";
 
 export interface ViewController {
     /** Exibe a visão */
@@ -26,7 +27,7 @@ export interface ViewHostItem {
     meta: ViewMeta
 
     /** Extensão que registrou a view */
-    extensionId: string
+    extension: ExtensionItem
 
     /** Controlador da view */
     controller: ViewController
@@ -82,7 +83,7 @@ export class ViewHost extends EventEmitter<{
     prepare(extensionId: string, panelId: string, meta: ViewMeta): Disposable {
         const item: ViewHostItem = {
             meta,
-            extensionId,
+            extension: extensions.getExtension(extensionId),
             controller: VoidViewController,
             isVisible: false,
             panelId,
