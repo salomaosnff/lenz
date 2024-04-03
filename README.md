@@ -1,6 +1,4 @@
-## API de Extensões do Editor
-
-Este documento descreve a API de extensões do editor, que permite que você adicione novos recursos ao editor e personalize-o para atender às suas necessidades.
+## Visão Geral de Extensões do Editor
 
 ### Visão Geral
 
