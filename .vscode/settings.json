@@ -1,0 +1,19 @@
+{
+    "prettier.enable": false,
+    "eslint.enable": true,
+    "eslint.format.enable": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "[vue]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "explicit",
+        "source.fixAll": "explicit"
+    },
+    "cSpell.language": "pt-BR,pt,en-US,en",
+    "files.autoSave": "onFocusChange"
+}

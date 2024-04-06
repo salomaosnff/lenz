@@ -1,6 +1,6 @@
 import EventEmitter from "events";
-import { AsyncOrSync, Disposable, PanelMeta, ViewMeta } from "../types";
 import { ExtensionItem, extensions } from ".";
+import { Disposable, PanelMeta, ViewMeta } from "../types";
 
 export interface ViewController {
     /** Exibe a visão */
@@ -56,8 +56,13 @@ export class ViewHost extends EventEmitter<{
 }> {
     #viewMap = new Map<string, ViewHostItem>()
     #panelMap = new Map<string, PanelMeta>([
-        { id: 'main', name: 'Main' },
-        { id: 'properties', name: 'Propriedades' }
+        { id: 'main', name: 'Main', group: 'main' },
+        {
+            id: 'properties',
+            name: 'Propriedades',
+            icon: 'Tune',
+            group: 'right'
+        } as PanelMeta
     ].map(p => [p.id, p]))
 
     /**
@@ -174,6 +179,7 @@ export class ViewHost extends EventEmitter<{
 
         this.emit("show", item)
         this.emit("updateVisibility", item, true)
+        this.emit("update", item)
     }
 
     /**
@@ -193,6 +199,7 @@ export class ViewHost extends EventEmitter<{
 
         this.emit("hide", item)
         this.emit("updateVisibility", item, false)
+        this.emit("update", item)
     }
 
     /**
@@ -212,6 +219,8 @@ export class ViewHost extends EventEmitter<{
         const item = this.getView(viewId)
 
         item.controller.create?.(element)
+
+        this.emit("update", item)
     }
 
     /**

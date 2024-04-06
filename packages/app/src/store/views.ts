@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import { useInternal } from '@/composables/lenz';
+import type { PanelMeta } from 'lenz';
 import { defineStore } from 'pinia';
 import { computed, customRef } from 'vue';
 
@@ -44,7 +45,14 @@ export const useViewStore = defineStore('views', () => {
     };
   });
 
-  const views = computed(() => Array.from(viewMap.value.values()));
+  const panelGroups = computed(() => Array.from(panelMap.value.values()).reduce((groups, panel) => {
+    const group = panel.group ?? 'right';
+
+    groups[group] ??= [];
+    groups[group].push(panel);
+
+    return groups;
+  }, {} as Record<string, PanelMeta[]>));
 
   function setViewRef(id: string, element: HTMLElement | null) {
     const item = lenz.views.getView(id);
@@ -59,9 +67,10 @@ export const useViewStore = defineStore('views', () => {
 
   return {
     setViewRef,
-    views,
+    panelGroups,
+    viewMap,
     panelMap,
     toggleView: (viewId: string) => lenz.views.toggle(viewId),
-    getPanel: (panelId: string) => lenz.views.getPanel(panelId)
+    getPanel: (panelId: string) => lenz.views.getPanel(panelId),
   };
 });

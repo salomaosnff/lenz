@@ -12,7 +12,7 @@
     "*://*"
   ],
   "domain": "localhost",
-  "chromium-args": "--mixed-context --load-extension='./node_modules/nw-vue-devtools-5/extension'",
+  "chromium-args": "--mixed-context --no-sandbox",
   "homepage": "https://example.com",
   "scripts": {
     "dev": "concurrently \"pnpm:dev:nw\" \"pnpm:dev:vite\"",

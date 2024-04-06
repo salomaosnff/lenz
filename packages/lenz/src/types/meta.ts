@@ -108,6 +108,13 @@ export interface PanelMeta {
      * @example { "type": "svg", "path": "M0 0h24v24H0z" }
      */
     icon?: IconMeta
+
+    /**
+     * Grupo do painéis onde o painel será mostrado
+     * @example "right"
+     * @default "right"
+     */
+    group?: string
 }
 
 export interface ToolMeta {
@@ -182,7 +189,7 @@ export interface ExtensionMeta {
     /**
      * Identificador único da extensão
      * Deve seguir o padrão `publisher.name`
-     * Somento letras minúsculas e pontos e hífens são permitidos.
+     * Somente letras minúsculas e pontos e hifens são permitidos.
      * @example "john.example"
      * @example "bob.cool-extension"
      */

@@ -1,24 +1,21 @@
 <script setup lang="ts">
-import AppView from './AppView.vue';
 import { computed } from 'vue';
 import { useViewStore } from '../store/views';
+import AppView from './AppView.vue';
 
-const props = withDefaults(
-  defineProps<{
-    panelId: string;
-  }>(),
-  { panelId: 'default' },
-);
+const props = defineProps<{
+  panelId: string;
+}>();
 
 const viewStore = useViewStore();
-const views = computed<any[]>(() => viewStore.getPanel(props.panelId)?.views);
+const views = computed(() => Array.from(viewStore.viewMap.values()).filter(v => v.panelId === props.panelId));
 </script>
 <template>
   <div class="flex flex-col">
     <AppView
       v-for="view in views"
       :key="view.meta.id"
-      :view="view"
+      :view-id="view.meta.id"
     />
   </div>
 </template>
