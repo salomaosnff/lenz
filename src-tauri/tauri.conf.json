@@ -1,0 +1,63 @@
+{
+  "productName": "Lenz",
+  "version": "0.0.0",
+  "identifier": "lenz.sallon.dev",
+  "build": {
+    "beforeDevCommand": "pnpm vite:dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm vite:build",
+    "frontendDist": "../packages/app/dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Lenz",
+        "width": 1024,
+        "height": 768,
+        "maximized": true,
+        "visible": false
+      },
+      {
+        "label": "splash",
+        "title": "Lenz",
+        "width": 480,
+        "height": 240,
+        "url": "splash.html",
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "visible": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["deb", "rpm"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "linux": {
+      "deb": {
+        "files": {
+          "/usr/share/lenz/extensions": "../extensions"
+        }
+      },
+      "rpm": {
+        "files": {
+          "/usr/share/lenz/extensions": "../extensions"
+        }
+      }
+    }
+  }
+}

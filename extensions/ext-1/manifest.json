@@ -1,0 +1,79 @@
+{
+  "id": "sample",
+  "name": "Extensão Nativa",
+  "main": "index.js",
+  "contributes": {
+    "commands": [
+      {
+        "id": "salomao.hello.say",
+        "title": "Exibir mensagem de olá, mundo",
+        "description": "Exibe a mensagem \"Hello World\"",
+        "icon": {
+          "type": "svg",
+          "path": "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+        }
+      }
+    ],
+    "views": {
+      "properties": [
+        {
+          "id": "salomao.view.hello",
+          "name": "Teste de visão"
+        }
+      ]
+    },
+    "tools": [
+      {
+        "id": "tool.select",
+        "name": "Seleção",
+        "icon": "CursorDefaultOutline"
+      },
+      {
+        "id": "tool.insert",
+        "name": "Inserir Elemento",
+        "icon": "Plus"
+      },
+      {
+        "id": "tool.div",
+        "name": "Inserir divisão",
+        "icon": "RectangleOutline",
+        "parent": "tool.insert"
+      },
+      {
+        "id": "tool.text",
+        "name": "Editar texto",
+        "icon": "FormatText"
+      },
+      {
+        "id": "tool.image",
+        "name": "Inserir imagem",
+        "icon": "Image",
+        "parent": "tool.insert"
+      },
+      {
+        "id": "tool.video",
+        "name": "Inserir vídeo",
+        "icon": "Video",
+        "parent": "tool.insert"
+      },
+      {
+        "id": "tool.audio",
+        "name": "Inserir áudio",
+        "icon": "Music",
+        "parent": "tool.insert"
+      },
+      {
+        "id": "tool.link",
+        "name": "Inserir link",
+        "icon": "Link",
+        "parent": "tool.insert"
+      },
+      {
+        "id": "tool.table",
+        "name": "Inserir tabela",
+        "icon": "Table",
+        "parent": "tool.insert"
+      }
+    ]
+  }
+}

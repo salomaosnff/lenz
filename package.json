@@ -1,0 +1,17 @@
+{
+  "name": "tauri-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "vite:dev": "pnpm --filter @lenz/app run dev",
+    "vite:build": "pnpm --filter @lenz/app run build",
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": ">=2.0.0-beta.0",
+    "typescript": "^5.0.2",
+    "unocss": "^0.59.4"
+  }
+}

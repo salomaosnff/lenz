@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            background: #000;
+            color: #fff;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body {
+            padding: 1rem;
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .task {
+            font-size: 0.809rem;
+            vertical-align: middle;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-weight: bold;
+        }
+
+        .task>* {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .task-separator {
+            margin: 0 .25rem;
+        }
+
+        .task>*:last-child {
+            opacity: 50%;
+            font-weight: normal;
+        }
+
+        .logo {
+            display: block;
+            border-radius: 0;
+        }
+
+        .progress {
+            width: 100%;
+            height: 0.25rem;
+            background: #333;
+            margin: 1rem auto;
+            background: linear-gradient(to right, magenta, cyan 10%, yellow, red, magenta 90%);
+            background-size: 200% 100%;
+            animation: progress 5s linear infinite;
+            background-position: 0 0;
+            border-radius: 2px;
+        }
+
+        @keyframes progress {
+            to {
+                background-position: -400% 0;
+            }
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.25);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <img src="icon.png" width="118" class="logo">
+    <div class="flex-1 overflow-hidden">
+        <h1>Lenz</h1>
+        <div class="progress"></div>
+        <p id="current" class="w-full break-words">
+        </p>
+        <div class="opacity-50 text-3 absolute bottom-4 left-4">
+            <p>Versão 0.0.0</p>
+            <p>Desevolvido no IFCE por <a class="text-white" href="https://sallon.dev" target="_blank">Salomão Neto</a> sob a licença MIT</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import 'uno.css'
+        import { listen } from '@tauri-apps/api/event'
+        const current = document.getElementById('current');
+
+        function buildTask(tasks) {
+            const el = document.createElement('span');
+            const taskSeparator = document.createElement('span');
+
+            taskSeparator.innerHTML = '&#9656;';
+            el.className = 'task';
+            taskSeparator.className = 'task-separator';
+
+            for (let i = 0; i < tasks.length; i++) {
+                const task = tasks[i];
+                const taskName = document.createElement('span');
+
+                taskName.innerText = task;
+
+                if (i < tasks.length - 1) {
+                    taskName.appendChild(taskSeparator.cloneNode(true));
+                }
+
+                el.appendChild(taskName);
+            }
+
+            return el
+        }
+
+        listen('update', (event) => {
+            current.innerHTML = buildTask(event.payload.tasks).outerHTML;
+        });
+    </script>
+</body>
+
+</html>

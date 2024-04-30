@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "lib": ["esnext", "dom"],
+        "declaration": true,
+        "declarationDir": "./types",
+        "outDir": "./dist",
+        "skipLibCheck": true
+    },
+    "buildOptions": {
+        "incremental": true,
+    },
+    "include": ["src/"],
+    "exclude": ["node_modules", "dist"]
+}
