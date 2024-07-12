@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Tool } from '@/store/toolbar';
 import { useToolbarStore } from '@/store/toolbar';
 import { computed, ref } from 'vue';
 import AppIcon from './AppIcon.vue';
+import { ToolbarItem } from 'lenz/types';
 
 const toolbarStore = useToolbarStore();
-const hoveredItem = ref<Tool>();
+const hoveredItem = ref<ToolbarItem>();
 const mainTools = computed(() => toolbarStore.tools.filter(tool => !tool.parentId));
 const children = computed(() => hoveredItem.value && toolbarStore.tools.filter(tool => tool.parentId === hoveredItem.value?.id));
 const activeTool = computed(() => toolbarStore.tools.find(tool => tool.id === toolbarStore.activeTool));

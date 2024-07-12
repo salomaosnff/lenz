@@ -26,52 +26,52 @@
       {
         "id": "tool.select",
         "name": "Seleção",
-        "icon": "CursorDefaultOutline"
+        "icon": "mdiCursorDefaultOutline"
       },
       {
         "id": "tool.insert",
         "name": "Inserir Elemento",
-        "icon": "Plus"
+        "icon": "mdiPlus"
       },
       {
         "id": "tool.div",
         "name": "Inserir divisão",
-        "icon": "RectangleOutline",
+        "icon": "mdiRectangleOutline",
         "parent": "tool.insert"
       },
       {
         "id": "tool.text",
         "name": "Editar texto",
-        "icon": "FormatText"
+        "icon": "mdiFormatText"
       },
       {
         "id": "tool.image",
         "name": "Inserir imagem",
-        "icon": "Image",
+        "icon": "mdiImage",
         "parent": "tool.insert"
       },
       {
         "id": "tool.video",
         "name": "Inserir vídeo",
-        "icon": "Video",
+        "icon": "mdiVideo",
         "parent": "tool.insert"
       },
       {
         "id": "tool.audio",
         "name": "Inserir áudio",
-        "icon": "Music",
+        "icon": "mdiMusic",
         "parent": "tool.insert"
       },
       {
         "id": "tool.link",
         "name": "Inserir link",
-        "icon": "Link",
+        "icon": "mdiLink",
         "parent": "tool.insert"
       },
       {
         "id": "tool.table",
         "name": "Inserir tabela",
-        "icon": "Table",
+        "icon": "mdiTable",
         "parent": "tool.insert"
       }
     ]

@@ -1,11 +1,13 @@
 {
-    "name": "@lenz/api",
+    "name": "lenz",
     "type": "module",
-    "main": "dist/api.js",
+    "main": "dist/lenz.js",
+    "types": "types",
     "scripts": {
         "build": "vite build"
     },
     "dependencies": {
+        "@mdi/js": "^7.4.47",
         "@tauri-apps/api": "2.0.0-beta.8",
         "@tauri-apps/plugin-dialog": "2.0.0-beta.2"
     },

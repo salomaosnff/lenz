@@ -1,32 +1,28 @@
-import type { ExtensionMetadata, ToolbarItem, Disposable } from '@editor/core';
+import * as lenz from 'lenz';
 import { defineStore } from 'pinia';
 import { computed, onBeforeUnmount, reactive, ref } from 'vue';
 
-export interface Tool extends ToolbarItem {
-  extension: ExtensionMetadata
-}
-
 export const useToolbarStore = defineStore('Toolbar', () => {
   const activeTool = ref<string>();
-  const toolsMap = reactive(new Map()) as Map<string, Tool>;
+  const toolsMap = reactive(new Map()) as Map<string, lenz.ToolbarItem>;
   const tools = computed(() => Array.from(toolsMap.values()).sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0)));
-  const disposers = new Set<Disposable>();
+  const disposers = new Set<lenz.Disposable>();
 
   disposers.add(
-    core.EventHost.on('@app/tools:prepare', (item) => {
+    lenz.events.on('tools:prepare', (item) => {
+      console.log('prepare', item);
       toolsMap.set(item.id, item);
     }),
   );
 
   disposers.add(
-    core.EventHost.on('@app/tools:remove', (id) => {
+    lenz.events.on('tools:remove', (id) => {
       toolsMap.delete(id);
     }),
   );
 
   disposers.add(
-    core.EventHost.on('@app/tools:activate', (id) => {
-      console.log('activate', id);
+    lenz.events.on('tools:activate', (id) => {
       activeTool.value = id;
     }),
   );
@@ -40,6 +36,6 @@ export const useToolbarStore = defineStore('Toolbar', () => {
   return {
     tools,
     activeTool,
-    activate: core.ToolHost.activate,
+    activate: (toolId: string) => lenz.tools.activate(toolId),
   };
 });

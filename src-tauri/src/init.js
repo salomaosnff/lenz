@@ -1,6 +1,6 @@
 const importmap = {
     imports: {
-        'lenz': `${window.location.origin}/lenz/api/dist/api.js`
+        'lenz': `${window.location.origin}/lenz/api/dist/lenz.js`
     }
 }
 

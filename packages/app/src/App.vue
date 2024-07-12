@@ -7,15 +7,15 @@ import EditorToolbar from './components/EditorToolbar.vue';
 </script>
 
 <template>
-  <div class="flex w-full h-full overflow-hidden" :class="$style['app']">
-    <!-- <EditorToolbar />
-    <AppTabs />
+  <div class="w-full h-full overflow-hidden" :class="$style['app']">
+    <EditorToolbar />
+    <!-- <AppTabs />
 
     <AppTabContent tab-id="main" class="app-pattern" />
 
     <AppTabContent tab-id="default" class="bg--background" />
-    <CommandPalete class="theme-vars--dark" />
-    -->
+    <CommandPalete class="theme-vars--dark" /> -->
+   
   </div>
 </template>
 

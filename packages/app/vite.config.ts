@@ -1,33 +1,35 @@
 import { defineConfig } from "vite";
-import Uno from 'unocss/vite'
-import {viteStaticCopy as Copy} from 'vite-plugin-static-copy'
-import Vue from '@vitejs/plugin-vue'
+import Uno from "unocss/vite";
+import { viteStaticCopy as Copy } from "vite-plugin-static-copy";
+import Vue from "@vitejs/plugin-vue";
+import Externalize from 'vite-plugin-externalize-dependencies'
+
 
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig(async ({ mode }) => ({
   plugins: [
-    Vue(),
-    Uno(),
+    Externalize({
+      externals: ['lenz']
+    }),
     Copy({
       structured: true,
       targets: [
         {
-          src: [
-            '../api/dist',
-            '../api/package.json'
-          ],
-          dest: 'lenz',
+          src: ["../api/dist", "../api/package.json"],
+          dest: "lenz",
           dereference: true,
-          overwrite: true
-        }
-      ]
-    })
+          overwrite: true,
+        },
+      ],
+    }),
+    Vue(),
+    Uno(),
   ],
 
   resolve: {
     alias: {
-      '@': '/src'
-    }
+      "@": "/src",
+    },
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
@@ -47,9 +49,9 @@ export default defineConfig(async () => ({
     rollupOptions: {
       treeshake: false,
       input: {
-        index: './index.html',
-        splash: './splash.html',
+        index: "./index.html",
+        splash: "./splash.html",
       },
-    }
-  }
+    },
+  },
 }));
