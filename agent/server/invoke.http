@@ -1,0 +1,14 @@
+POST http://localhost:5369/echo
+Content-Type: multipart/form-data; boundary=--field
+
+----field
+Content-Disposition: form-data; name="file"; filename="Cargo.toml"
+Content-Type: text/plain
+
+< Cargo.toml
+----field
+Content-Disposition: form-data; name="file"; filename="Cargo.lock"
+Content-Type: text/plain
+
+< Cargo.lock
+----field--

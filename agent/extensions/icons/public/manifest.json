@@ -1,0 +1,8 @@
+{
+    "$schema": "../../../../docs/extension.schema.json",
+    "id": "icons",
+    "name": "Ícones",
+    "description": "Biblioteca de ícones",
+    "version": "1.0.0",
+    "publisher": "Salomão Neto <contato@sallon.dev>"
+}

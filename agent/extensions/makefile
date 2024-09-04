@@ -1,0 +1,1 @@
+# Este makefile deve executar a build de todas as extensões do agente.

@@ -1,0 +1,5 @@
+/agent/target
+/agent/extensions/target
+/dist
+node_modules
+/frontend/packages/app/dist

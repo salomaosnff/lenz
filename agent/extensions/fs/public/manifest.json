@@ -1,0 +1,9 @@
+{
+    "$schema": "../../../../docs/extension.schema.json",
+    "id": "fs",
+    "name": "Sistema de Arquivos",
+    "description": "Api para manipulação de arquivos",
+    "version": "1.0.0",
+    "publisher": "Salomão Neto <contato@sallon.dev>",
+    "dynlib": "dynlib/lenz_extension_fs"
+}

@@ -1,0 +1,282 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Representa uma extensão do editor",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "version",
+    "publisher"
+  ],
+  "definitions": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9_\\-\\.]+$",
+      "description": "Identificador único"
+    },
+    "svg-icon": {
+      "type": "object",
+      "required": [
+        "type",
+        "path"
+      ],
+      "description": "Ícone SVG",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "svg"
+          ],
+          "description": "Tipo do ícone"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Caminho do arquivo SVG"
+        }
+      }
+    },
+    "native-icon": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Ícone nativo do editor"
+    },
+    "icon": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/svg-icon"
+        },
+        {
+          "$ref": "#/definitions/native-icon"
+        }
+      ]
+    }
+  },
+  "properties": {
+    "id": {
+      "$ref": "#/definitions/identifier",
+      "description": "Identificador único da extensão"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Nome amigável da extensão"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Descrição da extensão"
+    },
+    "main": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Caminho do arquivo de script principal da extensão",
+      "default": "main.js"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Versão da extensão no formato semântico",
+      "pattern": "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$"
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Nome do publisher da extensão",
+      "pattern": "^[^<]+(:?<(([^<>()\\[\\]\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))>)?$"
+    },
+    "inject": {
+      "type": "array",
+      "description": "Providers que a extensão depende e que devem ser providos por outras extensões ativas no editor",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "depends": {
+      "type": "array",
+      "description": "Extensões que a extensão depende",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "dynlib": {
+      "type": "string",
+      "description": "Caminho do arquivo de biblioteca dinâmica que a extensão depende. Não é necessário informar a extensão do arquivo e o prefixo 'lib'.",
+      "default": "dynlib/lenz_extension"
+    },
+    "contributes": {
+      "type": "object",
+      "description": "Recursos que a extensão contribui para o editor",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/identifier",
+                "description": "Identificador único do comando"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Título do comando que será mostrado na paleta de comandos"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Descrição do comando que será mostrado na paleta de comandos"
+              },
+              "icon": {
+                "$ref": "#/definitions/icon",
+                "description": "Ícone do comando que será mostrado na paleta de comandos"
+              }
+            }
+          }
+        },
+        "views": {
+          "type": "object",
+          "description": "Views que serão mostradas na barra lateral",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "#/definitions/identifier",
+                  "description": "Identificador único da view"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Nome amigável da view"
+                },
+                "icon": {
+                  "$ref": "#/definitions/icon",
+                  "description": "Ícone da view que será mostrado na barra lateral"
+                }
+              }
+            }
+          }
+        },
+        "panels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "description": "Painel que será mostrado na barra lateral",
+            "required": [
+              "id",
+              "name",
+              "icon"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/identifier",
+                "description": "Identificador único do painel"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Nome amigável do painel"
+              },
+              "icon": {
+                "$ref": "#/definitions/icon",
+                "description": "Ícone do painel que será mostrado na barra lateral"
+              }
+            }
+          }
+        },
+        "tools": {
+          "type": "array",
+          "description": "Ferramentas que serão mostradas na barra de ferramentas",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "icon"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/identifier",
+                "description": "Identificador único da ferramenta"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Nome amigável da ferramenta"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Descrição da ferramenta"
+              },
+              "icon": {
+                "$ref": "#/definitions/icon",
+                "description": "Ícone da ferramenta que será mostrado na barra de ferramentas"
+              },
+              "priority": {
+                "type": "number",
+                "description": "Prioridade da ferramenta na barra de ferramentas",
+                "minimum": 0
+              },
+              "parent": {
+                "type": "string",
+                "description": "Identificador da ferramenta pai"
+              }
+            }
+          }
+        },
+        "providers": {
+          "type": "array",
+          "description": "Provedores de dados que serão usados por outras extensões",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/identifier",
+                "description": "Identificador único do provedor"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Nome amigável do provedor"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Descrição do provedor"
+              }
+            }
+          }
+        },
+        "l10n": {
+          "type": "object",
+          "description": "Traduções da extensão",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Arquivo .yml com as traduções deste idioma"
+          }
+        }
+      }
+    }
+  }
+}
