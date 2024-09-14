@@ -1,15 +1,17 @@
 use std::path::PathBuf;
 
 pub fn install_dir() -> PathBuf {
-    return std::env::var("CARGO_MANIFEST_DIR").map(PathBuf::from)
-        .unwrap_or_else(|_| std::env::current_exe()
-            .expect("Failed to get current executable path")
-            .parent()
-            .expect("Failed to get parent directory of current executable")
-            .parent()
-            .expect("Failed to get parent directory of parent directory of current executable")
-            .to_path_buf()
-        );
+    return std::env::var("CARGO_MANIFEST_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| {
+            std::env::current_exe()
+                .expect("Failed to get current executable path")
+                .parent()
+                .expect("Failed to get parent directory of current executable")
+                .parent()
+                .expect("Failed to get parent directory of parent directory of current executable")
+                .to_path_buf()
+        });
 }
 
 pub fn resources_dir() -> PathBuf {
@@ -35,26 +37,28 @@ pub fn www_dir() -> PathBuf {
 pub fn app_data() -> PathBuf {
     std::env::var("LENZ_APP_DATA")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| {
-            dirs::home_dir()
-                .unwrap_or_else(install_dir)
-                .join(".lenz")
-        })
+        .unwrap_or_else(|_| dirs::home_dir().unwrap_or_else(install_dir).join(".lenz"))
 }
 
 pub fn built_in_extensions() -> PathBuf {
     std::env::var("LENZ_BUILT_IN_EXTENSIONS_PATH")
         .map(PathBuf::from)
         .unwrap_or_else(|_| {
+            #[allow(unused_mut)]
+            let mut dir = install_dir();
+
             #[cfg(debug_assertions)]
             {
-                install_dir().join("../../dist/plain").join("extensions").canonicalize().unwrap()
+                dir = dir.join("../../dist/plain").canonicalize().expect("Failed to get canonical path");
+
+                
+                #[cfg(target_os = "windows")]
+                {
+                    dir = dir.join("lenz-windows-x86-x64")
+                }
             }
 
-            #[cfg(not(debug_assertions))]
-            {
-                install_dir().join("extensions")
-            }
+            return dir.join("extensions")
         })
 }
 

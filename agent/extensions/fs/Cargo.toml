@@ -1,0 +1,13 @@
+[package]
+name = "lenz_extension_fs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+name = "lenz_extension_fs"
+
+[dependencies]
+lenz_core={path = "../../core"}
+bytes = {workspace = true}
+tokio = {workspace = true}

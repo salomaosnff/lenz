@@ -67,19 +67,27 @@ function toggle() {
 </script>
 
 <template>
-  <div v-color="color" class="ui-checkbox inline-flex gap-2 cursor-pointer" tabindex="0" @click="toggle"
+  <div v-color="color"
+  class="ui-checkbox inline-flex gap-2 cursor-pointer items-center" tabindex="0" @click="toggle"
+  :class="{
+    'ui-checkbox--checked': isChecked
+  }"
     @keyup.space="toggle">
-    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-      <rect x="0" y="0" width="32" height="32" :fill="isChecked ? 'var(--current-color)' : 'var(--color-surface)'" />
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="22" height="22" fill="none" rx="5" ry="5" />
 
-      <path fill="none" stroke-width="4" stroke="var(--color-foreground)"
-        :d="isChecked ? 'M7,16 L14,23 L26,7' : 'M14,16 L14,16 L14,16'" />
+      <path
+        fill="none"
+        :stroke-width="isChecked ? 3 : 1"
+        stroke="white"
+        :d="isChecked ? 'M 5 11.5 l 5 5 l 10 -10' : 'M 12 11.5 l 0 0 l 0 0'"
+        linecap="round"
+        linejoin="round"
+      />
     </svg>
 
     <slot />
-
   </div>
-
 </template>
 
 <style lang="scss">
@@ -87,17 +95,28 @@ function toggle() {
   &>svg {
     width: 1.25em;
     height: 1.25em;
-    border: 1px solid var(--color-surface-muted);
 
-    path,
-    rect {
+    & > * {
       transition: all .25s ease;
+    }
+
+    & > rect {
+      stroke: var(--color-muted);
     }
   }
 
   &:focus-visible {
     outline: 2px solid var(--current-color);
     outline-offset: 2px;
+  }
+
+  &--checked {
+    &>svg {
+      & > rect {
+        fill: var(--current-color);
+        stroke: none;
+      }
+    }
   }
 }
 </style>

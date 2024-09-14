@@ -15,6 +15,7 @@ pub struct FormFile {
 pub enum FormValue {
     Text(String),
     File(FormFile),
+    Bytes(Bytes),
 }
 
 impl FormValue {
@@ -28,6 +29,13 @@ impl FormValue {
     pub fn as_file(&self) -> Option<&FormFile> {
         match self {
             FormValue::File(file) => Some(file),
+            _ => None,
+        }
+    }
+
+    pub fn as_bytes(&self) -> Option<&Bytes> {
+        match self {
+            FormValue::Bytes(bytes) => Some(bytes),
             _ => None,
         }
     }
@@ -82,5 +90,14 @@ impl Form {
     pub fn get_all_as<T: std::str::FromStr>(&self, key: &str) -> Option<Vec<T>> {
         self.get_all_text(key)
             .map(|texts| texts.iter().filter_map(|text| text.parse().ok()).collect())
+    }
+
+    pub fn get_bytes(&self, key: &str) -> Option<&Bytes> {
+        self.get_entry(key).and_then(FormValue::as_bytes)
+    }
+
+    pub fn get_all_bytes(&self, key: &str) -> Option<Vec<&Bytes>> {
+        self.get_entry_all(key)
+            .map(|values| values.iter().filter_map(FormValue::as_bytes).collect())
     }
 }

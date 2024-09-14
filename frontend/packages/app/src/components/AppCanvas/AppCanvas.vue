@@ -1,32 +1,16 @@
 <script setup lang="ts">
 import icon_refresh from "lenz:icons/refresh";
-import { CanvasElement } from "./types";
+import { CanvasElement, createElementSelection } from "./types";
 
-const modelValue = defineModel<string>("html");
-const dom = defineModel<Document>();
-const hover = defineModel<CanvasElement>("hover");
-const active = defineModel<CanvasElement>("active");
-const isMobile = defineModel<boolean>("isMobile", {
-  default: false,
-});
+const documentModel = defineModel<Document>();
+const htmlModel = defineModel<string>("html");
+const hoverModel = defineModel<CanvasElement>("hover");
+const activeModel = defineModel<CanvasElement[]>("active");
 
 const loaded = ref(false);
 const iframe = ref<HTMLIFrameElement>();
 
-function createCanvasElement(element: HTMLElement): CanvasElement {
-  const iframeBox = iframe.value?.getBoundingClientRect() ?? new DOMRect();
-  const box = element.getBoundingClientRect();
 
-  return {
-    element,
-    box: new DOMRect(
-      iframeBox.x + box.x,
-      iframeBox.y + box.y,
-      box.width,
-      box.height
-    ),
-  };
-}
 
 const styleEl = document.createElement("style");
 
@@ -36,28 +20,102 @@ styleEl.textContent = `html, body {
   cursor: default !important;
 }`;
 
-watch(modelValue, () => {
-  loaded.value = false;
-  hover.value = undefined;
-  active.value = undefined;
-});
+watch(
+  htmlModel,
+  () => {
+    loaded.value = false;
+  },
+  { immediate: true }
+);
 
-whenever(loaded, () => {
-  dom.value = iframe.value?.contentDocument ?? undefined;
+whenever(
+  loaded,
+  () => {
+    documentModel.value = iframe.value?.contentDocument ?? undefined;
 
-  iframe.value?.contentDocument?.addEventListener("pointermove", (event) => {
-    hover.value = createCanvasElement(event.target as HTMLElement);
-  });
+    if (
+      !documentModel.value?.querySelector("style[data-ignore-on-to-string]")
+    ) {
+      documentModel.value?.head.appendChild(styleEl.cloneNode(true));
+    }
 
-  iframe.value?.contentDocument?.addEventListener("click", (event) => {
-    active.value = createCanvasElement(event.target as HTMLElement);
-  });
+    iframe.value?.contentDocument?.addEventListener("pointermove", (event) => {
+      hoverModel.value = createElementSelection(event.target as HTMLElement, iframe.value);
+    });
 
-  iframe.value?.contentDocument?.head.appendChild(styleEl);
-});
+    iframe.value?.contentDocument?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const selection = activeModel.value ?? [];
+      const element = createElementSelection(event.target as HTMLElement, iframe.value);
+      const isSelected = selection.some((el) =>
+        el.element.isSameNode(element.element)
+      );
+
+      if (event.ctrlKey) {
+        if (isSelected) {
+          activeModel.value = selection.filter(
+            (el) => !el.element.isSameNode(element.element)
+          );
+        } else {
+          activeModel.value = selection.concat(element);
+        }
+      } else if (isSelected) {
+        activeModel.value = [];
+      } else {
+        activeModel.value = [element];
+      }
+    }, {
+      capture: true,
+    });
+
+    // Propagate iframe window events to the parent window
+    const EVENTS = [
+      "click",
+      "pointermove",
+      "pointerleave",
+      "scroll",
+      "keydown",
+      "keyup",
+      "pointerdown",
+    ];
+
+    for (const event of EVENTS) {
+      iframe.value?.contentWindow?.addEventListener(event, (e) => {
+        window.dispatchEvent(new (e as any).constructor(e.type, e));
+      });
+    }
+
+    const currentDocument = iframe.value?.contentDocument as Document;
+
+    if (hoverModel.value) {
+      const element = currentDocument.querySelector(hoverModel.value.selector);
+
+      hoverModel.value = element
+        ? createElementSelection(element as HTMLElement, iframe.value, hoverModel.value.selector)
+        : undefined;
+    }
+
+    if (activeModel.value) {
+      activeModel.value = activeModel.value.reduce((acc, item) => {
+        const element = currentDocument.querySelector(item.selector);
+
+        if (element) {
+          acc.push(createElementSelection(element as HTMLElement, iframe.value, item.selector));
+        }
+
+        return acc;
+      }, [] as CanvasElement[]);
+    }
+  },
+  { flush: "post" }
+);
 
 useResizeObserver(
-  () => [hover.value?.element, active.value?.element],
+  () => [
+    hoverModel.value?.element,
+    ...Array.from(activeModel.value ?? []).map((el) => el.element),
+  ],
   () => updateInspect()
 );
 
@@ -66,12 +124,14 @@ function updateInspect() {
     return;
   }
 
-  if (hover.value) {
-    hover.value = createCanvasElement(hover.value.element);
+  if (hoverModel.value) {
+    hoverModel.value = createElementSelection(hoverModel.value.element, iframe.value);
   }
 
-  if (active.value) {
-    active.value = createCanvasElement(active.value.element);
+  if (activeModel.value) {
+    activeModel.value = Array.from(activeModel.value).map((el) =>
+      createElementSelection(el.element, iframe.value)
+    );
   }
 }
 
@@ -83,13 +143,13 @@ useEventListener(
   iframe,
   "pointerleave",
   () => {
-    hover.value = undefined;
+    hoverModel.value = undefined;
   },
   { capture: true }
 );
 
 function toString() {
-  const copy = dom.value?.cloneNode(true) as Document;
+  const copy = documentModel.value?.cloneNode(true) as Document;
 
   for (const el of copy.querySelectorAll("[data-ignore-on-to-string]")) {
     el.remove();
@@ -105,7 +165,6 @@ defineExpose({
 <template>
   <div
     class="relative rounded-md transition-all duration-1000 shadow-lg"
-    :class="isMobile ? 'w-480px' : 'w-full'"
   >
     <iframe
       ref="iframe"
@@ -113,15 +172,28 @@ defineExpose({
       :class="[
         loaded ? ['visible', 'opacity-100'] : ['invisible', 'opacity-0'],
       ]"
-      .srcdoc="modelValue"
+      .srcdoc="htmlModel"
       frameborder="0"
       @load="loaded = true"
     ></iframe>
 
-    <AppCanvasInspectBox v-if="active" :item="active" active />
     <AppCanvasInspectBox
-      v-if="hover && !(active && active.element.isSameNode(hover.element))"
-      :item="hover"
+      v-for="(item, i) in activeModel"
+      :key="i"
+      :item="item"
+      active
+    />
+    <AppCanvasInspectBox
+      v-if="
+        hoverModel &&
+        !(
+          activeModel &&
+          activeModel.some((el) =>
+            el.element.isSameNode((hoverModel as CanvasElement).element)
+          )
+        )
+      "
+      :item="hoverModel"
     />
 
     <UiIcon

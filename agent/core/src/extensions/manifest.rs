@@ -1,6 +1,6 @@
 use std::{collections::HashSet, path::PathBuf};
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub enum ExtensionIcon {
   Svg(String),
   Native(String),
@@ -16,14 +16,14 @@ pub enum ExtensionPanel {
   Other(String),
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifestSys {
   pub linux: Option<String>,
   pub windows: Option<String>,
   pub macos: Option<String>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifestContributesCommand {
   pub id: String,
   pub title: Option<String>,
@@ -31,7 +31,7 @@ pub struct ExtensionManifestContributesCommand {
   pub icon: Option<ExtensionIcon>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifestContributesView {
   pub id: String,
   pub name: String,
@@ -39,14 +39,14 @@ pub struct ExtensionManifestContributesView {
   pub icon: Option<ExtensionIcon>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifestContributesPanel {
   pub id: String,
   pub name: String,
   pub icon: ExtensionIcon,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifestContributesTool {
   pub id: String,
   pub name: String,
@@ -56,20 +56,20 @@ pub struct ExtensionManifestContributesTool {
   pub parent: Option<String>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifestContributesProvider {
   pub id: String,
   pub name: String,
   pub description: Option<String>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifestContributesL10n {
   pub locale: String,
   pub path: String,
 }
 
-#[derive(Debug, serde::Deserialize, std::default::Default)]
+#[derive(Debug, std::default::Default, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifestContributes {
   pub commands: Vec<ExtensionManifestContributesCommand>,
   pub views: Vec<ExtensionManifestContributesView>,
@@ -83,7 +83,7 @@ fn default_activate_on() -> HashSet<String> {
   HashSet::from_iter(vec![String::from("main")])
 }
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionManifest {
   pub id: String,
   pub name: String,
@@ -102,6 +102,7 @@ pub struct ExtensionManifest {
   pub contributes: ExtensionManifestContributes,
 }
 
+#[derive(Debug)]
 pub enum ExtensionError {
   ManifestFileNotFound,
   FailedToLoadManifestFile(String),

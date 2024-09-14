@@ -1,0 +1,37 @@
+.ui-fade {
+    &-enter-active,
+    &-leave-active {
+        transition: opacity 0.2s ease;
+    }
+
+    &-enter-from,
+    &-leave-to {
+        opacity: 0;
+    }
+}
+
+.ui-slide-x {
+    &-enter-active,
+    &-leave-active {
+        transition: all 0.2s ease;
+    }
+
+    &-enter-from,
+    &-leave-to {
+        transform: translateX(-1rem);
+        opacity: 0;
+    }
+}
+
+.ui-slide-y {
+    &-enter-active,
+    &-leave-active {
+        transition: all 0.2s ease;
+    }
+
+    &-enter-from,
+    &-leave-to {
+        transform: translateY(-1rem);
+        opacity: 0;
+    }
+}

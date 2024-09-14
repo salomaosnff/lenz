@@ -1,10 +1,16 @@
 [workspace]
-members = ["fs/lib"]
+members = ["fs"]
 exclude = ["icons"]
 resolver = "2"
 
 [profile.release]
-lto = true
-opt-level = "z"
-codegen-units = 1
-panic = "abort"
+# lto = true
+# opt-level = "z"
+# codegen-units = 1
+# panic = "abort"
+
+[workspace.dependencies]
+bytes = "1.7.1"
+tokio = { version = "1.40.0" }
+serde={version = "1.0.210",features = ["derive"]}
+serde_json={version = "1.0.128"}

@@ -29,7 +29,7 @@ export default defineConfig({
               tag: 'script',
               injectTo: 'head-prepend',
               attrs: {
-                src: 'http://localhost:5369/importmap.js',
+                src: 'http://localhost:5369/lenz-init.js',
               },
             }
           ]

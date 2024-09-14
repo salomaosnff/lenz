@@ -60,6 +60,15 @@ const props = defineProps({
   full: Boolean,
 
   disabled: Boolean,
+
+  /** Não empilha o menu no overlay stack */
+  noStack: Boolean,
+
+  /** Nome da transição */
+  transition: {
+    type: String,
+    default: 'ui-fade',
+  },
 });
 
 const emit = defineEmits<{
@@ -68,16 +77,14 @@ const emit = defineEmits<{
 
   /** Dispara quando o menu é fechado */
   (name: 'close'): void;
-
-  /** Dispara quando visible é atualizado */
-  (name: 'update:visible', value: boolean): void;
 }>();
+
+const isVisible = defineModel<boolean>();
 
 const activatorEl = ref<HTMLDivElement>();
 const contentEl = ref<HTMLDivElement>();
 const activatorRect = ref(new DOMRect());
 const contentRect = ref(new DOMRect());
-const isVisible = ref(props.visible);
 const overlay = useOverlayStack(close);
 
 const origin = computed(() => {
@@ -176,7 +183,6 @@ function updateRect() {
 
 function setVisible(value: boolean) {
   isVisible.value = value;
-  emit('update:visible', value);
   if (value) {
     emit('open');
   } else {
@@ -287,10 +293,23 @@ useEventListener(document, 'scroll', updateRect, {
   passive: true,
   capture: true,
 });
+
 useEventListener(window, 'resize', updateRect, { passive: true });
-onClickOutside(contentEl, () => props.closeOnClick && overlay.pop(), {
+
+onClickOutside(contentEl, () => {
+  if (!props.closeOnClick) {
+    return;
+  }
+
+  if(props.noStack) {
+    return close();
+  }
+  
+  return overlay.pop()
+}, {
   ignore: [activatorEl],
 });
+
 useResizeObserver([activatorEl, contentEl], updateRect);
 
 watchEffect(() => {
@@ -304,6 +323,9 @@ watchEffect(() => {
 });
 
 watchEffect(() => {
+  if (props.noStack) {
+    return;
+  }
   if (isVisible.value) {
     overlay.push();
   } else {
@@ -343,7 +365,7 @@ provide('overlay_menu', {
     onClick: openOnClick && !disabled ? toggle : () => { },
   }" name="activator" />
   <Teleport :to="teleport">
-    <Transition>
+    <Transition :name="transition">
       <div v-if="isVisible" ref="contentEl" class="ui-menu__content fixed z-999 inline-block"
         :style="[positionStyle, dimensionStyle]" @click="closeOnClickContent && close()">
         <slot v-bind="bind" />
@@ -351,20 +373,3 @@ provide('overlay_menu', {
     </Transition>
   </Teleport>
 </template>
-
-<style lang="scss">
-.ui-menu {
-  &__content {
-
-    &.v-enter-active,
-    &.v-leave-active {
-      transition: opacity 0.2s ease;
-    }
-
-    &.v-enter-from,
-    &.v-leave-to {
-      opacity: 0;
-    }
-  }
-}
-</style>

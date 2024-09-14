@@ -17,7 +17,26 @@ function createRequest(command, args = {}) {
   };
 }
 
-async function parseResponse({
+function isContentTypePlainText(contentType) {
+  return contentType.includes("text/plain");
+}
+
+function isContentTypeJson(contentType) {
+  return contentType.includes("application/json");
+}
+
+function isContentTypeBinary(contentType) {
+  return contentType.includes("application/octet-stream");
+}
+
+export class InvokeError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "InvokeError";
+  }
+}
+
+function parseResponse({
   resultType = "void",
   contentType,
   text = () => "",
@@ -28,19 +47,25 @@ async function parseResponse({
     return;
   }
 
-  if (resultType === "text" && contentType === "text/plain") {
+  if (resultType === "text" && isContentTypePlainText(contentType)) {
     return text();
   }
 
-  if (resultType === "error" && contentType === "text/plain") {
-    throw new Error(await text());
+  if (resultType === "error" && isContentTypePlainText(contentType)) {
+    const result = text();
+
+    if (result instanceof Promise) {
+      return result.then((text) => Promise.reject(new InvokeError(text)));
+    }
+
+    throw new InvokeError(result);
   }
 
-  if (resultType === "binary" && contentType === "application/octet-stream") {
+  if (resultType === "binary" && isContentTypeBinary(contentType)) {
     return binary();
   }
 
-  if (resultType === "json" && contentType === "application/json") {
+  if (resultType === "json" && isContentTypeJson(contentType)) {
     return json();
   }
 
@@ -86,6 +111,6 @@ export function invokeSync(command, args = {}) {
     resultType: xhr.getResponseHeader("X-Invoke-Result"),
     text: () => xhr.responseText,
     json: () => JSON.parse(xhr.responseText),
-    binary: () => xhr.response,
+    binary: () => xhr.response instanceof ArrayBuffer ? xhr.response : new TextEncoder().encode(xhr.responseText),
   });
 }

@@ -1,7 +1,10 @@
 use std::{collections::HashMap, future::Future, pin::Pin, sync::Arc};
 
 use hyper::body::Incoming;
-use lenz_core::invoke::{form::{Form, FormFile, FormValue}, InvokeHandler, InvokeRequest, InvokeResult};
+use lenz_core::invoke::{
+    form::{Form, FormFile, FormValue},
+    InvokeHandler, InvokeRequest, InvokeResult,
+};
 
 use futures_util::StreamExt;
 use http::{header::CONTENT_TYPE, Request};
@@ -28,23 +31,29 @@ pub async fn request_to_form(request: Request<Incoming>) -> Option<Form> {
     while let Some(field) = multipart.next_field().await.ok()? {
         let name = field
             .name()
+            .clone()
             .map(|name| name.to_string())
             .unwrap_or_default();
 
         if let Some(filename) = field.file_name().map(|name| name.to_string()) {
-            let content_type = field
-                .content_type()
-                .cloned()
-                .unwrap_or(APPLICATION_OCTET_STREAM);
-            let data = field.bytes().await.unwrap_or_default();
+            
+            if filename == "blob" {
+                form.append(name, FormValue::Bytes(field.bytes().await.unwrap_or_default()));
+            } else {
+                let content_type = field
+                    .content_type()
+                    .cloned()
+                    .unwrap_or(APPLICATION_OCTET_STREAM);
+                let data = field.bytes().await.unwrap_or_default();
 
-            let file = FormFile {
-                filename,
-                content_type,
-                data,
-            };
+                let file = FormFile {
+                    filename,
+                    content_type,
+                    data,
+                };
 
-            form.append(name, FormValue::File(file));
+                form.append(name, FormValue::File(file));
+            }
         } else {
             let text = field.text().await.unwrap_or_default();
             form.append(name, FormValue::Text(text));
@@ -55,7 +64,7 @@ pub async fn request_to_form(request: Request<Incoming>) -> Option<Form> {
 }
 
 pub struct InvokeHandlers {
-    handlers: HashMap<String, Arc<InvokeHandler>>,
+    pub handlers: HashMap<String, Arc<InvokeHandler>>,
 }
 
 impl InvokeHandlers {
@@ -77,6 +86,10 @@ impl InvokeHandlers {
 
     pub fn remove(&mut self, command: &str) {
         self.handlers.remove(command);
+    }
+
+    pub fn extend(&mut self, handlers: HashMap<String, Arc<InvokeHandler>>) {
+        self.handlers.extend(handlers);
     }
 
     pub async fn invoke(&self, request: InvokeRequest) -> InvokeResult {

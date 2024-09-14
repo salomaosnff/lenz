@@ -1,14 +1,15 @@
 use std::{
     collections::HashMap,
     fs::{self, DirEntry},
-    future::Future,
     io::Error,
     path::PathBuf,
-    process::Output,
     sync::Arc,
 };
 
-use lenz_core::{config::consts::BASE_URL, context::ExtensionContext};
+use lenz_core::{
+    config::consts::BASE_URL,
+    extensions::plugin::{LenzPlugin, LenzPluginContext},
+};
 use libloading::Library;
 
 use crate::state::{
@@ -18,6 +19,7 @@ use crate::state::{
 };
 
 pub struct AppState {
+    #[allow(dead_code)]
     pub config: Arc<lenz_core::config::AgentConfig>,
     pub static_files: tokio::sync::RwLock<StaticAssets>,
     pub extension_host: tokio::sync::RwLock<ExtensionHost>,
@@ -43,21 +45,23 @@ fn visit_dirs(dir: &PathBuf, cb: &mut dyn FnMut(&DirEntry)) -> Result<(), Error>
     Ok(())
 }
 
-pub fn search_esm_files(dir: &PathBuf, user_extension: Option<&Extension>) -> HashMap<String, String> {
-    let (
-        prefix_name,
-        prefix_url,
-    ) = user_extension.map(|ext| {
-        let id = ext.id();
-        let public_url = ext.public_url();
-        let relative_path = dir.strip_prefix(&ext.dir()).unwrap().to_str().unwrap();
-        let script_url = format!("{public_url}/{relative_path}");
+pub fn search_esm_files(
+    dir: &PathBuf,
+    user_extension: Option<&Extension>,
+) -> HashMap<String, String> {
+    let (prefix_name, prefix_url) = user_extension
+        .map(|ext| {
+            let id = ext.id();
+            let public_url = ext.base_url();
+            let relative_path = dir.strip_prefix(&ext.dir()).unwrap().to_str().unwrap();
+            let script_url = format!("{public_url}/{relative_path}");
 
-        if ext.is_builtin() {
-            return (id, script_url);
-        }
-        (format!("ext/{id}"), script_url)
-    }).unwrap_or_else(|| ("".to_string(), format!("{BASE_URL}/esm")));
+            if ext.is_builtin() {
+                return (id, script_url);
+            }
+            (format!("ext/{id}"), script_url)
+        })
+        .unwrap_or_else(|| ("".to_string(), format!("{BASE_URL}/esm")));
 
     let mut import_map: HashMap<String, String> = HashMap::new();
 
@@ -89,7 +93,6 @@ pub fn search_esm_files(dir: &PathBuf, user_extension: Option<&Extension>) -> Ha
             let url = format!("{prefix_url}/{url}");
 
             import_map.insert(name, url);
-
         }
     })
     .ok();
@@ -116,25 +119,28 @@ impl AppState {
     pub async fn get_importmap(&self) -> HashMap<String, String> {
         self.import_map.read().await.clone()
     }
+}
 
-    pub fn load_dynlib_extension(
-        &self,
-        lib_path: PathBuf,
-        context: Arc<ExtensionContext>,
-    ) -> Result<Library, Box<dyn std::error::Error>> {
-        let base_name = lib_path.file_name().unwrap_or_default();
-        let dirname = lib_path
-            .parent()
-            .expect("Library path must have a parent directory");
-        let lib_path = dirname.join(libloading::library_filename(base_name.to_str().unwrap()));
+pub fn load_dynlib_extension(
+    lib_path: PathBuf,
+    context: &mut LenzPluginContext,
+) -> Result<(Box<dyn LenzPlugin>, Library), Box<dyn std::error::Error>> {
+    let base_name = lib_path.file_name().unwrap_or_default();
+    let dirname = lib_path
+        .parent()
+        .expect("Library path must have a parent directory");
+    let lib_path = dirname.join(libloading::library_filename(base_name.to_str().unwrap()));
 
-        unsafe {
-            let lib = libloading::Library::new(lib_path)?;
-            let func: libloading::Symbol<fn(Arc<ExtensionContext>)> = lib.get(b"execute")?;
+    unsafe {
+        let lib = libloading::Library::new(lib_path)
+            .expect("Failed to load library");
+        let create_plugin: libloading::Symbol<fn(&mut LenzPluginContext) -> *mut dyn LenzPlugin> =
+            lib.get(b"create_plugin").expect("Failed to load symbol");
 
-            func(context);
+        let mut plugin = Box::from_raw(create_plugin(context));
 
-            return Ok(lib);
-        }
+        plugin.activate(context);
+
+        Ok((plugin, lib))
     }
 }

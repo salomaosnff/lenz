@@ -4,62 +4,38 @@ use http_body_util::Full;
 use hyper::body::Incoming;
 use lenz_core::config::consts::{ADDR, BASE_URL};
 use lenz_core::invoke::InvokeResult;
+use mime_guess::mime::{APPLICATION_JSON, APPLICATION_OCTET_STREAM, TEXT_PLAIN_UTF_8};
 use std::convert::Infallible;
-use std::pin::pin;
 use std::time::Duration;
 use tokio::net::TcpListener;
 
 use crate::app::App;
 use crate::state::invoke_handlers::get_invoke_request;
-
-fn open_browser(url: &str) {
-    #[cfg(target_os = "windows")]
-    {
-        std::process::Command::new("cmd")
-            .args(&["/C", "start", url])
-            .spawn()
-            .expect("Failed to open browser");
-    }
-
-    #[cfg(any(target_os = "macos", target_os = "linux"))]
-    {
-        std::process::Command::new("open")
-            .arg(url)
-            .spawn()
-            .expect("Failed to open browser");
-    }
-
-}
+use std::pin::pin;
 
 async fn countdown(message: &str, seconds: u32) {
-    for i in (0..seconds).rev() {
-        eprintln!("({}s) {}", i, message);
+    eprint!("\x1b[?25l");
+    for i in (1..=seconds).rev() {
+        eprint!("\x1b[33m({}s) {}\x1b[0m", i, message);
         tokio::time::sleep(Duration::from_secs(1)).await;
+        eprint!("\x1b[2K\r");
     }
+    eprint!("\x1b[?25h");
 }
 
 pub fn create_response() -> http::response::Builder {
-    let response = {
-        #[cfg(debug_assertions)]
-        {
-            http::Response::builder().header("Access-Control-Allow-Origin", "*")
-        }
-
-        #[cfg(not(debug_assertions))]
-        {
-            http::Response::builder()
-        }
-    };
+    let response = http::Response::builder().header("Access-Control-Allow-Origin", "*");
 
     return response.header("Access-Control-Expose-Headers", "X-Invoke-Result");
 }
 
 pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Starting server at {}", BASE_URL);
     let listener = TcpListener::bind(ADDR).await?;
 
+    println!("\x1b[32;1mServidor iniciado em http://{}\x1b[0m", ADDR);
+
     #[cfg(not(debug_assertions))]
-    open_browser(BASE_URL);
+    crate::browser::open_in_app_mode(BASE_URL);
 
     let server = hyper_util::server::conn::auto::Builder::new(hyper_util::rt::TokioExecutor::new());
     let graceful = hyper_util::server::graceful::GracefulShutdown::new();
@@ -80,25 +56,25 @@ pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
 
                 let stream = hyper_util::rt::TokioIo::new(Box::pin(stream));
 
-
                 let conn = server.serve_connection_with_upgrades(stream, hyper::service::service_fn(move |req: Request<Incoming>| handle_request(req, app.clone())));
 
                 tokio::spawn(graceful.watch(conn.into_owned()));
             },
 
             _ = ctrl_c.as_mut() => {
-                eprintln!("\n\x1b[31mCtrl-C foi pressionado! Encerrando aplicação...\x1b[0m");
+                drop(listener);
+                eprintln!("\r\x1b[2K\x1b[36mEncerrando servidor...\x1b[0m");
                     break;
             }
-        }
+        };
     }
 
     tokio::select! {
         _ = graceful.shutdown() => {
-            eprintln!("Conexões finalizadas, encerrando...");
+            eprintln!("\x1b[32mTodas as conexões foram encerradas.\x1b[0m");
         },
-        _ = countdown("Aguardando conexões serem finalizadas...", 10) => {
-            eprintln!("Tempo limite de espera atingido! Forçando encerramento...");
+        _ = countdown("Aguardando conexões ativas...", 10) => {
+            eprintln!("\x1b[31mTempo limite atingido, encerrando servidor...\x1b[0m");
         }
     }
 
@@ -112,7 +88,7 @@ async fn handle_request(
     match *req.method() {
         Method::GET => match req.uri().path().trim_matches('/') {
             "importmap.json" => resolve_importmap(req, app).await,
-            "importmap.js" => resolve_importmap_js(req, app).await,
+            "lenz-init.js" => resolve_init_script(req, app).await,
             _ => resolve_static(req, app).await,
         },
         Method::POST => resolve_invoke(req, app).await,
@@ -180,23 +156,26 @@ async fn resolve_invoke(
     match result {
         InvokeResult::Void => Ok(response.body("".into()).unwrap()),
         InvokeResult::Text(text) => Ok(response
-            .header("Content-Type", "text/plain")
+            .header("Content-Type", TEXT_PLAIN_UTF_8.to_string())
             .body(text.into())
             .unwrap()),
         InvokeResult::Json(json) => Ok(response
-            .header("Content-Type", "application/json")
+            .header("Content-Type", APPLICATION_JSON.to_string())
             .body(serde_json::to_string(&json).unwrap().into())
             .unwrap()),
-        InvokeResult::Binary(bytes) => Ok(response.body(bytes.into()).unwrap()),
+        InvokeResult::Binary(bytes) => Ok(response
+            .header("Content-Type", APPLICATION_OCTET_STREAM.to_string())
+            .body(bytes.into())
+            .unwrap()),
         InvokeResult::Error(message) => Ok(response
-            .header("Content-Type", "text/plain")
+            .header("Content-Type", TEXT_PLAIN_UTF_8.to_string())
             .body(message.into())
             .unwrap()),
     }
 }
 
 async fn resolve_importmap(
-    req: Request<Incoming>,
+    _req: Request<Incoming>,
     app: App,
 ) -> Result<http::Response<http_body_util::Full<Bytes>>, Infallible> {
     let importmap = app.get_importmap().await;
@@ -210,17 +189,19 @@ async fn resolve_importmap(
         .unwrap())
 }
 
-async fn resolve_importmap_js(
-    req: Request<Incoming>,
+async fn resolve_init_script(
+    _req: Request<Incoming>,
     app: App,
 ) -> Result<http::Response<http_body_util::Full<Bytes>>, Infallible> {
     let importmap = app.get_importmap().await;
+    let extensions = app.extension_host.read().await.get_extensions_json().await;
 
     Ok(create_response()
         .header("Content-Type", "application/javascript")
         .body(Full::new(Bytes::from(
-            include_str!("./scripts/importmap.js")
-                .replace("$IMPORTS$", &serde_json::to_string(&importmap).unwrap()),
+            include_str!("./scripts/init.js")
+                .replace("$IMPORTS$", &serde_json::to_string(&importmap).unwrap())
+                .replace("$EXTENSIONS$", &serde_json::to_string(&extensions).unwrap()),
         )))
         .unwrap())
 }

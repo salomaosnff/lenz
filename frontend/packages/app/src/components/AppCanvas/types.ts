@@ -1,9 +1,12 @@
+import { getSpecificElementSelector } from "../../util/element";
+
 export interface CanvasElement {
+  selector: string;
   element: HTMLElement;
   box: DOMRect;
 }
 
-export function getElementSelector(el: HTMLElement): string {
+export function simpleElementSelector(el: HTMLElement): string {
   let selector = `${el.tagName.toLowerCase()}`;
 
   if (el.id) {
@@ -21,4 +24,25 @@ export function getElementSelector(el: HTMLElement): string {
   }
 
   return selector;
+}
+
+
+export function createElementSelection(
+  element: HTMLElement,
+  iframe?: HTMLIFrameElement,
+  selector = getSpecificElementSelector(element)
+): CanvasElement {
+  const iframeBox = iframe?.getBoundingClientRect() ?? new DOMRect();
+  const box = element.getBoundingClientRect();
+
+  return {
+    selector,
+    element,
+    box: new DOMRect(
+      iframeBox.x + box.x,
+      iframeBox.y + box.y,
+      box.width,
+      box.height
+    ),
+  };
 }

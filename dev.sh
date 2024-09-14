@@ -8,13 +8,11 @@ PID_VITE=
 FRONTEND_PATH="$(pwd)/frontend/packages/app"
 SERVER_PATH="$(pwd)/agent/server"
 
+node builder/src/plain.mjs --no-frontend --no-backend
+
 start_frontend(){
   echo "Starting frontend..."
   cd frontend
-
-  echo "Linking esm modules to packages/app/public/esm..."
-  rm -rf $FRONTEND_PATH/public/esm
-  ln -s $SERVER_PATH/resources/esm $FRONTEND_PATH/public/esm
   
   echo "Starting vite project in development mode...."
   pnpm dev &

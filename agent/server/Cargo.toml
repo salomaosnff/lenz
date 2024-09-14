@@ -14,8 +14,9 @@ futures-util = "0.3.30"
 http = "1.1.0"
 http-body-util = "0.1.2"
 hyper = { version = "1.4.1", features = ["full"] }
-hyper-util = { version = "0.1.7", features = ["full"] }
+hyper-util = { version = "0.1.8", features = ["full"] }
 multer = "3.1.0"
 
 lenz_core = { path = "../core" }
 libloading = "0.8.5"
+which = "6.0.3"

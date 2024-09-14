@@ -1,3 +1,5 @@
+use std::io::Error;
+
 use bytes::Bytes;
 
 pub enum InvokeResult {
@@ -38,17 +40,35 @@ impl Into<InvokeResult> for Bytes {
     }
 }
 
+impl Into<InvokeResult> for () {
+    fn into(self) -> InvokeResult {
+        InvokeResult::Void
+    }
+}
+
+impl Into<InvokeResult> for Vec<u8> {
+    fn into(self) -> InvokeResult {
+        InvokeResult::Binary(self.into())
+    }
+}
+
 impl Into<InvokeResult> for &str {
     fn into(self) -> InvokeResult {
         InvokeResult::Text(self.to_string())
     }
 }
 
-impl<T: Into<InvokeResult>, E: Into<String>> Into<InvokeResult> for Result<T, E> {
+impl Into<InvokeResult> for Error {
+    fn into(self) -> InvokeResult {
+        InvokeResult::Error(self.to_string())
+    }
+}
+
+impl<T: Into<InvokeResult>, E: ToString> Into<InvokeResult> for Result<T, E> {
     fn into(self) -> InvokeResult {
         match self {
             Ok(value) => value.into(),
-            Err(message) => InvokeResult::Error(message.into()),
+            Err(message) => InvokeResult::Error(message.to_string()),
         }
     }
 }

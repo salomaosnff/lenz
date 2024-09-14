@@ -21,7 +21,9 @@ declare module 'vue-router/auto-routes' {
     '/btn': RouteRecordInfo<'/btn', '/btn', Record<never, never>, Record<never, never>>,
     '/checkbox': RouteRecordInfo<'/checkbox', '/checkbox', Record<never, never>, Record<never, never>>,
     '/form': RouteRecordInfo<'/form', '/form', Record<never, never>, Record<never, never>>,
+    '/menu': RouteRecordInfo<'/menu', '/menu', Record<never, never>, Record<never, never>>,
     '/overlay': RouteRecordInfo<'/overlay', '/overlay', Record<never, never>, Record<never, never>>,
+    '/radio': RouteRecordInfo<'/radio', '/radio', Record<never, never>, Record<never, never>>,
     '/text-field': RouteRecordInfo<'/text-field', '/text-field', Record<never, never>, Record<never, never>>,
     '/toolbar': RouteRecordInfo<'/toolbar', '/toolbar', Record<never, never>, Record<never, never>>,
   }

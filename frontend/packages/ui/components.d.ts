@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    copy: typeof import('./src/components/UiMenu/UiMenuBar copy.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -15,8 +16,19 @@ declare module 'vue' {
     UiForm: typeof import('./src/components/UiForm/UiForm.vue')['default']
     UiIcon: typeof import('./src/components/UiIcon/UiIcon.vue')['default']
     UiInput: typeof import('./src/components/UiInput/UiInput.vue')['default']
+    UiKbd: typeof import('./src/components/UiKbd/UiKbd.vue')['default']
+    UiMenu: typeof import('./src/components/UiMenu/UiMenu.vue')['default']
+    UiMenuBar: typeof import('./src/components/UiMenuBar/UiMenuBar.vue')['default']
+    UiMenuBarItem: typeof import('./src/components/UiMenuBar/UiMenuBarItem.vue')['default']
+    UiMenuGroup: typeof import('./src/components/UiMenu/UiMenuGroup.vue')['default']
+    UiMenuItem: typeof import('./src/components/UiMenu/UiMenuItem.vue')['default']
+    UiMenuItemCheckbox: typeof import('./src/components/UiMenu/UiMenuItemCheckbox.vue')['default']
+    UiMenuItemSeparator: typeof import('./src/components/UiMenu/UiMenuItemSeparator.vue')['default']
+    UiMenuSeparator: typeof import('./src/components/UiMenuBar/UiMenuSeparator.vue')['default']
+    UiMenuSubContent: typeof import('./src/components/UiMenuBar/UiMenuSubContent.vue')['default']
     UiOverlayMenu: typeof import('./src/components/UiOverlayMenu/UiOverlayMenu.vue')['default']
     UiPopup: typeof import('./src/components/UiOverlayMenu/UiPopup.vue')['default']
+    UiRadio: typeof import('./src/components/UiRadio/UiRadio.vue')['default']
     UiSelect: typeof import('./src/components/UiSelect/UiSelect.vue')['default']
     UiTextField: typeof import('./src/components/UiTextField/UiTextField.vue')['default']
   }

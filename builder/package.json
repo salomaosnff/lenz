@@ -1,19 +1,26 @@
 {
-  "name": "build",
+  "name": "builder",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lenz-make": "tsx src/index.ts",
+    "build": "lenz-make build",
+    "pack": "lenz-make pack"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@9.9.0+sha256.7a4261e50d9a44d9240baf6c9d6e10089dcf0a79d0007f2a26985a6927324177",
   "devDependencies": {
-    "@types/node": "^22.5.2"
+    "@types/node": "^22.5.2",
+    "tsx": "^4.19.0"
   },
   "dependencies": {
-    "fast-glob": "^3.3.2"
+    "commander": "^12.1.0",
+    "execa": "^9.3.1",
+    "fast-glob": "^3.3.2",
+    "listr2": "^8.2.4"
   }
 }

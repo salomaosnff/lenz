@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CanvasElement, getElementSelector } from "./types";
+import { CanvasElement, simpleElementSelector } from "./types";
 
 const props = defineProps<{
   item: CanvasElement;
@@ -7,7 +7,7 @@ const props = defineProps<{
 }>();
 
 const hoverSelector = computed(() =>
-  props.item ? getElementSelector(props.item.element) : ""
+  props.item ? simpleElementSelector(props.item.element) : ""
 );
 
 const style = computed(() => {

@@ -1,5 +1,8 @@
 import { invoke } from 'lenz:invoke';
 
-export function read(path) {
-  return invoke('fs.read', { path })
+export function readFile(path) {
+  return invoke('fs.readFile', { path })
+}
+export function writeFile(path, data) {
+  return invoke('fs.writeFile', { path, data: new Blob([data]) })
 }

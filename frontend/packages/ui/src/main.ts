@@ -1,7 +1,7 @@
 import '@unocss/reset/tailwind-compat.css';
 import 'uno.css';
 
-import './style.css';
+import './style.scss';
 
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
