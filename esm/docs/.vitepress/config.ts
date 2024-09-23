@@ -10,6 +10,7 @@ export default defineConfig({
   themeConfig: {
     logo: "/logo.png",
     nav: [
+      { text: "Instalação", link: "/install" },
       { text: "Documentação", link: "/docs" },
 
       // {

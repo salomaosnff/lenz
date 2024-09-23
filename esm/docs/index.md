@@ -14,10 +14,10 @@ hero:
       link: /install
     - theme: alt
       text: Documentação da API
-      link: https://github.com/vuejs/vitepress
+      link: /docs
     - theme: alt
-      text: Outras versões
-      link: /install
+      text: GitHub
+      link: https://github.com/salomaosnff/lenz
 
 features:
   - title: Ágil e Intuitivo

@@ -1,5 +1,4 @@
 ---
-layout: 'docs'
 title: 'Instalação'
 ---
 
@@ -23,6 +22,7 @@ Se você não sabe qual pacote baixar, escolha o pacote .AppImage, ele é portá
 :::
 
 <table>
+    <tbody>
     <tr>
         <th>Sistema Operacional</th>
         <th>Notas</th>
@@ -50,6 +50,7 @@ Se você não sabe qual pacote baixar, escolha o pacote .AppImage, ele é portá
         <td>Arquivo compactado (.zip)</td>
         <td><a href="https://github.com/salomaosnff/lenz-designer/releases/download/v0.1.0/lenz-designer.zip">Baixar arquivo</a></td>
     </tr>
+    </tbody>
 </table>
 
 ## Debian/Ubuntu e derivados
