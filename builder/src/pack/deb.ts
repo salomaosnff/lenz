@@ -1,10 +1,10 @@
-import { mkdir, mkdtemp, rm, writeFile } from "fs/promises";
 import { ListrTask } from "listr2";
 import { tmpdir } from "os";
-import { copyFiles } from "../util";
-import { basename, dirname, join, relative } from "path";
+import { basename, dirname, join } from "path";
+import { mkdir, mkdtemp, rm, writeFile } from "fs-extra";
 import { execaCommand as command } from "execa";
-import { setTimeout } from "timers/promises";
+
+import { copyFiles } from "../util";
 
 export class Launcher {
   data: Record<string, any> = {};
@@ -114,11 +114,9 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
 }>[] {
   return [
     {
-      title: "Create Debian package structure",
+      title: "Criar estrutura do pacote Debian",
       async task(ctx, task) {
         ctx.workdir = await mkdtemp(join(tmpdir(), "lenz-deb-"));
-
-        task.output = "Create Debian package structure";
 
         const debian = join(ctx.workdir, "DEBIAN");
 
@@ -131,11 +129,9 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
       },
     },
     {
-      title: "Create control file",
-      async task(ctx, task) {
+      title: "Criar arquivo de controle",
+      async task(ctx) {
         const controlFile = join(ctx.workdir, "DEBIAN", "control");
-
-        task.output = `Creating control file ${basename(controlFile)}`;
 
         const controlBuilder = new ControlFile()
           .setPackage("lenz")
@@ -143,31 +139,30 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
           .setVersion("0.0.1")
           .setMaintainer("Salomão Neto <contato@sallon.dev>")
           .setArchitecture("amd64");
+
         ctx.controlFile = controlBuilder;
 
         await writeFile(controlFile, controlBuilder.toControlFile());
       },
     },
     {
-      title: "Copy build files to debian package workdir",
+      title: "Copiar arquivos para o pacote Debian",
       async task(ctx, task) {
         const source = options.input;
         const destination = join(ctx.workdir, "usr", "share", "lenz");
         const iconFile = join(options.input, "resources/icon.png");
-        const iconDestination = join(ctx.workdir, "usr", "share", "icons", "lenz.sallon.dev.png");
+        const iconDestination = join(
+          ctx.workdir,
+          "usr",
+          "share",
+          "icons",
+          "lenz.sallon.dev.png"
+        );
 
-        task.output = `Copying files from ${source}`;
+        task.output = `Copiando arquivos de ${source}`;
 
-        for await (const message of copyFiles(source, destination)) {
-          task.output = message;
-        }
-
-        for await (const message of copyFiles(
-          iconFile,
-          iconDestination
-        )) {
-          task.output = message;
-        }
+        await copyFiles(source, destination);
+        await copyFiles(iconFile, iconDestination);
 
         const binFile = join(ctx.workdir, "usr", "bin", "lenz");
 
@@ -182,7 +177,7 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
       },
     },
     {
-      title: "Create launchers",
+      title: "Criar lançadores",
       async task(ctx, task) {
         const launchers = {
           lenz: new Launcher()
@@ -190,7 +185,7 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
             .setIcon("lenz.sallon.dev")
             .setComment("Editor de páginas web")
             .setMimeType("text/html")
-            .setTerminal(true)
+            .setTerminal(false)
             .setType("Application")
             .setCategories(["Development"])
             .setExecutable("lenz %f"),
@@ -205,14 +200,14 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
             `${name}.desktop`
           );
 
-          task.output = `Creating launcher ${basename(desktopFile)}`;
+          task.output = `Criando lançador ${basename(desktopFile)}`;
 
           await writeFile(desktopFile, launcher.toDesktopFile());
         }
       },
     },
     {
-      title: "Create Debian package",
+      title: "Criar arquivo .deb usando dpkg-deb",
       async task(ctx, task) {
         const packageFile = join(
           options.output,
@@ -220,8 +215,6 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
         );
 
         await mkdir(dirname(packageFile), { recursive: true });
-
-        task.output = `Creating Debian package ${basename(packageFile)}`;
 
         const execute = command(
           `dpkg-deb --build ${ctx.workdir} ${packageFile}`
@@ -234,11 +227,9 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
       },
     },
     {
-      title: "Cleanup workdir",
-      async task(ctx, task) {
-        task.output = "Remove temporary workdir";
-
-        await rm(ctx.workdir, { recursive: true });
+      title: "Limpar pasta de trabalho",
+      async task(ctx) {
+        await rm(ctx.workdir, { recursive: true, force: true });
       },
     },
   ];

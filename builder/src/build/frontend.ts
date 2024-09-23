@@ -4,38 +4,38 @@ import { join } from "path";
 import { copyFiles } from "../util";
 
 export interface BuildFrontendOptions {
-    input: string;
-    output: string;
-    noBuild: boolean;
-    noCopy: boolean;
+  input: string;
+  output: string;
+  noBuild: boolean;
+  noCopy: boolean;
 }
 
-export function getBuildFrontendTasks(options: BuildFrontendOptions): ListrTask[] {
-    return [
-        {
-            title: "Build frontend",
-            skip: () => options.noBuild,
-            async task(_, task) {
-                const execute = command("pnpm run build", {
-                    cwd: options.input,
-                });
+export function getBuildFrontendTasks(
+  options: BuildFrontendOptions
+): ListrTask[] {
+  return [
+    {
+      title: "Transpilar frontend utilizando `pnpm build`",
+      skip: () => options.noBuild,
+      async task(_, task) {
+        const execute = command("pnpm build", {
+          cwd: options.input,
+        });
 
-                execute.stdout.pipe(task.stdout());
-                execute.stderr.pipe(task.stdout());
+        execute.stdout.pipe(task.stdout());
+        execute.stderr.pipe(task.stdout());
 
-                await execute;
-            }
-        },
-        {
-            title: "Copy build files",
-            skip: () => options.noCopy,
-            async task(_, task) {
-                const source = join(options.input, "dist");
+        await execute;
+      },
+    },
+    {
+      title: "Copiar arquivos de frontend",
+      skip: () => options.noCopy,
+      async task(_, task) {
+        const source = join(options.input, "dist");
 
-                for await (const message of copyFiles(source, options.output)) {
-                    task.output = message;
-                }
-            }
-        }
-    ]
+        await copyFiles(source, options.output);
+      },
+    },
+  ];
 }

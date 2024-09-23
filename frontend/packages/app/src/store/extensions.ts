@@ -25,7 +25,7 @@ export const useExtensionsStore = defineStore("extensions", () => {
       };
 
       if (extension.script_url) {
-        const { activate, deactivate } = await import(extension.script_url);
+        const { activate, deactivate } = await import(/* @vite-ignore */extension.script_url);
 
         data.activate = activate;
         data.deactivate = deactivate;
@@ -37,9 +37,7 @@ export const useExtensionsStore = defineStore("extensions", () => {
 
       loadedExtensions.value.set(extension.id, data);
     } catch (e) {
-      console.groupCollapsed(`Failed to load extension ${extension.id}`);
       console.error(e);
-      console.groupEnd();
     } finally {
       loadingState.value = undefined;
     }

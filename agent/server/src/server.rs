@@ -6,6 +6,7 @@ use lenz_core::config::consts::{ADDR, BASE_URL};
 use lenz_core::invoke::InvokeResult;
 use mime_guess::mime::{APPLICATION_JSON, APPLICATION_OCTET_STREAM, TEXT_PLAIN_UTF_8};
 use std::convert::Infallible;
+use std::sync::Arc;
 use std::time::Duration;
 use tokio::net::TcpListener;
 
@@ -23,6 +24,16 @@ async fn countdown(message: &str, seconds: u32) {
     eprint!("\x1b[?25h");
 }
 
+pub fn open_browser() {
+    let url = match std::env::args().nth(1) {
+        // Encode URI component arg
+        Some(arg) => &format!("{}?file={}", BASE_URL, urlencoding::encode(&arg)),
+        None => BASE_URL,
+    };
+
+    crate::browser::open_in_app_mode(url);
+}
+
 pub fn create_response() -> http::response::Builder {
     let response = http::Response::builder().header("Access-Control-Allow-Origin", "*");
 
@@ -30,18 +41,38 @@ pub fn create_response() -> http::response::Builder {
 }
 
 pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
-    let listener = TcpListener::bind(ADDR).await?;
+    let listener = match TcpListener::bind(ADDR).await {
+        Ok(listener) => listener,
+        Err(e) => match e.kind() {
+            std::io::ErrorKind::AddrInUse => {
+                eprintln!("\x1b[31;1mPorta {} já está em uso.\x1b[0m", ADDR);
+                open_browser();
+                return Ok(());
+            }
+            _ => {
+                eprintln!("Erro ao iniciar servidor: {}", e);
+                return Ok(());
+            }
+        },
+    };
 
     println!("\x1b[32;1mServidor iniciado em http://{}\x1b[0m", ADDR);
 
     #[cfg(not(debug_assertions))]
-    crate::browser::open_in_app_mode(BASE_URL);
+    {
+        open_browser()
+    }
 
     let server = hyper_util::server::conn::auto::Builder::new(hyper_util::rt::TokioExecutor::new());
     let graceful = hyper_util::server::graceful::GracefulShutdown::new();
     let mut ctrl_c = pin!(tokio::signal::ctrl_c());
+    let (quit_tx, quit_rx) = tokio::sync::oneshot::channel::<()>();
+    let quit_tx = Arc::new(tokio::sync::RwLock::new(Some(quit_tx)));
+    let mut quit_rx: std::pin::Pin<&mut tokio::sync::oneshot::Receiver<()>> = pin!(quit_rx);
 
     loop {
+        let quit_tx = quit_tx.clone();
+
         tokio::select! {
             conn = listener.accept() => {
                 let app = app.clone();
@@ -56,15 +87,19 @@ pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
 
                 let stream = hyper_util::rt::TokioIo::new(Box::pin(stream));
 
-                let conn = server.serve_connection_with_upgrades(stream, hyper::service::service_fn(move |req: Request<Incoming>| handle_request(req, app.clone())));
+                let conn = server.serve_connection_with_upgrades(stream, hyper::service::service_fn(move |req: Request<Incoming>| handle_request(req, app.clone(), quit_tx.clone())));
 
                 tokio::spawn(graceful.watch(conn.into_owned()));
             },
 
+            _ = quit_rx.as_mut() => {
+                eprintln!("\r\x1b[2K\x1b[36mUm pedido de encerramento foi recebido, encerrando servidor...\x1b[0m");
+                break;
+            },
+
             _ = ctrl_c.as_mut() => {
-                drop(listener);
-                eprintln!("\r\x1b[2K\x1b[36mEncerrando servidor...\x1b[0m");
-                    break;
+                eprintln!("\r\x1b[2K\x1b[36mCtrl-C pressionado, encerrando servidor...\x1b[0m");
+                break;
             }
         };
     }
@@ -84,6 +119,7 @@ pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
 async fn handle_request(
     req: Request<Incoming>,
     app: App,
+    quit_signal: Arc<tokio::sync::RwLock<Option<tokio::sync::oneshot::Sender<()>>>>,
 ) -> Result<http::Response<http_body_util::Full<Bytes>>, Infallible> {
     match *req.method() {
         Method::GET => match req.uri().path().trim_matches('/') {
@@ -91,7 +127,7 @@ async fn handle_request(
             "lenz-init.js" => resolve_init_script(req, app).await,
             _ => resolve_static(req, app).await,
         },
-        Method::POST => resolve_invoke(req, app).await,
+        Method::POST => resolve_invoke(req, app, quit_signal).await,
         _ => method_not_allowed(),
     }
 }
@@ -137,6 +173,7 @@ async fn resolve_static(
 async fn resolve_invoke(
     req: Request<Incoming>,
     app: App,
+    quit_signal: Arc<tokio::sync::RwLock<Option<tokio::sync::oneshot::Sender<()>>>>,
 ) -> Result<http::Response<http_body_util::Full<Bytes>>, Infallible> {
     let request = match get_invoke_request(req).await {
         Some(request) => request,
@@ -171,6 +208,13 @@ async fn resolve_invoke(
             .header("Content-Type", TEXT_PLAIN_UTF_8.to_string())
             .body(message.into())
             .unwrap()),
+        InvokeResult::Quit => {
+            if let Some(quit_signal) = quit_signal.write().await.take() {
+                quit_signal.send(()).ok();
+            }
+
+            Ok(response.body("".into()).unwrap())
+        }
     }
 }
 

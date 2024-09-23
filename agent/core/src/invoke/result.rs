@@ -8,6 +8,7 @@ pub enum InvokeResult {
     Binary(Bytes),
     Error(String),
     Void,
+    Quit,
 }
 
 impl InvokeResult {
@@ -18,6 +19,7 @@ impl InvokeResult {
             InvokeResult::Binary(_) => "binary",
             InvokeResult::Void => "void",
             InvokeResult::Error(_) => "error",
+            InvokeResult::Quit => "void",
         }
     }
 }

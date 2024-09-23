@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import icon_close from "lenz:icons/close";
-import { WebviewChannel } from "../AppWebview/types";
 
 defineProps<{
   title?: string;
   content: string;
-  channels?: Record<string, WebviewChannel<unknown>>;
+  data?: Record<string, unknown>;
 }>();
 
 const visible = defineModel<boolean>("visible", {
@@ -51,8 +50,12 @@ useEventListener(
   (event) => {
     if (lastPointerEvent.value) {
       event.stopPropagation();
-      x.value += event.clientX - lastPointerEvent.value.clientX;
-      y.value += event.clientY - lastPointerEvent.value.clientY;
+      const dx = event.clientX - lastPointerEvent.value.clientX;
+      const dy = event.clientY - lastPointerEvent.value.clientY;
+
+      x.value = Math.max(0, x.value + dx);
+      y.value = Math.max(0, y.value + dy);
+
       lastPointerEvent.value = event;
     }
   },
@@ -76,12 +79,40 @@ watchEffect(() => {
     lockIframe.value = false;
   }
 });
+
+let lastResizeEvent: MouseEvent | undefined;
+
+useEventListener(
+  window,
+  "pointermove",
+  (event) => {
+    if (lastResizeEvent) {
+      event.stopPropagation();
+
+      const dx =
+        Math.floor(event.clientX) - Math.floor(lastResizeEvent.clientX);
+      const dy =
+        Math.floor(event.clientY) - Math.floor(lastResizeEvent.clientY);
+
+      width.value += dx;
+      height.value += dy;
+
+      lastResizeEvent = event;
+    }
+  },
+  { capture: true, passive: true }
+);
+
+useEventListener(window, "pointerup", () => {
+  lastResizeEvent = undefined;
+  lockIframe.value = false;
+});
 </script>
 <template>
-  <Transition appear>
-    <div v-if="visible" class="app-window" :style>
+  <div class="app-window perspective-1000px" :style>
+    <div class="app-window__box">
       <div class="app-window__header" @pointerdown="lastPointerEvent = $event">
-        <div class="app-window__title">{{ title }}</div>
+        <div class="app-window__title text-center">{{ title }}</div>
         <div>
           <UiIcon
             :path="icon_close"
@@ -93,30 +124,43 @@ watchEffect(() => {
       </div>
       <AppWebview
         :content="content"
-        :channels
+        :data
         class="flex-1 bg-transparent"
         :class="{
-          'pointer-events-none': lastPointerEvent,
+          'pointer-events-none': lastPointerEvent || lastResizeEvent,
         }"
       />
+      <div
+        class="w-4 h-4 absolute bottom--2 right--2 cursor-se-resize"
+        @pointerdown.stop.prevent="
+          (lockIframe = true), (lastResizeEvent = $event)
+        "
+      />
     </div>
-  </Transition>
+  </div>
 </template>
 
 <style lang="scss">
 .app-window {
-  @apply fixed flex flex-col rounded-md shadow-lg overflow hidden bg--surface z-5;
+  @apply fixed z-5;
   border: 1px solid var(--color-surface-muted);
 
   &.v-enter-active,
   &.v-leave-active {
-    transition: all 0.25s;
+    transition-duration: 0.5s;
+
+    .app-window__box {
+      transition-property: all;
+      transition-duration: inherit;
+    }
   }
 
   &.v-enter-from,
   &.v-leave-to {
-    transform: scale(0);
-    opacity: 0;
+    .app-window__box {
+      transform: scale(50%) rotate3d(1, 0, 0, -90deg);
+      opacity: 0;
+    }
   }
 
   &__header {
@@ -125,6 +169,10 @@ watchEffect(() => {
 
   &__title {
     @apply flex-1 font-bold;
+  }
+
+  &__box {
+    @apply flex flex-col w-full h-full rounded-lg shadow-lg overflow-hidden bg--surface;
   }
 }
 </style>

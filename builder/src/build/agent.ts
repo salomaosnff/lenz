@@ -1,4 +1,4 @@
-import { Listr, ListrTask } from "listr2";
+import { ListrTask } from "listr2";
 import { execaCommand as command } from "execa";
 import { join } from "path";
 import { copyFiles } from "../util";
@@ -16,7 +16,7 @@ export async function getBuildAgentTasks(
 ): Promise<ListrTask[]> {
   return [
     {
-      title: "Build agent backend",
+      title: "Construir agente utilizando cargo",
       skip: () => options.skipBuild,
       task: async (_, task) => {
         const execute = command("cargo build --release", {
@@ -30,9 +30,9 @@ export async function getBuildAgentTasks(
       },
     },
     {
-      title: "Copy Binaries",
+      title: "Copiar binário do agente",
       skip: () => options.skipBin,
-      task: async (_, task) => {
+      task: async () => {
         const binSource = join(
           options.input,
           "agent",
@@ -42,29 +42,18 @@ export async function getBuildAgentTasks(
         );
         const binTarget = join(options.output, "bin", "lenz");
 
-        for await (const message of copyFiles(binSource, binTarget)) {
-          task.output = message;
-        }
+        await copyFiles(binSource, binTarget)
       },
     },
     {
-      title: "Copy Resources",
+      title: "Copiar recursos do agente",
       skip: () => options.skipResources,
-      task: async (_, task) => {
-        const resourcesSource = join(
-          options.input,
-          "agent",
-          "server",
-          "resources"
-        );
+      task: async () => {
+        const resourcesSource = join(options.input, "agent", "server", "resources");
+        const resourcesTarget = join(options.output, "resources");
 
-        for await (const message of copyFiles(
-          resourcesSource,
-          join(options.output, "resources")
-        )) {
-          task.output = message;
-        }
+        await copyFiles(resourcesSource, resourcesTarget)
       },
-    },
+    }
   ];
 }

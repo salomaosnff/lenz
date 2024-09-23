@@ -84,30 +84,26 @@ export const useMenuBarStore = defineStore("menubar", () => {
     },
   ]);
 
-  function addMenuItemsAt(parent: string[], items: MenuItem[]) {
-    let current = {
-      children: menuItems.value,
-    } as MenuItemAction & { children: MenuItem[] };
+  function addMenuItemsAt(path: string[], items: MenuItem[]) {
+    let children = menuItems.value;
 
-    for (const name of parent) {
-      let found = current.children.find(
-        (i) => (!i.type || i.type === "item") && i.title === name
-      ) as MenuItemAction | undefined;
+    for (const title of path) {
+      let item = children.find((item) => item.type === 'item' && item.title === title) as MenuItemAction | undefined
 
-      if (!found) {
-        found = { title: name, children: [] };
-        current.children.push(found);
+      if (!item) {
+        item = {
+          title,
+          type: "item",
+          children: [],
+        }
+
+        children.push(item);
       }
 
-      found.children ??= [];
-      current = found as MenuItemAction & { children: MenuItem[] };
+      children = item.children as MenuItem[];
     }
 
-    current.children.push(...items);
-
-    return () => {
-      current.children = current.children.filter((i) => !items.includes(i));
-    };
+    children.push(...items);
   }
 
   return {

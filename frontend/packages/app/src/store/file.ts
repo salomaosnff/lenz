@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 
-import { prompt } from "lenz:dialog";
 
 import * as fs from "lenz:fs";
 import * as history from "lenz:history";
@@ -8,6 +7,7 @@ import { MenuItem } from "./menubar";
 
 import icon_redo from "lenz:icons/redo";
 import icon_undo from "lenz:icons/undo";
+import { invoke } from "lenz:invoke";
 
 export class EditorFile {
   dirty = false;
@@ -40,7 +40,7 @@ export class EditorFile {
     this.autoSaveTimer = setTimeout(() => {
       this.save();
       this.autoSaveTimer = null;
-    }, 5_000);
+    }, 3_000);
   }
 
   text() {
@@ -154,13 +154,12 @@ export const useFileStore = defineStore("file", () => {
     }
   }
 
-  openFile("/home/sallon/Área de trabalho/hello.lenz/index.html");
-
   hotkeysStore.addHotKeys({
     "Ctrl+O": "file.open.html",
     "Ctrl+S": "file.save",
     "Ctrl+Z": "file.undo",
     "Ctrl+Y": "file.redo",
+    'Ctrl+Q': 'app.quit'
   });
 
   commandsStore.registerCommand({
@@ -168,9 +167,11 @@ export const useFileStore = defineStore("file", () => {
     name: "Abrir arquivo",
     description: "Abrir uma página HTML",
     async run() {
-      const filepath = await prompt({
-        message: "Informe o caminho para o arquivo:",
-      });
+      const filepath = await commandsStore.executeCommand<string>('dialog.file.open', {
+        filters: {
+          'Páginas HTML': ['*html'],
+        }
+      })
       await openFile(filepath);
     },
   });
@@ -204,6 +205,10 @@ export const useFileStore = defineStore("file", () => {
     },
   });
 
+  window.addEventListener("beforeunload", async () => {
+    await commandsStore.executeCommand('app.quit');
+  })
+
   menubarStore.addMenuItemsAt(["Arquivo"], [
     {
       title: "Abrir arquivo HTML",
@@ -228,7 +233,26 @@ export const useFileStore = defineStore("file", () => {
         },
       ],
     },
+    {
+      type: 'separator'
+    },
+    {
+      type: 'item',
+      title: 'Sair da aplicação',
+      command: 'app.quit'
+    }
   ] as MenuItem[]);
+
+  commandsStore.registerCommand({
+    id: 'app.quit',
+    name: 'Sair da aplicação',
+    description: 'Fecha a aplicação',
+    async run() {
+      await saveAll();
+      await invoke('app.quit');
+      window.close();
+    }
+  })
 
   menubarStore.addMenuItemsAt(["Editar"], [
     {

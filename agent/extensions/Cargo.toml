@@ -1,13 +1,13 @@
 [workspace]
-members = ["fs"]
-exclude = ["icons"]
+members = ["fs", "dialog-fs"]
 resolver = "2"
 
 [profile.release]
-# lto = true
-# opt-level = "z"
-# codegen-units = 1
-# panic = "abort"
+opt-level = "z"  # ou "s" para mais foco em tamanho
+lto = true       # Link Time Optimization para reduzir o tamanho final
+codegen-units = 1  # Garante que o compilador otimize ao máximo o código
+debug = false     # Não incluir informações de depuração
+panic = 'abort'   # Menor overhead ao lidar com panics
 
 [workspace.dependencies]
 bytes = "1.7.1"

@@ -10,14 +10,13 @@ const activeModel = defineModel<CanvasElement[]>("active");
 const loaded = ref(false);
 const iframe = ref<HTMLIFrameElement>();
 
-
-
 const styleEl = document.createElement("style");
 
 styleEl.setAttribute("data-ignore-on-to-string", "true");
 
 styleEl.textContent = `html, body {
   cursor: default !important;
+  user-select: none !important;
 }`;
 
 watch(
@@ -34,51 +33,57 @@ whenever(
     documentModel.value = iframe.value?.contentDocument ?? undefined;
 
     if (
-      !documentModel.value?.querySelector("style[data-ignore-on-to-string]")
+      !iframe.value?.contentDocument?.querySelector("style[data-ignore-on-to-string]")
     ) {
-      documentModel.value?.head.appendChild(styleEl.cloneNode(true));
+      iframe.value?.contentDocument?.head.appendChild(styleEl.cloneNode(true));
     }
 
     iframe.value?.contentDocument?.addEventListener("pointermove", (event) => {
-      hoverModel.value = createElementSelection(event.target as HTMLElement, iframe.value);
-    });
-
-    iframe.value?.contentDocument?.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const selection = activeModel.value ?? [];
-      const element = createElementSelection(event.target as HTMLElement, iframe.value);
-      const isSelected = selection.some((el) =>
-        el.element.isSameNode(element.element)
+      hoverModel.value = createElementSelection(
+        event.target as HTMLElement,
+        iframe.value
       );
-
-      if (event.ctrlKey) {
-        if (isSelected) {
-          activeModel.value = selection.filter(
-            (el) => !el.element.isSameNode(element.element)
-          );
-        } else {
-          activeModel.value = selection.concat(element);
-        }
-      } else if (isSelected) {
-        activeModel.value = [];
-      } else {
-        activeModel.value = [element];
-      }
-    }, {
-      capture: true,
     });
+
+    iframe.value?.contentDocument?.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const selection = activeModel.value ?? [];
+        const element = createElementSelection(
+          event.target as HTMLElement,
+          iframe.value
+        );
+        const isSelected = selection.some((el) =>
+          el.element.isSameNode(element.element)
+        );
+
+        if (event.ctrlKey) {
+          if (isSelected) {
+            activeModel.value = selection.filter(
+              (el) => !el.element.isSameNode(element.element)
+            );
+          } else {
+            activeModel.value = selection.concat(element);
+          }
+        } else if (isSelected) {
+          activeModel.value = [];
+        } else {
+          activeModel.value = [element];
+        }
+      },
+      {
+        capture: true,
+      }
+    );
 
     // Propagate iframe window events to the parent window
-    const EVENTS = [
-      "click",
-      "pointermove",
-      "pointerleave",
-      "scroll",
-      "keydown",
-      "keyup",
-      "pointerdown",
-    ];
+    const EVENTS = new Set(Object.keys(window)
+      .filter((key) => key.startsWith("on"))
+      .map((key) => key.slice(2).toLowerCase()));
+
+      EVENTS.delete("beforeunload")
 
     for (const event of EVENTS) {
       iframe.value?.contentWindow?.addEventListener(event, (e) => {
@@ -92,7 +97,11 @@ whenever(
       const element = currentDocument.querySelector(hoverModel.value.selector);
 
       hoverModel.value = element
-        ? createElementSelection(element as HTMLElement, iframe.value, hoverModel.value.selector)
+        ? createElementSelection(
+            element as HTMLElement,
+            iframe.value,
+            hoverModel.value.selector
+          )
         : undefined;
     }
 
@@ -101,7 +110,13 @@ whenever(
         const element = currentDocument.querySelector(item.selector);
 
         if (element) {
-          acc.push(createElementSelection(element as HTMLElement, iframe.value, item.selector));
+          acc.push(
+            createElementSelection(
+              element as HTMLElement,
+              iframe.value,
+              item.selector
+            )
+          );
         }
 
         return acc;
@@ -125,7 +140,10 @@ function updateInspect() {
   }
 
   if (hoverModel.value) {
-    hoverModel.value = createElementSelection(hoverModel.value.element, iframe.value);
+    hoverModel.value = createElementSelection(
+      hoverModel.value.element,
+      iframe.value
+    );
   }
 
   if (activeModel.value) {
@@ -163,9 +181,7 @@ defineExpose({
 });
 </script>
 <template>
-  <div
-    class="relative rounded-md transition-all duration-1000 shadow-lg"
-  >
+  <div class="relative rounded-md transition-all duration-1000 shadow-lg">
     <iframe
       ref="iframe"
       class="h-full w-full"

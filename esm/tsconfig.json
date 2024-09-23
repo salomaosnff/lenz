@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "strict": true,
+        "skipLibCheck": true,
+        "outDir": "dist",
+        "lib": ["DOM", "ES2023", "DOM.Iterable"],
+    },
+    "include": ["src/**/*.ts"],
+}

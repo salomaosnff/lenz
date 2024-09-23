@@ -22,7 +22,7 @@ const filteredShortcuts = computed(() => {
   }
 
   return allShortcuts.value.filter((shortcut) => {
-    return (
+    return shortcut.command && (
       shortcut.key.toLowerCase().includes(search) ||
       shortcut.command.name?.toLowerCase()?.includes(search) ||
       shortcut.command.description?.toLowerCase()?.includes(search)
@@ -53,12 +53,12 @@ onClickOutside(element, () => {
           class="w-full mt-4"
           placeholder="Pesquisar atalhos..."
         />
-        <div class="overflow-y-auto flex-1 max-h-100">
+        <div class="overflow-y-auto flex-1 max-h-100 pr-2">
           <table>
-            <thead>
+            <thead class="sticky top-0 bg--surface">
               <tr>
                 <th class="text-left w-full pa-2">Comando</th>
-                <th class="pa-2">Atalho</th>
+                <th class="pa-2 text-right">Atalho</th>
               </tr>
             </thead>
             <tr
@@ -70,7 +70,7 @@ onClickOutside(element, () => {
                 <p>{{ command.name }}</p>
                 <p class="text-3 fg--muted">{{ command.description }}</p>
               </td>
-              <td class="text-nowrap pa-2 rounded-r-md">
+              <td class="text-nowrap pa-2 rounded-r-md text-right">
                 <UiKbd class="text-4 py-2">{{ key }}</UiKbd>
               </td>
             </tr>

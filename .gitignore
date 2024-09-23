@@ -1,6 +1,6 @@
 /agent/target
 /agent/extensions/target
 /agent/extensions/fs/target
-/dist
+dist
 node_modules
 /frontend/packages/app/dist

@@ -1,12 +1,11 @@
-import { mkdir, mkdtemp, rm, writeFile } from "fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "fs-extra";
 import { ListrTask } from "listr2";
 import { tmpdir } from "os";
-import { copyFiles } from "../util";
-import { basename, dirname, join, relative, resolve } from "path";
+import { basename, dirname, join, resolve } from "path";
 import { execaCommand as command } from "execa";
-import { setTimeout } from "timers/promises";
+
+import { copyFiles } from "../util";
 import { Launcher } from "./deb";
-import { cwd } from "process";
 
 export interface PackAppImageOptions {
   input: string;
@@ -23,7 +22,7 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
 }>[] {
   return [
     {
-      title: "Create AppImage package structure",
+      title: "Criar estrutura de pacote AppImage",
       async task(ctx, task) {
         ctx.package = {
           id: "lenz-designer",
@@ -32,8 +31,6 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
         };
         ctx.workdir = await mkdtemp(join(tmpdir(), "lenz-appimage-"));
 
-        task.output = "Create AppImage package structure";
-
         await mkdir(join(ctx.workdir, "usr", "bin"), { recursive: true });
         await mkdir(join(ctx.workdir, "usr", "share", "applications"), {
           recursive: true,
@@ -41,7 +38,7 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
       },
     },
     {
-      title: "Create AppRun file",
+      title: "Criar arquivo AppRun",
       async task(ctx, task) {
         const appRunFile = join(ctx.workdir, "AppRun");
 
@@ -58,7 +55,7 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
       },
     },
     {
-      title: "Copy build files to AppImage package workdir",
+      title: "Copiar arquivos para o pacote AppImage",
       async task(ctx, task) {
         const source = options.input;
         const destination = join(ctx.workdir, "usr", "share", "lenz");
@@ -67,13 +64,8 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
 
         task.output = `Copying files from ${source}`;
 
-        for await (const message of copyFiles(source, destination)) {
-          task.output = message;
-        }
-
-        for await (const message of copyFiles(iconFile, iconDestination)) {
-          task.output = message;
-        }
+        await copyFiles(source, destination);
+        await copyFiles(iconFile, iconDestination);
 
         const binFile = join(ctx.workdir, "usr", "bin", "lenz");
 
@@ -88,14 +80,14 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
       },
     },
     {
-      title: "Create launchers",
+      title: "Criar lançadores",
       async task(ctx, task) {
         const launcher = new Launcher()
           .setName("Lenz Designer")
           .setIcon("icon")
           .setComment("Editor de páginas web")
           .setMimeType("text/html")
-          .setTerminal(true)
+          .setTerminal(false)
           .setType("Application")
           .setCategories(["Development"])
           .setExecutable("usr/bin/lenz %f");
@@ -108,7 +100,7 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
       },
     },
     {
-      title: "Create AppImage",
+      title: "Criar pacote AppImage",
       async task(ctx, task) {
         const appimagetoolExec = resolve(
           __dirname,
@@ -121,13 +113,11 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
 
         await mkdir(dirname(appImageFile), { recursive: true });
 
-        task.output = `Creating AppImage package ${basename(appImageFile)}`;
-
         const execute = command(`${appimagetoolExec} ${ctx.workdir}`, {
           cwd: options.output,
           env: {
             ARCH: ctx.package.architecture,
-          }
+          },
         });
 
         execute.stdout.pipe(task.stdout());

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lenz-make": "pnpm --filter=builder run lenz-make --output=../dist"
+    "make": "pnpm --filter=builder run make --output=../dist",
+    "build:docs": "pnpm --filter=esm run docs:build && rm -rf docs/ && mv esm/docs/.vitepress/dist docs"
   },
   "keywords": [],
   "author": "",

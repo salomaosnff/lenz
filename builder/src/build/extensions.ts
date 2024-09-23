@@ -1,8 +1,7 @@
 import { ListrTask } from "listr2";
 import { execaCommand as command } from "execa";
-import { existsSync } from "node:fs";
-import { copyFile, mkdir, readdir, readFile } from "node:fs/promises";
-import { basename, dirname, join, relative, resolve } from "node:path";
+import { copy, mkdir, readdir, readFile, exists } from "fs-extra";
+import { basename, dirname, join } from "node:path";
 import { copyFiles } from "../util";
 
 export interface BuildExtensionsOptions {
@@ -27,7 +26,7 @@ async function getAllExtensions(dir: string): Promise<string[]> {
       "manifest.json"
     );
 
-    if (!existsSync(manifestFile)) {
+    if (!(await exists(manifestFile))) {
       continue;
     }
 
@@ -49,14 +48,16 @@ function getLibNames(libpath: string): string[] {
 export async function getBuildExtensionsTask(
   options: BuildExtensionsOptions
 ): Promise<ListrTask[]> {
-  const include = ([] as string[]).concat(options.include ?? await getAllExtensions(options.input));
+  const include = ([] as string[]).concat(
+    options.include ?? (await getAllExtensions(options.input))
+  );
   const exclude = ([] as string[]).concat(options.exclude ?? []);
 
-  const extensions = include.filter((ext) => !exclude.includes(ext));  
+  const extensions = include.filter((ext) => !exclude.includes(ext));
 
   return [
     {
-      title: "Building extensions workspace",
+      title: "Compilar workspace de extensões utilizando cargo",
       task: async (_, task) => {
         const execute = command("cargo build --release", {
           cwd: options.input,
@@ -69,50 +70,81 @@ export async function getBuildExtensionsTask(
       },
     },
     {
-      title: "Copying extensions build files",
+      title: "Copiar arquivos de extensões",
       task: async (_, task) =>
         task.newListr(
           extensions.map((ext) => ({
-            title: `Copying ${ext} files`,
-            task: async (_, task) => {
-              const inputExtensionDir = join(options.input, ext);
-              const outputExtensionDir = join(options.output, ext);
-              const publicDir = join(inputExtensionDir, "public");
-              const manifestFile = join(publicDir, "manifest.json");
+            title: `Construir "${ext}"`,
+            task: (_, task) =>
+              task.newListr([
+                {
+                  title: "Construir frontend usando `pnpm build`...",
+                  skip: async () => {
+                    const packageJson = join(
+                      options.input,
+                      ext,
+                      "frontend/package.json"
+                    );
 
-              task.output = "Reading manifest file...";
+                    return !(await exists(packageJson));
+                  },
+                  task: async (_, task) => {
+                    const execute = command("pnpm build", {
+                      cwd: join(options.input, ext, "frontend"),
+                    });
 
-              const manifest = JSON.parse(
-                await readFile(manifestFile, "utf-8")
-              );
+                    execute.stdout.pipe(task.stdout());
+                    execute.stderr.pipe(task.stdout());
 
-              await mkdir(outputExtensionDir, { recursive: true });
+                    await execute;
 
-              for await (const output of copyFiles(
-                publicDir,
-                outputExtensionDir
-              )) {
-                task.output = output;
-              }
+                    task.output = "Copiando arquivos de frontend...";
 
-              if (manifest.dynlib) {
-                task.output = "Copying dynamic libraries...";
-                const libfiles = getLibNames(manifest.dynlib);
-                const targetDir = join(options.input, "target", "release");
+                    await copyFiles(
+                      join(options.input, ext, "frontend/dist"),
+                      join(options.output, ext, "www")
+                    );
+                  },
+                },
+                {
+                  title: `Copiar arquivos`,
+                  task: async (_, task) => {
+                    const inputExtensionDir = join(options.input, ext);
+                    const outputExtensionDir = join(options.output, ext);
+                    const publicDir = join(inputExtensionDir, "public");
+                    const manifestFile = join(publicDir, "manifest.json");
 
-                for (const libfile of libfiles) {
-                  const libname = basename(libfile);
-                  const targetFile = join(targetDir, libname);
+                    task.output = "Lendo manifest.json...";
 
-                  if (existsSync(targetFile)) {
-                    const outputLibFile = join(outputExtensionDir, libfile);
+                    const manifest = JSON.parse(
+                      await readFile(manifestFile, "utf-8")
+                    );
 
-                    await mkdir(dirname(outputLibFile), { recursive: true });
-                    await copyFile(targetFile, outputLibFile);
-                  }
-                }
-              }
-            },
+                    await copyFiles(publicDir, outputExtensionDir);
+
+                    if (manifest.dynlib) {
+                      task.output = "Copiando arquivos de biblioteca dinâmica...";
+                      const libfiles = getLibNames(manifest.dynlib);
+                      const targetDir = join(
+                        options.input,
+                        "target",
+                        "release"
+                      );
+
+                      for (const libFile of libfiles) {
+                        const libName = basename(libFile);
+                        const sourceLibFile = join(targetDir, libName);
+
+                        if (!(await exists(sourceLibFile))) {
+                          continue;
+                        }
+
+                        await copyFiles(sourceLibFile, join(outputExtensionDir, libFile));
+                      }
+                    }
+                  },
+                },
+              ]),
           }))
         ),
     },

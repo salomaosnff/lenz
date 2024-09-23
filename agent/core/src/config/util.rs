@@ -1,17 +1,25 @@
 use std::path::PathBuf;
 
 pub fn install_dir() -> PathBuf {
-    return std::env::var("CARGO_MANIFEST_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|_| {
-            std::env::current_exe()
-                .expect("Failed to get current executable path")
-                .parent()
-                .expect("Failed to get parent directory of current executable")
-                .parent()
-                .expect("Failed to get parent directory of parent directory of current executable")
-                .to_path_buf()
-        });
+    if let Some(cargo_manifest_dir) = std::env::var("CARGO_MANIFEST_DIR").ok() {
+        PathBuf::from(cargo_manifest_dir)
+            .join("../../dist/plain")
+            .canonicalize()
+            .expect("Failed to get canonical path")
+    } else {
+        let x = std::env::current_exe()
+            .expect("Failed to get current exe")
+            .parent()
+            .expect("Failed to get parent")
+            .join("../")
+            .canonicalize()
+            .expect("Failed to get canonical path")
+            .to_path_buf();
+
+        println!("install_dir: {:?}", x);
+
+        x
+    }
 }
 
 pub fn resources_dir() -> PathBuf {
@@ -43,23 +51,7 @@ pub fn app_data() -> PathBuf {
 pub fn built_in_extensions() -> PathBuf {
     std::env::var("LENZ_BUILT_IN_EXTENSIONS_PATH")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| {
-            #[allow(unused_mut)]
-            let mut dir = install_dir();
-
-            #[cfg(debug_assertions)]
-            {
-                dir = dir.join("../../dist/plain").canonicalize().expect("Failed to get canonical path");
-
-                
-                #[cfg(target_os = "windows")]
-                {
-                    dir = dir.join("lenz-windows-x86-x64")
-                }
-            }
-
-            return dir.join("extensions")
-        })
+        .unwrap_or_else(|_| install_dir().join("extensions"))
 }
 
 pub fn user_extensions() -> PathBuf {

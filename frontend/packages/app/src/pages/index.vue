@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-
 import { useEditorStore } from "../store/editor";
 
 import { ref } from "vue";
 import AppPanel from "../components/AppPanel.vue";
 
+const route = useRoute();
+const router = useRouter();
 const editor = useEditorStore();
 
 const isMobile = ref(false);
@@ -17,50 +18,63 @@ provide("lockIframe", {
 
 const fileStore = useFileStore();
 
-const html = computed(() =>
-  fileStore.currentFile?.data
-    ? fileStore.currentFile.text()
-    : `
-    <div class="container">
-      <h1 class="title">Bem-vindo ao Editor de Páginas!</h1>
-      <p class="description">Clique em uma ferramenta para começar.</p>
-    </div>
-    `
-);
+const html = computed(() => fileStore.currentFile?.text());
 
 const settingsStore = useSettingsStore();
+
+watch(
+  () => route.query.file?.toString(),
+  async (file) => {
+    if (!file) {
+      return;
+    }
+
+    await router.replace({ query: { ...route.query, file: undefined } });
+
+    fileStore.openFile(file);
+  },
+  { immediate: true }
+);
 </script>
 <template>
-  <div class="w-full h-full flex flex-col pa-2 gap-2 bg--surface">
+  <div
+    class="w-full h-full flex flex-col pa-2 gap-2 bg--surface"
+    :class="{
+      'pointer-events-none': lockIframe,
+    }"
+  >
     <AppMenubar />
     <AppPanel>
       <div class="flex items-center">
         <span>Arquivo atual: </span>
-        <p class="px-4">{{ fileStore.currentFile?.filepath }} </p>
-        <span v-if="fileStore.currentFile?.dirty" class="text-3 font-bold fg--warning">Há alterações não salvas</span>
+        <p class="px-4">{{ fileStore.currentFile?.filepath }}</p>
+        <span
+          v-if="fileStore.currentFile?.dirty"
+          class="text-3 font-bold fg--warning"
+          >Há alterações não salvas</span
+        >
       </div>
     </AppPanel>
-    <AppCommandPalette class="fixed top-12 left-50% w-120 translate-x--50% z-99" />
+    <AppCommandPalette
+      class="fixed top-12 left-50% w-120 translate-x--50% z-99"
+    />
     <AppHotkeys class="fixed top-12 right-4 z-99" />
     <div
       class="app-editor-view w-full flex-1 pa-4 relative justify-center items-center"
     >
       <AppCanvas
+        v-if="fileStore.currentFile"
         v-model="editor.currentDocument"
         v-model:active="editor.selectedElements"
         v-model:hover="editor.hoveredElement"
         :html="html"
         :is-mobile
         class="mx-auto h-full bg-white"
-        :class="{
-          'pointer-events-none': lockIframe,
-        }"
         :style="{
-          maxWidth: `${settingsStore.settings.frame.width}px`
+          maxWidth: `${settingsStore.settings.frame.width}px`,
         }"
       />
     </div>
-
     <AppWindowManager />
   </div>
 </template>

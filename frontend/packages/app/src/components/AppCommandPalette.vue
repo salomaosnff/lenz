@@ -3,12 +3,14 @@ const commandsStore = useCommandsStore();
 const search = ref("");
 
 window.addEventListener("keydown", (event) => {
-  const isInputActive = document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA";
+  const isInputActive =
+    document.activeElement?.tagName === "INPUT" ||
+    document.activeElement?.tagName === "TEXTAREA";
 
   if (event.key === "F1") {
     event.preventDefault();
     event.stopImmediatePropagation();
-    
+
     if (!isInputActive) {
       commandsStore.showCommands = !commandsStore.showCommands;
     }
@@ -26,8 +28,8 @@ const filteredCommands = computed(() => {
 
   return Object.values(commandsStore.commands).filter(
     (command) =>
-      command.name.toLowerCase().includes(query) ||
-      command.description.toLowerCase().includes(query)
+      (command && command.name?.toLowerCase().includes(query)) ||
+      command.description?.toLowerCase().includes(query)
   );
 });
 </script>
@@ -52,7 +54,10 @@ const filteredCommands = computed(() => {
           <UiMenuItemSeparator />
           <li
             class="app-cmd-palette__item pa-2 hover:bg--surface-muted cursor-pointer flex gap-3 items-start rounded-md"
-            @click="commandsStore.executeCommand(command.id), (commandsStore.showCommands = false)"
+            @click="
+              commandsStore.executeCommand(command.id),
+                (commandsStore.showCommands = false)
+            "
           >
             <UiIcon :path="command.icon ?? ''" class="!w-6 !h-6" />
             <div>

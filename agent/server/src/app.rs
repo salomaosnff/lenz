@@ -8,7 +8,9 @@ use std::{
 
 use lenz_core::{
     config::consts::BASE_URL,
+    define_invoke_handlers,
     extensions::plugin::{LenzPlugin, LenzPluginContext},
+    invoke::InvokeResult,
 };
 use libloading::Library;
 
@@ -69,7 +71,7 @@ pub fn search_esm_files(
         let path = entry.path();
         let ext = path.extension().unwrap_or_default();
 
-        if ext == "mjs" {
+        if ext == "js" || ext == "mjs" {
             let relative_path = path.strip_prefix(dir).unwrap();
 
             let name = relative_path.with_extension("");
@@ -105,13 +107,21 @@ impl AppState {
         let config = Arc::new(lenz_core::config::AgentConfig::load());
         let mut static_assets = StaticAssets::new(config.www_dir.clone());
 
+        let mut invoke_handlers = InvokeHandlers::new();
+
+        invoke_handlers.extend(define_invoke_handlers! {
+            "app.quit" => |_| async {
+                InvokeResult::Quit
+            }
+        });
+
         static_assets.add("/esm/", config.esm_dir.clone());
 
         Arc::new(Self {
             import_map: tokio::sync::RwLock::new(search_esm_files(&config.esm_dir, None)),
             extension_host: tokio::sync::RwLock::new(ExtensionHost::new(config.clone())),
             static_files: tokio::sync::RwLock::new(static_assets),
-            invoke_handlers: tokio::sync::RwLock::new(InvokeHandlers::new()),
+            invoke_handlers: tokio::sync::RwLock::new(invoke_handlers),
             config,
         })
     }
@@ -132,8 +142,7 @@ pub fn load_dynlib_extension(
     let lib_path = dirname.join(libloading::library_filename(base_name.to_str().unwrap()));
 
     unsafe {
-        let lib = libloading::Library::new(lib_path)
-            .expect("Failed to load library");
+        let lib = libloading::Library::new(lib_path).expect("Failed to load library");
         let create_plugin: libloading::Symbol<fn(&mut LenzPluginContext) -> *mut dyn LenzPlugin> =
             lib.get(b"create_plugin").expect("Failed to load symbol");
 

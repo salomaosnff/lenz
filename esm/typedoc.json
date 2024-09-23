@@ -1,0 +1,17 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPointStrategy": "expand",
+    "out": "./docs",
+    "exclude": [
+        "./src/icons/*"
+    ],
+    "entryPoints": [
+        "./src"
+    ],
+    "lang": "pt",
+    "locales": {
+        "pt": {
+            
+        }
+    }
+}

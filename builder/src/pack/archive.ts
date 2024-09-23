@@ -1,8 +1,7 @@
 import { execaCommand as command } from "execa";
-import { mkdir } from "fs/promises";
+import { mkdir } from "fs-extra";
 import { ListrTask } from "listr2";
 import { join } from "path";
-import { setTimeout } from "timers/promises";
 
 export interface PackArchiveOptions {
   input: string;
@@ -19,7 +18,7 @@ export async function getPackArquiveTasks(options: PackArchiveOptions): Promise<
 
   return [
     {
-      title: "Create tar.gz archive",
+      title: "Criar pacote tar.gz",
       skip: () => options.noTarGz,
       async task(_, task) {
         const archiveFilename = join(options.output, `${prefix}.tar.gz`);
@@ -33,7 +32,7 @@ export async function getPackArquiveTasks(options: PackArchiveOptions): Promise<
       },
     },
     {
-      title: "Create zip archive",
+      title: "Criar pacote zip",
       skip: () => options.noZip,
       async task(_, task) {
         const archiveFilename = join(options.output, `${prefix}.zip`);
@@ -47,7 +46,7 @@ export async function getPackArquiveTasks(options: PackArchiveOptions): Promise<
       },
     },
     {
-      title: "Create tar.xz archive",
+      title: "Criar pacote tar.xz",
       skip: () => options.noTarXz,
       async task(_, task) {
         const archiveFilename = join(options.output, `${prefix}.tar.xz`);

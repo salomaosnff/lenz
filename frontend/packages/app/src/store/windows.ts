@@ -1,15 +1,15 @@
 import _uniqueId from "lodash-es/uniqueId";
 import { defineStore } from "pinia";
 import { reactive } from "vue";
-import { WebviewChannel } from "../components/AppWebview/types";
 
 export interface WindowOptions {
   title?: string;
-  content?: string;
+  content?: string | URL;
+  base?: URL;
   width?: number;
   height?: number;
   themed?: boolean;
-  channels?: Record<string, WebviewChannel<unknown>>;
+  data?: Record<string, unknown>;
   position?: { x: number; y: number };
   resizable?: boolean;
   borderless?: boolean;
@@ -20,9 +20,9 @@ export interface WindowOptions {
 
 export interface WindowInstance {
   id: string;
-  options: Required<WindowOptions>;
+  options: WindowOptions & Required<Omit<WindowOptions, "base" | "content">>;
 
-  setContent(source: string): void;
+  setContent(source: string | URL): void;
   setPosition(x: number, y: number): void;
   setSize(width: number, height: number): void;
   center(): void;
@@ -116,18 +116,69 @@ content += Object.entries(THEME.themes)
 
 style.textContent = content;
 
-function parseContent(content: string, options: WindowOptions) {
-  const importmap = document.head.querySelectorAll("script[type=importmap]");
+function parseContent(
+  content: string,
+  options: WindowOptions,
+  base = options.base
+) {
+  const importmap = document.head.querySelector("script[type=importmap]");
   const iframeDocument = new DOMParser().parseFromString(content, "text/html");
+
+  // set origin
+  iframeDocument.documentElement.setAttribute("data-origin", window.origin);
+
+  const existingImportmap = iframeDocument.head.querySelector(
+    "script[type=importmap]"
+  );
 
   if (options.themed) {
     iframeDocument.documentElement.classList.add("theme--dark");
     iframeDocument.head.appendChild(style.cloneNode(true));
   }
 
-  iframeDocument.head.prepend(
-    ...Array.from(importmap).map((script) => script.cloneNode(true))
-  );
+  if (existingImportmap) {
+    const currentContent = JSON.parse(existingImportmap.textContent ?? "{}");
+    const contentToMerge = JSON.parse(importmap?.textContent ?? "{}");
+
+    Object.assign(currentContent.imports, contentToMerge.imports);
+
+    existingImportmap.textContent = JSON.stringify(currentContent);
+  } else if (importmap) {
+    iframeDocument.head.prepend(importmap?.cloneNode(true));
+  }
+
+  if (base) {
+    const baseElement = document.createElement("base");
+    baseElement.href = base.href;
+    iframeDocument.head.prepend(baseElement);
+
+    const setOriginScript = document.createElement("script");
+
+    setOriginScript.textContent = `
+      window.origin = "${base.protocol}//${base.host}";
+    `;
+
+    iframeDocument.head.prepend(setOriginScript);
+
+    for (const el of iframeDocument.querySelectorAll(
+      "script[src], link[href], img[src]"
+    )) {
+      const src = (
+        el.getAttribute("src") ??
+        el.getAttribute("href") ??
+        ""
+      ).replace(/^\.\/*/, "");
+      const normalizedSrc = src.startsWith("http")
+        ? src
+        : `${base.href.replace(/\/+$/, "")}/${src.replace(/^\/+/, "")}`;
+
+      if (el.tagName === "SCRIPT" || el.tagName === "IMG") {
+        el.setAttribute("src", normalizedSrc);
+      } else if (el.tagName === "LINK") {
+        el.setAttribute("href", normalizedSrc);
+      }
+    }
+  }
 
   return iframeDocument;
 }
@@ -137,26 +188,34 @@ export const useWindowStore = defineStore("window", () => {
 
   function createWindow(options: WindowOptions): WindowInstance {
     const id = _uniqueId("window-");
-    const normalizedOptions = reactive<Required<WindowOptions>>({
+    const { content, ...rest } = options;
+    const normalizedOptions = reactive({
       title: "Window",
       width: 600,
       height: 400,
       position: { x: 0, y: 0 },
       borderless: false,
-      channels: {},
+      data: {},
       closable: true,
       content: "",
       modal: false,
       movable: true,
       resizable: true,
       themed: true,
-      ...options,
+      ...rest,
     });
 
-    function setContent(content: string) {
+    async function setContent(content: string | URL, base?: URL) {
+      if (content instanceof URL) {
+        return setContent(
+          await fetch(content).then((res) => res.text()),
+          base ?? content
+        );
+      }
       normalizedOptions.content = parseContent(
         content,
-        options
+        options,
+        base
       ).documentElement.outerHTML;
     }
 
@@ -176,7 +235,11 @@ export const useWindowStore = defineStore("window", () => {
       setPosition((innerWidth - width) / 2, (innerHeight - height) / 2);
     }
 
-    const instance = {
+    function close() {
+      windowsMap.delete(id);
+    }
+
+    const instance: WindowInstance = {
       id,
       options: normalizedOptions,
       center,
@@ -186,7 +249,7 @@ export const useWindowStore = defineStore("window", () => {
       setSize,
     };
 
-    instance.setContent(options.content || "");
+    instance.setContent(content || "");
 
     windowsMap.set(id, instance);
 

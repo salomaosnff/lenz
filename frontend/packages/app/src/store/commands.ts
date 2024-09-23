@@ -35,15 +35,15 @@ export const useCommandsStore = defineStore("commands", () => {
     commands.value[command.id] = command;
   }
 
-  async function executeCommand(id: string, ...args: any) {
+  async function executeCommand<T>(id: string, ...args: any): Promise<T> {
     if (!commands.value[id]) {
       throw new Error(`Command with id ${id} does not exist`);
     }
 
-    await commands.value[id].run(
+    return commands.value[id].run(
       {
         getSelection: editorStore.getSelection,
-        setSelection: editorStore.setSelection,
+        getSelection: editorStore.setSelection,
         getHover: editorStore.getHover,
         getCurrentDocument: editorStore.getCurrentDocument,
         getCurrentContent: editorStore.getCurrentContent,
