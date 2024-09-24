@@ -1,6 +1,7 @@
 import { ListrTask } from "listr2";
 import { execaCommand as command } from "execa";
-import { copy, mkdir, readdir, readFile, exists } from "fs-extra";
+import { exists } from "fs-extra";
+import { readFile, readdir } from "fs/promises";
 import { basename, dirname, join } from "node:path";
 import { copyFiles } from "../util";
 
@@ -89,6 +90,18 @@ export async function getBuildExtensionsTask(
                     return !(await exists(packageJson));
                   },
                   task: async (_, task) => {
+                    task.output = "Instalando dependências...";
+                    const install = command("pnpm install --ignore-workspace", {
+                      cwd: join(options.input, ext, "frontend"),
+                    });
+
+                    install.stdout.pipe(task.stdout());
+                    install.stderr.pipe(task.stdout());
+
+                    await install;
+
+                    task.output = "Executando `pnpm build`...";
+
                     const execute = command("pnpm build", {
                       cwd: join(options.input, ext, "frontend"),
                     });

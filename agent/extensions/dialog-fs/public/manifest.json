@@ -1,0 +1,10 @@
+{
+    "$schema": "https://gist.githubusercontent.com/salomaosnff/13a918110aaca6a170f43ad56bacb395/raw/92ce12821b90f5ae6c4a509331c82d1c300000cc/lenz-extension.schema.json",
+    "id": "file-dialog",
+    "name": "Janela de Arquivos",
+    "description": "Extensão para abrir janela de arquivos",
+    "dynlib": "dynlib/lenz_extension_file_dialog",
+    "publisher": "Salomão Neto <contato@sallon.dev>",
+    "version": "1.0.0",
+    "main": "main.js"
+}

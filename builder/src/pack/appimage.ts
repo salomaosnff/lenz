@@ -1,8 +1,10 @@
-import { mkdir, mkdtemp, rm, writeFile } from "fs-extra";
+import { ensureDir, remove } from "fs-extra";
 import { ListrTask } from "listr2";
 import { tmpdir } from "os";
 import { basename, dirname, join, resolve } from "path";
+import { fileURLToPath } from "url";
 import { execaCommand as command } from "execa";
+import { mkdtemp, writeFile } from "fs/promises";
 
 import { copyFiles } from "../util";
 import { Launcher } from "./deb";
@@ -31,10 +33,8 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
         };
         ctx.workdir = await mkdtemp(join(tmpdir(), "lenz-appimage-"));
 
-        await mkdir(join(ctx.workdir, "usr", "bin"), { recursive: true });
-        await mkdir(join(ctx.workdir, "usr", "share", "applications"), {
-          recursive: true,
-        });
+        await ensureDir(join(ctx.workdir, "usr", "bin"));
+        await ensureDir(join(ctx.workdir, "usr", "share", "applications"));
       },
     },
     {
@@ -103,7 +103,7 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
       title: "Criar pacote AppImage",
       async task(ctx, task) {
         const appimagetoolExec = resolve(
-          __dirname,
+          dirname(fileURLToPath(import.meta.url)),
           "../../vendor/appimagetool-x86_64.AppImage"
         );
         const appImageFile = join(
@@ -111,7 +111,7 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
           `${ctx.package.id}-v${ctx.package.version}-linux-${ctx.package.architecture}.deb`
         );
 
-        await mkdir(dirname(appImageFile), { recursive: true });
+        await ensureDir(dirname(appImageFile));
 
         const execute = command(`${appimagetoolExec} ${ctx.workdir}`, {
           cwd: options.output,
@@ -131,7 +131,7 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
       async task(ctx, task) {
         task.output = "Remove temporary workdir";
 
-        await rm(ctx.workdir, { recursive: true });
+        await remove(ctx.workdir);
       },
     },
   ];

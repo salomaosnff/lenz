@@ -14,6 +14,7 @@ export interface BuildAgentOptions {
 export async function getBuildAgentTasks(
   options: BuildAgentOptions
 ): Promise<ListrTask[]> {
+  
   return [
     {
       title: "Construir agente utilizando cargo",

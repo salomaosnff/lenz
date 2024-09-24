@@ -15,7 +15,7 @@ declare module "util" {
      * Garante que o editor foi inicializado
      * @returns Store do editor
      */
-    export function ensureInitialized(): any;
+    export function ensureInitialized(): Record<string, () => any>;
 }
 declare module "commands" {
     /**

@@ -31,24 +31,24 @@ Se você não sabe qual pacote baixar, escolha o pacote .AppImage, ele é portá
     <tr>
         <td>Debian/Ubuntu e derivados</td>
         <td>Pacote Debian (.deb)</td>
-        <td><a href="">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.deb">Baixar arquivo</a></td>
     </tr>
     <tr>
         <td rowspan="4">Todas as distribuições Linux</td>
         <td>Executável portátil (.AppImage)</td>
-        <td><a href="https://github.com/salomaosnff/lenz-designer/releases/download/v0.1.0/lenz-designer.AppImage">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.AppImage">Baixar arquivo</a></td>
     </tr>
     <tr>
         <td>Arquivo compactado (.tar.gz)</td>
-        <td><a href="https://github.com/salomaosnff/lenz-designer/releases/download/v0.1.0/lenz-designer.tar.gz">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.tar.gz">Baixar arquivo</a></td>
     </tr>
     <tr>
         <td>Arquivo compactado (.tar.xz)</td>
-        <td><a href="https://github.com/salomaosnff/lenz-designer/releases/download/v0.1.0/lenz-designer.tar.xz">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.tar.xz">Baixar arquivo</a></td>
     </tr>
     <tr>
         <td>Arquivo compactado (.zip)</td>
-        <td><a href="https://github.com/salomaosnff/lenz-designer/releases/download/v0.1.0/lenz-designer.zip">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.zip">Baixar arquivo</a></td>
     </tr>
     </tbody>
 </table>

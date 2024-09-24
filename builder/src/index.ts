@@ -1,7 +1,8 @@
 import { program } from "commander";
 import { join, dirname, relative, resolve } from "path";
+import { fileURLToPath } from "node:url";
 import { Listr } from "listr2";
-import { rm } from "fs-extra";
+import { remove } from "fs-extra";
 
 import { getBuildAgentTasks } from "./build/agent";
 import { getBuildExtensionsTask } from "./build/extensions";
@@ -13,16 +14,13 @@ import { getBuildEsmTasks } from "./build/esm";
 
 let outDirDeleted = false;
 
-const ROOT_DIR = dirname(__dirname);
+const ROOT_DIR = dirname(dirname(fileURLToPath(import.meta.url)));
 const ROOT_PROJECT = dirname(ROOT_DIR);
 
 async function clean(options: any) {
   if (!outDirDeleted) {
     outDirDeleted = true;
-    await rm(join(process.cwd(), options.output), {
-      force: true,
-      recursive: true,
-    });
+    await remove(join(process.cwd(), options.output));
   }
 }
 

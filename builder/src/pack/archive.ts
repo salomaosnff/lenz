@@ -1,5 +1,5 @@
 import { execaCommand as command } from "execa";
-import { mkdir } from "fs-extra";
+import { ensureDir } from "fs-extra";
 import { ListrTask } from "listr2";
 import { join } from "path";
 
@@ -14,7 +14,7 @@ export interface PackArchiveOptions {
 export async function getPackArquiveTasks(options: PackArchiveOptions): Promise<ListrTask[]> {
   const prefix = "lenz-designer-linux-x64";
 
-  await mkdir(options.output, { recursive: true });
+  await ensureDir(options.output);
 
   return [
     {

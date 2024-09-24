@@ -9,7 +9,7 @@
     "build:js": "rm -rf dist && tsx build.ts",
     "build:types": "rm -rf types && tsc -p tsconfig.types.json",
     "build:copy-dts": "for file in src/*.d.ts src/**/*.d.ts; do cp $file types/$(basename $file); done",
-    "build": "pnpm build:js && pnpm build:types && pnpm build:docs",
+    "build": "pnpm build:js && pnpm build:types && pnpm docs:build",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs"

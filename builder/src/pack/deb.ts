@@ -1,8 +1,9 @@
 import { ListrTask } from "listr2";
 import { tmpdir } from "os";
 import { basename, dirname, join } from "path";
-import { mkdir, mkdtemp, rm, writeFile } from "fs-extra";
+import { ensureDir, remove } from "fs-extra";
 import { execaCommand as command } from "execa";
+import { mkdtemp, writeFile } from "fs/promises";
 
 import { copyFiles } from "../util";
 
@@ -120,12 +121,10 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
 
         const debian = join(ctx.workdir, "DEBIAN");
 
-        await mkdir(debian, { recursive: true });
+        await ensureDir(debian);
 
-        await mkdir(join(ctx.workdir, "usr", "bin"), { recursive: true });
-        await mkdir(join(ctx.workdir, "usr", "share", "applications"), {
-          recursive: true,
-        });
+        await ensureDir(join(ctx.workdir, "usr", "bin"));
+        await ensureDir(join(ctx.workdir, "usr", "share", "applications"));
       },
     },
     {
@@ -214,7 +213,7 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
           `${ctx.controlFile.data.Package}-v${ctx.controlFile.data.Version}-linux-${ctx.controlFile.data.Architecture}.deb`
         );
 
-        await mkdir(dirname(packageFile), { recursive: true });
+        await ensureDir(dirname(packageFile));
 
         const execute = command(
           `dpkg-deb --build ${ctx.workdir} ${packageFile}`
@@ -229,7 +228,7 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
     {
       title: "Limpar pasta de trabalho",
       async task(ctx) {
-        await rm(ctx.workdir, { recursive: true, force: true });
+        await remove(ctx.workdir);
       },
     },
   ];

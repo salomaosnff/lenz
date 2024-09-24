@@ -1,0 +1,4 @@
+.file-grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 128px);
+}

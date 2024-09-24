@@ -1,2 +1,3 @@
+pnpm i
 cd builder
-pnpm tsx src/index.ts build
+pnpm make build && pnpm make pack --all
