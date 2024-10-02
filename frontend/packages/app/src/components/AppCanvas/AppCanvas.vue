@@ -2,10 +2,24 @@
 import icon_refresh from "lenz:icons/refresh";
 import { CanvasElement, createElementSelection } from "./types";
 
+const props = defineProps<{
+  html: string;
+}>();
+
 const documentModel = defineModel<Document>();
-const htmlModel = defineModel<string>("html");
 const hoverModel = defineModel<CanvasElement>("hover");
 const activeModel = defineModel<CanvasElement[]>("active");
+
+const hotKeysStore = useHotKeysStore();
+
+const currentHTML = computed(() => {
+  const dom = new DOMParser().parseFromString(props.html, "text/html");
+  return dom.documentElement.outerHTML;
+});
+
+const emit = defineEmits<{
+  "dom-update": [string];
+}>();
 
 const loaded = ref(false);
 const iframe = ref<HTMLIFrameElement>();
@@ -20,25 +34,44 @@ styleEl.textContent = `html, body {
 }`;
 
 watch(
-  htmlModel,
+  currentHTML,
   () => {
     loaded.value = false;
   },
   { immediate: true }
 );
 
+let observer: MutationObserver | undefined;
+
 whenever(
   loaded,
   () => {
-    documentModel.value = iframe.value?.contentDocument ?? undefined;
+    const dom = iframe.value?.contentDocument;
 
-    if (
-      !iframe.value?.contentDocument?.querySelector("style[data-ignore-on-to-string]")
-    ) {
-      iframe.value?.contentDocument?.head.appendChild(styleEl.cloneNode(true));
+    if (!dom) {
+      return;
     }
 
-    iframe.value?.contentDocument?.addEventListener("pointermove", (event) => {
+    observer?.disconnect();
+
+    documentModel.value = markRaw(dom);
+
+    if (!dom.querySelector("style[data-ignore-on-to-string]")) {
+      dom?.head.appendChild(styleEl.cloneNode(true));
+    }
+
+    observer = new MutationObserver(() =>
+      emit("dom-update", toString(documentModel.value))
+    );
+
+    observer.observe(dom.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      characterData: true,
+    });
+
+    dom?.addEventListener("pointermove", (event) => {
       hoverModel.value = createElementSelection(
         event.target as HTMLElement,
         iframe.value
@@ -67,6 +100,19 @@ whenever(
           } else {
             activeModel.value = selection.concat(element);
           }
+        } else if (event.shiftKey && selection.length === 1) {
+          const children = Array.from(
+            selection[0].element.parentElement?.children ?? []
+          );
+
+          const start = children.indexOf(selection[0].element);
+          const end = children.indexOf(element.element);
+
+          activeModel.value = children
+            .slice(Math.min(start, end), Math.max(start, end) + 1)
+            .map((el) =>
+              createElementSelection(el as HTMLElement, iframe.value)
+            );
         } else if (isSelected) {
           activeModel.value = [];
         } else {
@@ -79,17 +125,24 @@ whenever(
     );
 
     // Propagate iframe window events to the parent window
-    const EVENTS = new Set(Object.keys(window)
-      .filter((key) => key.startsWith("on"))
-      .map((key) => key.slice(2).toLowerCase()));
-
-      EVENTS.delete("beforeunload")
+    const EVENTS: string[] = ['pointerdown', 'click'];
 
     for (const event of EVENTS) {
       iframe.value?.contentWindow?.addEventListener(event, (e) => {
         window.dispatchEvent(new (e as any).constructor(e.type, e));
       });
     }
+
+    iframe.value?.contentWindow?.addEventListener(
+      "keydown",
+      hotKeysStore.handleKeyDown,
+      { capture: true }
+    );
+    iframe.value?.contentWindow?.addEventListener(
+      "keyup",
+      hotKeysStore.handleKeyUp,
+      { capture: true }
+    );
 
     const currentDocument = iframe.value?.contentDocument as Document;
 
@@ -140,16 +193,18 @@ function updateInspect() {
   }
 
   if (hoverModel.value) {
-    hoverModel.value = createElementSelection(
+    const { box } = createElementSelection(
       hoverModel.value.element,
       iframe.value
     );
+    hoverModel.value.box = box;
   }
 
   if (activeModel.value) {
-    activeModel.value = Array.from(activeModel.value).map((el) =>
-      createElementSelection(el.element, iframe.value)
-    );
+    for (const item of activeModel.value) {
+      const { box } = createElementSelection(item.element, iframe.value);
+      item.box = box;
+    }
   }
 }
 
@@ -166,8 +221,12 @@ useEventListener(
   { capture: true }
 );
 
-function toString() {
-  const copy = documentModel.value?.cloneNode(true) as Document;
+function toString(dom?: Document) {
+  if (!dom) {
+    return "";
+  }
+
+  const copy = dom.cloneNode(true) as Document;
 
   for (const el of copy.querySelectorAll("[data-ignore-on-to-string]")) {
     el.remove();
@@ -177,7 +236,7 @@ function toString() {
 }
 
 defineExpose({
-  toString,
+  toString: () => toString(documentModel.value),
 });
 </script>
 <template>
@@ -188,8 +247,9 @@ defineExpose({
       :class="[
         loaded ? ['visible', 'opacity-100'] : ['invisible', 'opacity-0'],
       ]"
-      .srcdoc="htmlModel"
+      .srcdoc="html"
       frameborder="0"
+      @loadstart="loaded = false"
       @load="loaded = true"
     ></iframe>
 

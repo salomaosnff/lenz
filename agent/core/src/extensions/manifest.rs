@@ -142,7 +142,7 @@ impl ExtensionManifest {
     } else {
       return Err(ExtensionError::ManifestFileNotFound);
     };
-
+    
     let manifest = match std::fs::read_to_string(&manifest_path) {
       Ok(str) => str,
       Err(err) => return Err(ExtensionError::FailedToLoadManifestFile(err.to_string())),

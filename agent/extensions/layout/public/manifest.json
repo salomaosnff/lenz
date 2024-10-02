@@ -1,0 +1,8 @@
+{
+  "id": "css.flexbox.grid",
+  "name": "Flexbox e Grid Layout",
+  "main": "main.js",
+  "description": "Habilita o suporte a Flexbox e Grid Layout",
+  "version": "1.0.0",
+  "publisher": "Salomão Neto <contato@sallon.dev>"
+}

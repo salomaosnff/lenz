@@ -1,18 +1,29 @@
 <script setup lang="ts">
 const windowStore = useWindowStore();
+const windowRefs = ref<any[]>([]);
+
+function scheduleFocus() {
+  setTimeout(() => {
+    windowRefs.value.at(-1)?.focus();
+  }, 0);
+}
 </script>
 <template>
   <Teleport to="body">
-    <div class="!z-100 fixed">
-      <TransitionGroup>
-        <AppWindow
-          v-for="[id, window] of windowStore.windowsMap"
-          :key="id"
-          :title="window.options.title"
-          :content="(window.options.content as string)"
-          :data="window.options.data"
-        />
-      </TransitionGroup>
-    </div>
+    <AppWebWindow
+      v-for="([id, w], i) of windowStore.windowsMap"
+      :key="id"
+      :ref="
+        (r) => {
+          if (r) {
+            windowRefs[i] = r;
+          } else {
+            windowRefs.splice(i, 1);
+          }
+        }
+      "
+      v-bind="w.options"
+      @close="scheduleFocus"
+    />
   </Teleport>
 </template>

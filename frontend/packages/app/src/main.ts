@@ -10,6 +10,9 @@ import { routes } from "vue-router/auto-routes";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 
+window.moveTo(0, 0)
+window.resizeTo(window.screen.availWidth, window.screen.availHeight)
+
 const router = createRouter({
   history: createWebHistory(),
   routes,

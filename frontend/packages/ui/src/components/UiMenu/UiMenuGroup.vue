@@ -5,6 +5,7 @@ import { inject, Ref } from 'vue';
 
 defineProps<{
     disabled?: boolean
+    icon?: string
 }>();
 
 const id = _uniqueId('menu-group-');
@@ -18,9 +19,6 @@ const parentMenuGroup = inject<{
 
 if (!parentMenuGroup) {
     throw new Error('UiMenuGroup must be used inside UiMenu or UiMenuBar');
-}
-function onPointerEnter() {
-    (parentMenuGroup as any).currentItem.value = id;
 }
 
 function onClick() {
@@ -50,10 +48,12 @@ function close() {
             <slot name="activator" :ref="bind.setActivatorRef" @pointerenter="onPointerEnter">
                 <li :ref="bind.setActivatorRef" tabindex="0"
                     class="whitespace-nowrap hover:bg--surface2 py-1 px-2 gap-2 cursor-pointer flex rounded-md" :class="{
-                        'pl-28px': parentMenuGroup.hasIcons.value,
+                        'pl-28px': parentMenuGroup.hasIcons.value && !icon,
                         'bg--surface2': parentMenuGroup?.currentItem.value === id,
                         'fg--muted pointer-events-none': disabled
-                    }" @pointerenter="onPointerEnter" @click="onClick">
+                    }"  @click="onClick">
+                    <UiIcon v-if="icon" :path="icon" class="!w-16px !h-16px" />
+
                     <div class="flex-1">
                         <slot name="title"></slot>
                     </div>

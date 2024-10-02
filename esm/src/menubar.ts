@@ -144,14 +144,13 @@ export type MenuItem =
   | MenuItemRadioGroup;
 
 /**
- * Insere um novo item na barra de menu
- * @param parent Caminho do item pai
- * @param items Itens a serem inseridos
- * @returns Disposer para remover os itens
+ * Adiciona itens a barra de menu
+ * @param items Itens a serem adicionados
+ * @param parentId Id do item pai
  */
-export function addMenuItemsAt(
-  parent: string[],
-  items: MenuItem[]
+export function extendMenu(
+  items: MenuItem[],
+  parentId?: string,
 ): LenzDisposer {
   const menubarStore = ensureInitialized().menubar?.();
 
@@ -159,5 +158,5 @@ export function addMenuItemsAt(
     throw new Error("Editor not initialized yet");
   }
 
-  return menubarStore.addMenuItemsAt(parent, items);
+  return menubarStore.extendMenu(items, parentId);
 }

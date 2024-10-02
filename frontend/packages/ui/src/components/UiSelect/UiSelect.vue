@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T, V">
-import icon_chevron_down from "lenz:icons/chevron-down";
+import icon_chevron_down from "lenz:icons/chevron_down";
 import { computed } from "vue";
 
 import { useFormField } from "../../composable/useForm";

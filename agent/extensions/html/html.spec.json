@@ -1,0 +1,804 @@
+{
+  "$id": "tags-spec",
+  "type": "object",
+  "declarations": {
+    "GlobalAttrs": {
+      "attrs": {
+        "id": {
+          "type": "string",
+          "label": "Identificador"
+        },
+        "class": {
+          "type": "string",
+          "array": true,
+          "label": "Classes"
+        },
+        "contenteditable": {
+          "type": "boolean",
+          "label": "Conteúdo editável"
+        },
+        "dragable": {
+          "type": "boolean",
+          "label": "Arrastável"
+        },
+        "style": {
+          "type": "string",
+          "label": "Estilo"
+        },
+        "tabindex": {
+          "type": "number",
+          "label": "Índice de tabulação"
+        },
+        "title": {
+          "type": "string",
+          "label": "Título"
+        }
+      }
+    }
+  },
+  "elements": {
+    "a": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "href": {
+          "type": "string",
+          "label": "URL"
+        },
+        "download": {
+          "type": "string",
+          "label": "Nome do arquivo"
+        },
+        "rel": {
+          "type": "string",
+          "array": true,
+          "label": "Relações"
+        },
+        "target": {
+          "type": "string",
+          "enum": ["_self", "_blank", "_parent", "_top"],
+          "label": "Destino"
+        },
+        "shape": {
+          "type": "string",
+          "enum": ["default", "rect", "circle", "poly"],
+          "label": "Forma"
+        }
+      }
+    },
+    "body": { "extends": ["declarations/GlobalAttrs"] },
+    "br": { "extends": ["declarations/GlobalAttrs"] },
+    "button": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "autofocus": {
+          "type": "boolean",
+          "label": "Foco automático"
+        },
+        "disabled": {
+          "type": "boolean",
+          "label": "Desabilitado"
+        },
+        "name": {
+          "type": "string",
+          "label": "Nome"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["button", "reset", "submit"],
+          "label": "Tipo"
+        },
+        "value": {
+          "type": "string",
+          "label": "Valor"
+        }
+      }
+    },
+    "div": { "extends": ["declarations/GlobalAttrs"] },
+    "em": { "extends": ["declarations/GlobalAttrs"] },
+    "fieldset": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "disabled": {
+          "type": "boolean",
+          "label": "Desabilitado"
+        }
+      }
+    },
+    "form": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "accept-charset": {
+          "type": "string",
+          "label": "Conjunto de caracteres"
+        },
+        "action": {
+          "type": "string",
+          "label": "URL"
+        },
+        "autocomplete": {
+          "type": "string",
+          "enum": ["on", "off"],
+          "label": "Autocompletar"
+        },
+        "enctype": {
+          "type": "string",
+          "enum": [
+            "application/x-www-form-urlencoded",
+            "multipart/form-data",
+            "text/plain"
+          ],
+          "label": "Tipo de codificação"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["get", "post"],
+          "label": "Método"
+        },
+        "name": {
+          "type": "string",
+          "label": "Nome"
+        },
+        "novalidate": {
+          "type": "boolean",
+          "label": "Validação desativada"
+        },
+        "target": {
+          "type": "string",
+          "enum": ["_self", "_blank", "_parent", "_top"],
+          "label": "Destino"
+        }
+      }
+    },
+    "h1": { "extends": ["declarations/GlobalAttrs"] },
+    "h2": { "extends": ["declarations/GlobalAttrs"] },
+    "h3": { "extends": ["declarations/GlobalAttrs"] },
+    "h4": { "extends": ["declarations/GlobalAttrs"] },
+    "h5": { "extends": ["declarations/GlobalAttrs"] },
+    "h6": { "extends": ["declarations/GlobalAttrs"] },
+    "head": { "extends": ["declarations/GlobalAttrs"] },
+    "hr": { "extends": ["declarations/GlobalAttrs"] },
+    "html": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "lang": {
+          "type": "string",
+          "label": "Idioma"
+        }
+      }
+    },
+    "header": { "extends": ["declarations/GlobalAttrs"] },
+    "i": { "extends": ["declarations/GlobalAttrs"] },
+    "iframe": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "allow": {
+          "type": "string",
+          "array": true,
+          "label": "Permissões"
+        },
+        "allowfullscreen": {
+          "type": "boolean",
+          "label": "Tela cheia permitida"
+        },
+        "height": {
+          "type": "number",
+          "label": "Altura"
+        },
+        "name": {
+          "type": "string",
+          "label": "Nome"
+        },
+        "sandbox": {
+          "type": "string",
+          "array": true,
+          "label": "Restrições"
+        },
+        "src": {
+          "type": "string",
+          "label": "URL"
+        },
+        "width": {
+          "type": "number",
+          "label": "Largura"
+        }
+      }
+    },
+    "img": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "alt": {
+          "type": "string",
+          "label": "Texto alternativo"
+        },
+        "crossorigin": {
+          "type": "string",
+          "enum": ["anonymous", "use-credentials"],
+          "label": "Origem cruzada"
+        },
+        "height": {
+          "type": "number",
+          "label": "Altura"
+        },
+        "ismap": {
+          "type": "boolean",
+          "label": "Mapa de imagem"
+        },
+        "loading": {
+          "type": "string",
+          "enum": ["auto", "eager", "lazy"],
+          "label": "Carregamento"
+        },
+        "sizes": {
+          "type": "string",
+          "label": "Tamanhos"
+        },
+        "src": {
+          "type": "string",
+          "label": "URL"
+        },
+        "srcset": {
+          "type": "string",
+          "label": "Conjunto de URLs"
+        },
+        "usemap": {
+          "type": "string",
+          "label": "Mapa de imagem"
+        },
+        "width": {
+          "type": "number",
+          "label": "Largura"
+        }
+      }
+    },
+    "input": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "accept": {
+          "type": "string",
+          "label": "Tipos de arquivo"
+        },
+        "alt": {
+          "type": "string",
+          "label": "Texto alternativo"
+        },
+        "autocomplete": {
+          "type": "string",
+          "enum": ["on", "off"],
+          "label": "Autocompletar"
+        },
+        "autofocus": {
+          "type": "boolean",
+          "label": "Foco automático"
+        },
+        "checked": {
+          "type": "boolean",
+          "label": "Marcado"
+        },
+        "disabled": {
+          "type": "boolean",
+          "label": "Desabilitado"
+        },
+        "form": {
+          "type": "string",
+          "label": "Formulário"
+        },
+        "formaction": {
+          "type": "string",
+          "label": "URL"
+        },
+        "formenctype": {
+          "type": "string",
+          "enum": [
+            "application/x-www-form-urlencoded",
+            "multipart/form-data",
+            "text/plain"
+          ],
+          "label": "Tipo de codificação"
+        },
+        "formmethod": {
+          "type": "string",
+          "enum": ["get", "post"],
+          "label": "Método"
+        },
+        "formnovalidate": {
+          "type": "boolean",
+          "label": "Validação desativada"
+        },
+        "formtarget": {
+          "type": "string",
+          "enum": ["_self", "_blank", "_parent", "_top"],
+          "label": "Destino"
+        },
+        "height": {
+          "type": "number",
+          "label": "Altura"
+        },
+        "list": {
+          "type": "string",
+          "label": "Lista"
+        },
+        "max": {
+          "type": "number",
+          "label": "Máximo"
+        },
+        "maxlength": {
+          "type": "number",
+          "label": "Tamanho máximo"
+        },
+        "min": {
+          "type": "number",
+          "label": "Mínimo"
+        },
+        "multiple": {
+          "type": "boolean",
+          "label": "Múltiplo"
+        },
+        "name": {
+          "type": "string",
+          "label": "Nome"
+        },
+        "pattern": {
+          "type": "string",
+          "label": "Padrão"
+        },
+        "placeholder": {
+          "type": "string",
+          "label": "Marcador"
+        },
+        "readonly": {
+          "type": "boolean",
+          "label": "Somente leitura"
+        },
+        "required": {
+          "type": "boolean",
+          "label": "Obrigatório"
+        },
+        "size": {
+          "type": "number",
+          "label": "Tamanho"
+        },
+        "src": {
+          "type": "string",
+          "label": "URL"
+        },
+        "step": {
+          "type": "number",
+          "label": "Passo"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "button",
+            "checkbox",
+            "color",
+            "date",
+            "datetime-local",
+            "email",
+            "file",
+            "hidden",
+            "image",
+            "month",
+            "number",
+            "password",
+            "radio",
+            "range",
+            "reset",
+            "search",
+            "submit",
+            "tel",
+            "text",
+            "time",
+            "url",
+            "week"
+          ],
+          "label": "Tipo"
+        },
+        "value": {
+          "type": "string",
+          "label": "Valor"
+        },
+        "width": {
+          "type": "number",
+          "label": "Largura"
+        }
+      }
+    },
+    "label": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "for": {
+          "type": "string",
+          "label": "ID do controle"
+        },
+        "form": {
+          "type": "string",
+          "label": "Formulário"
+        }
+      }
+    },
+    "legend": { "extends": ["declarations/GlobalAttrs"] },
+    "li": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "value": {
+          "type": "number",
+          "label": "Valor"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["1", "a", "A", "i", "I"],
+          "label": "Tipo"
+        }
+      }
+    },
+    "main": { "extends": ["declarations/GlobalAttrs"] },
+    "mark": { "extends": ["declarations/GlobalAttrs"] },
+    "meta": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "charset": {
+          "type": "string",
+          "label": "Conjunto de caracteres"
+        },
+        "content": {
+          "type": "string",
+          "label": "Conteúdo"
+        },
+        "http-equiv": {
+          "type": "string",
+          "label": "Nome"
+        },
+        "name": {
+          "type": "string",
+          "label": "Nome"
+        }
+      }
+    },
+    "nav": { "extends": ["declarations/GlobalAttrs"] },
+    "ol": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "reversed": {
+          "type": "boolean",
+          "label": "Reverso"
+        },
+        "start": {
+          "type": "number",
+          "label": "Início"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["1", "a", "A", "i", "I"],
+          "label": "Tipo"
+        }
+      }
+    },
+    "p": { "extends": ["declarations/GlobalAttrs"] },
+    "pre": { "extends": ["declarations/GlobalAttrs"] },
+    "q": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "cite": {
+          "type": "string",
+          "label": "Citação"
+        }
+      }
+    },
+    "script": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "async": {
+          "type": "boolean",
+          "label": "Assíncrono"
+        },
+        "charset": {
+          "type": "string",
+          "label": "Conjunto de caracteres"
+        },
+        "defer": {
+          "type": "boolean",
+          "label": "Adiado"
+        },
+        "src": {
+          "type": "string",
+          "label": "URL"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["module", "text/javascript"],
+          "label": "Tipo"
+        }
+      }
+    },
+    "section": { "extends": ["declarations/GlobalAttrs"] },
+    "select": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "autofocus": {
+          "type": "boolean",
+          "label": "Foco automático"
+        },
+        "disabled": {
+          "type": "boolean",
+          "label": "Desabilitado"
+        },
+        "form": {
+          "type": "string",
+          "label": "Formulário"
+        },
+        "multiple": {
+          "type": "boolean",
+          "label": "Múltiplo"
+        },
+        "name": {
+          "type": "string",
+          "label": "Nome"
+        },
+        "required": {
+          "type": "boolean",
+          "label": "Obrigatório"
+        },
+        "size": {
+          "type": "number",
+          "label": "Tamanho"
+        }
+      }
+    },
+    "small": { "extends": ["declarations/GlobalAttrs"] },
+    "span": { "extends": ["declarations/GlobalAttrs"] },
+    "strong": { "extends": ["declarations/GlobalAttrs"] },
+    "style": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "media": {
+          "type": "string",
+          "label": "Mídia"
+        },
+        "scoped": {
+          "type": "boolean",
+          "label": "Escopo"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text/css"],
+          "label": "Tipo"
+        }
+      }
+    },
+    "table": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "border": {
+          "type": "number",
+          "label": "Borda"
+        },
+        "cellpadding": {
+          "type": "number",
+          "label": "Preenchimento da célula"
+        },
+        "cellspacing": {
+          "type": "number",
+          "label": "Espaçamento da célula"
+        },
+        "summary": {
+          "type": "string",
+          "label": "Resumo"
+        }
+      }
+    },
+    "tbody": { "extends": ["declarations/GlobalAttrs"] },
+    "td": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "colspan": {
+          "type": "number",
+          "label": "Colunas"
+        },
+        "headers": {
+          "type": "string",
+          "label": "Cabeçalhos"
+        },
+        "rowspan": {
+          "type": "number",
+          "label": "Linhas"
+        }
+      }
+    },
+    "textarea": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "autofocus": {
+          "type": "boolean",
+          "label": "Foco automático"
+        },
+        "cols": {
+          "type": "number",
+          "label": "Colunas"
+        },
+        "disabled": {
+          "type": "boolean",
+          "label": "Desabilitado"
+        },
+        "form": {
+          "type": "string",
+          "label": "Formulário"
+        },
+        "maxlength": {
+          "type": "number",
+          "label": "Tamanho máximo"
+        },
+        "name": {
+          "type": "string",
+          "label": "Nome"
+        },
+        "placeholder": {
+          "type": "string",
+          "label": "Marcador"
+        },
+        "readonly": {
+          "type": "boolean",
+          "label": "Somente leitura"
+        },
+        "required": {
+          "type": "boolean",
+          "label": "Obrigatório"
+        },
+        "rows": {
+          "type": "number",
+          "label": "Linhas"
+        },
+        "wrap": {
+          "type": "string",
+          "enum": ["hard", "soft"],
+          "label": "Quebra de linha"
+        }
+      }
+    },
+    "tfoot": { "extends": ["declarations/GlobalAttrs"] },
+    "th": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "colspan": {
+          "type": "number",
+          "label": "Colunas"
+        },
+        "headers": {
+          "type": "string",
+          "label": "Cabeçalhos"
+        },
+        "rowspan": {
+          "type": "number",
+          "label": "Linhas"
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["col", "colgroup", "row", "rowgroup"],
+          "label": "Escopo"
+        }
+      }
+    },
+    "thead": { "extends": ["declarations/GlobalAttrs"] },
+    "title": { "extends": ["declarations/GlobalAttrs"] },
+    "tr": { "extends": ["declarations/GlobalAttrs"] },
+    "ul": { "extends": ["declarations/GlobalAttrs"] },
+    "video": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "autoplay": {
+          "type": "boolean",
+          "label": "Reprodução automática"
+        },
+        "controls": {
+          "type": "boolean",
+          "label": "Controles"
+        },
+        "height": {
+          "type": "number",
+          "label": "Altura"
+        },
+        "loop": {
+          "type": "boolean",
+          "label": "Repetir"
+        },
+        "muted": {
+          "type": "boolean",
+          "label": "Mudo"
+        },
+        "poster": {
+          "type": "string",
+          "label": "Pôster"
+        },
+        "preload": {
+          "type": "string",
+          "enum": ["auto", "metadata", "none"],
+          "label": "Pré-carregamento"
+        },
+        "src": {
+          "type": "string",
+          "label": "URL"
+        },
+        "width": {
+          "type": "number",
+          "label": "Largura"
+        }
+      }
+    },
+    "wbr": { "extends": ["declarations/GlobalAttrs"] },
+    "area": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "alt": {
+          "type": "string",
+          "label": "Texto alternativo"
+        },
+        "coords": {
+          "type": "string",
+          "label": "Coordenadas"
+        },
+        "download": {
+          "type": "string",
+          "label": "Nome do arquivo"
+        },
+        "href": {
+          "type": "string",
+          "label": "URL"
+        },
+        "hreflang": {
+          "type": "string",
+          "label": "Idioma"
+        },
+        "rel": {
+          "type": "string",
+          "array": true,
+          "label": "Relações"
+        },
+        "shape": {
+          "type": "string",
+          "enum": ["default", "rect", "circle", "poly"],
+          "label": "Forma"
+        },
+        "target": {
+          "type": "string",
+          "enum": ["_self", "_blank", "_parent", "_top"],
+          "label": "Destino"
+        }
+      }
+    },
+    "base": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "href": {
+          "type": "string",
+          "label": "URL"
+        },
+        "target": {
+          "type": "string",
+          "enum": ["_self", "_blank", "_parent", "_top"],
+          "label": "Destino"
+        }
+      }
+    },
+    "link": {
+      "extends": ["declarations/GlobalAttrs"],
+      "attrs": {
+        "href": {
+          "type": "string",
+          "label": "URL"
+        },
+        "rel": {
+          "type": "string",
+          "array": true,
+          "label": "Relações"
+        },
+        "sizes": {
+          "type": "string",
+          "label": "Tamanhos"
+        },
+        "type": {
+          "type": "string",
+          "label": "Tipo"
+        }
+      }
+    }
+  }
+}

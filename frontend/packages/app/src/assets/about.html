@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sobre o Lenz</title>
+    <style>
+      body {
+        display: grid;
+        place-items: center;
+        padding: 2rem 1rem;
+      }
+
+      h1 {
+        font-size: 2.25rem;
+        font-weight: bold;
+      }
+
+      .logo {
+        position: relative;
+        width: max-content;
+        margin: 0 auto 1rem auto;
+        max-width: 10rem;
+
+        & .logo-bg {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          border-radius: 50%;
+          background: linear-gradient(82deg, #ff00fa 50%, #d4dc18 50%);
+          filter: blur(65px);
+          z-index: 0;
+          animation: spin 5s linear infinite;
+        }
+
+        & img {
+          position: relative;
+          z-index: 1;
+        }
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        margin: 1rem 0;
+
+        & > a:not(:last-child) {
+            &:after {
+                content: '•';
+                margin: 0 0.75rem;
+                opacity: 0.5;
+            }
+        }
+      }
+
+      .banner {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .tagline {
+        font-size: 1.25rem;
+        font-weight: bold;
+        opacity: 0.75;
+        margin-bottom: 1em;
+      }
+
+      .main {
+        z-index: 10;
+      }
+
+      @keyframes spin {
+        50% {
+          filter: blur(50px);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .small {
+        font-size: 0.75rem;
+        opacity: 0.5;
+      }
+
+      .mt-1 {
+        margin-top: 1rem;
+      }
+
+      .text-justify {
+        text-align: justify;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .not-again {
+        display: inline-block;
+        margin: 1em 0 1rem 1rem;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="logo">
+        <div class="logo-bg"></div>
+        <img src="/logo.png" />
+      </div>
+      <div class="main text-center">
+        <h1>Lenz Designer</h1>
+        <p class="tagline">Um editor de páginas web para todos</p>
+      </div>
+
+      <div class="separator"></div>
+      
+      <p class="text-center mt-1">
+        Este projeto foi desenvolvido por
+        <a href="https://sallon.dev" target="_blank">Salomão Neto</a>
+        durante o Trabalho de Conclusão de Curso no
+        <strong
+        >Instituto Federal de Educação, Ciência e Tecnologia do Ceará
+        (IFCE)</strong
+        >
+        no curso de Bacharelado em Ciência da Computação no ano de 2024.
+      </p>
+      
+      <nav class="main">
+        <a target="_blank" noreferer href="https://sallon.dev/lenz"
+        >Site do projeto</a
+        >
+        <a target="_blank" noreferer href="https://github.com/salomaosnff/lenz"
+        >Contribua com o projeto</a
+        >
+        <a
+        target="_blank"
+        noreferer
+        href="https://github.com/salomaosnff/lenz/issues/new"
+        >Reporte um problema</a
+        >
+        <a href="javascript:alert('Ainda é cedo')">Leia o artigo</a>
+      </nav>
+      <div class="separator"></div>
+
+      <p class="text-center small mt-1">
+        Todas as tecnologias utilizadas são de
+        <strong>código aberto</strong> e como forma de agradecimento a todos que
+        participaram de forma direta ou indireta no desenvolvimento deste
+        projeto, o código fonte está disponível no
+        <a href="https://github.com/salomaosnff/lenz">GitHub</a> para que
+        qualquer pessoa possa estudar e/ou contribuir.
+      </p>
+
+      <label class="not-again">
+        <input type="checkbox" id="not-show-again" />
+        <span>Não mostrar novamente</span>
+      </label>
+    </div>
+
+    <script type="module">
+      import { onUiInit, getData } from 'lenz:ui'
+
+      onUiInit(() => {
+        const { tx, notShowAgain } = getData()
+        const checkbox = document.getElementById('not-show-again')
+
+        checkbox.checked = notShowAgain ?? false
+
+        checkbox.addEventListener('change', () => {
+          tx.send(checkbox.checked)
+        })
+      })
+    </script>
+  </body>
+</html>

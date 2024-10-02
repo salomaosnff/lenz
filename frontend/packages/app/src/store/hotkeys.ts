@@ -128,7 +128,6 @@ function getKeyName(event: KeyboardEvent) {
 
 export const useHotKeysStore = defineStore("hotkeys", () => {
   const commandStore = useCommandsStore();
-  const menubarStore = useMenuBarStore();
 
   const hotKeyToCommand = new Map<Hotkey, string>();
   const commandToHotKey = new Map<string, Hotkey>();
@@ -136,54 +135,91 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
   const activeElement = useActiveElement();
   const showHotKeys = ref(false);
 
-  window.addEventListener(
-    "keydown",
-    (event) => {
-      if (
-        activeElement.value?.tagName === "INPUT" ||
-        activeElement.value?.tagName === "TEXTAREA" ||
-        activeElement.value?.contentEditable === "true"
-      ) {
-        return;
-      }
-      const key = getKeyName(event);
+  window.addEventListener('focus', () => currentPressedKeys.clear())
+  window.addEventListener('blur', () => currentPressedKeys.clear())
 
-      if (!currentPressedKeys.has(key)) {
-        currentPressedKeys.add(key);
-      }
+  function isInEditableField(tag?: HTMLElement | null): boolean {
+    return (
+      typeof tag === "object" &&
+      tag !== null &&
+      (tag.tagName === "INPUT" ||
+        tag.tagName === "TEXTAREA" ||
+        tag.contentEditable === "true" ||
+        (tag.tagName === "IFRAME" &&
+          isInEditableField(
+            (tag as HTMLIFrameElement).contentDocument
+              ?.activeElement as HTMLElement
+          )))
+    );
+  }
 
-      const pressedKeys = Array.from(currentPressedKeys)
-        .sort((a, b) => a.localeCompare(b))
-        .join("+")
-        .toLocaleLowerCase();
+  function handleKeyDown(event: KeyboardEvent) {
+    if (isInEditableField(activeElement.value)) {
+      return;
+    }
 
-      for (const [hotKey, command] of hotKeyToCommand) {
-        const keys = hotKey
-          .toLocaleLowerCase()
-          .split("+")
-          .sort((a, b) => a.localeCompare(b))
-          .join("+");
+    const key = getKeyName(event);
 
-        if (keys !== pressedKeys) {
-          continue;
+    if (!currentPressedKeys.has(key)) {
+      currentPressedKeys.add(key);
+    }
+
+    const pressedKeys = Array.from(currentPressedKeys)
+      .sort((a, b) => {
+        if (Modifier.has(a as Modifier) && !Modifier.has(b as Modifier)) {
+          return -1;
         }
 
-        event.preventDefault();
+        if (Modifier.has(b as Modifier) && !Modifier.has(a as Modifier)) {
+          return 1;
+        }
 
-        commandStore.executeCommand(command);
+        return a.localeCompare(b);
+      })
+      .join("+")
+      .toLowerCase();
+
+    for (const [hotKey, command] of hotKeyToCommand) {
+      const keys = hotKey
+        .split("+")
+        .sort((a, b) => {
+          if (Modifier.has(a as Modifier) && !Modifier.has(b as Modifier)) {
+            return -1;
+          }
+
+          if (Modifier.has(b as Modifier) && !Modifier.has(a as Modifier)) {
+            return 1;
+          }
+
+          return a.localeCompare(b);
+        })
+        .join("+")
+        .toLowerCase();
+
+      if (keys !== pressedKeys) {
+        continue;
       }
-    },
-    {
-      capture: true,
-    }
-  );
 
-  window.addEventListener("keyup", (event) => {
+      event.preventDefault();
+
+      commandStore.executeCommand(command);
+    }
+  }
+
+  function handleKeyUp(event: KeyboardEvent) {
     const key = getKeyName(event);
 
     if (currentPressedKeys.has(key)) {
       currentPressedKeys.delete(key);
     }
+  }
+
+  window.addEventListener("keydown", handleKeyDown, {
+    capture: true,
+  });
+
+  window.addEventListener("keyup", handleKeyUp, {
+    capture: true,
   });
 
   function addHotKeys(hotKeys: {
@@ -225,38 +261,13 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
     return hotKeyToCommand.get(hotKey);
   }
 
-  nextTick(() => {
-    addHotKeys({
-      F2: "help.hotkeys",
-    });
-
-    commandStore.registerCommand({
-      id: "help.hotkeys",
-      name: "Exibir atalhos de teclado",
-      description:
-        "Exibe uma lista com todos os atalhos de teclado disponíveis",
-      async run() {
-        showHotKeys.value = true;
-      },
-    });
-
-    menubarStore.addMenuItemsAt(
-      ["Ajuda"],
-      [
-        {
-          type: "item",
-          title: "Atalhos de teclado",
-          command: "help.hotkeys",
-        },
-      ]
-    );
-  });
-
   return {
     showHotKeys,
     pressedKeys: readonly(currentPressedKeys),
     hotKeyToCommand: readonly(hotKeyToCommand),
     commandToHotKey: readonly(commandToHotKey),
+    handleKeyDown,
+    handleKeyUp,
     addHotKeys,
     removeHotKeys,
     getHotKey,

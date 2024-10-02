@@ -21,6 +21,8 @@ export async function activate({ subscriptions }) {
                 const w = createWindow({
                     title: 'Selecionar arquivo',
                     themed: true,
+                    width: 640,
+                    height: 480,
                     content: new URL('www', import.meta.url),
                     data: {
                       result: tx,

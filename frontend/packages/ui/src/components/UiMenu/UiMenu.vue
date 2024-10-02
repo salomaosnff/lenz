@@ -13,7 +13,7 @@ provide('menu-group', {
 })
 </script>
 <template>
-    <ul class="ui-menu bg--surface b-1 border-color-[var(--color-surface-muted)] shadow-sm rounded-md pa-2">
+    <ul class="ui-menu pa-1 bg--surface b-1 border-color-[var(--color-surface-muted)] shadow-sm rounded-md min-w-max">
         <slot />
     </ul>
 </template>

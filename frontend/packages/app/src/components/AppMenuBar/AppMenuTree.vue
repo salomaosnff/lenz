@@ -5,10 +5,20 @@ import AppMenuTreeItem from "./AppMenuTreeItem.vue";
 defineProps<{
   title: string;
   items: MenuItem[];
+  icon?: string;
 }>();
+
+const commandStore = useCommandsStore();
+
+function getIcon(item: MenuItem) {
+  if (item.type && item.type !== 'item') {
+    return
+  }  
+  return item.icon ?? (item.command && commandStore.getCommand(item.command)?.icon);
+}
 </script>
 <template>
-  <UiMenuGroup>
+  <UiMenuGroup :icon>
     <template #title>{{ title }}</template>
     <template
       v-for="(item, i) of items"
@@ -20,7 +30,9 @@ defineProps<{
           item.type === 'checkbox-group' || item.type === 'radio-group'
         "
       >
-        <p v-if="item.title" class="fg--muted uppercase text-3 mb-1">{{ item.title }}</p>
+        <p v-if="item.title" class="fg--muted uppercase text-3 mb-1">
+          {{ item.title }}
+        </p>
         <AppMenuCheckGroupItem
           v-for="check in item.items"
           :key="check.title"
@@ -34,8 +46,11 @@ defineProps<{
         v-else-if="item.children?.length"
         :title="item.title"
         :items="item.children"
+        :icon="getIcon(item)"
       />
-      <AppMenuTreeItem v-else :title="item.title" :command="item.command" />
+      <template v-else>
+        <AppMenuTreeItem :title="item.title" :command="item.command" :icon="getIcon(item)" />
+      </template>
     </template>
   </UiMenuGroup>
 </template>

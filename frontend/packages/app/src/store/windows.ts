@@ -1,26 +1,31 @@
+import cssReset from "@unocss/reset/tailwind.css?raw";
 import _uniqueId from "lodash-es/uniqueId";
 import { defineStore } from "pinia";
 import { reactive } from "vue";
 
 export interface WindowOptions {
   title?: string;
-  content?: string | URL;
+  content?: string;
   base?: URL;
+  x?: number;
+  y?: number;
   width?: number;
   height?: number;
   themed?: boolean;
   data?: Record<string, unknown>;
-  position?: { x: number; y: number };
   resizable?: boolean;
   borderless?: boolean;
   modal?: boolean;
   closable?: boolean;
   movable?: boolean;
+  onClose?(): void | Promise<void>;
 }
 
 export interface WindowInstance {
   id: string;
-  options: WindowOptions & Required<Omit<WindowOptions, "base" | "content">>;
+  options: WindowOptions &
+    Required<Omit<WindowOptions, "base" | "content" | "x" | "y">>;
+  disposers: Set<() => void>;
 
   setContent(source: string | URL): void;
   setPosition(x: number, y: number): void;
@@ -90,7 +95,17 @@ const variables = Object.entries(THEME.variables)
   .join("\n");
 
 let content = `
+${cssReset}
 :root { ${variables} }
+
+* {
+accent-color: var(--color-primary)
+}
+
+html {
+ font-size: 14px;
+}
+
 html, body {
   width: 100%;
   height: 100%;
@@ -98,6 +113,61 @@ html, body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: "BlinkMacSystemFont","Segoe UI","Roboto","Helvetica Neue","Open Sans","Segoe UI Emoji",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface2);
+  border-radius: 5px;
+}
+
+a {
+  font-weight: bold;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  width: 100%;
+  font: inherit;
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-surface2);
+  padding: 0.25rem 0.5rem;
+
+  &:focus {
+    outline: 1px solid var(--color-primary);
+  }
+}
+
+fieldset {
+  border: 1px solid var(--color-surface2);
+  padding: 0.5rem;
+  & legend {
+    font-weight: bold;
+    padding: 0 0.25rem;
+  }
+}
+
+.separator {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--color-surface2) 50%,
+    transparent 100%
+  );
+  margin: 0.5rem 0;
 }
 `;
 
@@ -133,7 +203,7 @@ function parseContent(
 
   if (options.themed) {
     iframeDocument.documentElement.classList.add("theme--dark");
-    iframeDocument.head.appendChild(style.cloneNode(true));
+    iframeDocument.head.prepend(style.cloneNode(true));
   }
 
   if (existingImportmap) {
@@ -188,20 +258,28 @@ export const useWindowStore = defineStore("window", () => {
 
   function createWindow(options: WindowOptions): WindowInstance {
     const id = _uniqueId("window-");
-    const { content, ...rest } = options;
+    const { content, onClose, ...rest } = options;
+    const disposers = new Set<() => void>();
     const normalizedOptions = reactive({
       title: "Window",
-      width: 600,
-      height: 400,
-      position: { x: 0, y: 0 },
       borderless: false,
       data: {},
+      width: 320,
+      height: 320,
       closable: true,
       content: "",
       modal: false,
       movable: true,
       resizable: true,
       themed: true,
+      async onClose() {
+        for (const disposer of disposers) {
+          disposer();
+        }
+        disposers.clear();
+        await onClose?.();
+        windowsMap.delete(id);
+      },
       ...rest,
     });
 
@@ -225,7 +303,8 @@ export const useWindowStore = defineStore("window", () => {
     }
 
     function setPosition(x: number, y: number) {
-      normalizedOptions.position = { x, y };
+      normalizedOptions.x = x;
+      normalizedOptions.y = y;
     }
 
     function center() {
@@ -235,19 +314,54 @@ export const useWindowStore = defineStore("window", () => {
       setPosition((innerWidth - width) / 2, (innerHeight - height) / 2);
     }
 
-    function close() {
+    async function close() {
+      const window = windowsMap.get(id);
+
+      if (window) {
+        await window.options.onClose();
+      }
+
       windowsMap.delete(id);
     }
 
     const instance: WindowInstance = {
       id,
       options: normalizedOptions,
+      disposers,
       center,
       close,
       setContent,
       setPosition,
       setSize,
     };
+
+    if (!normalizedOptions.x || !normalizedOptions.y) {
+      instance.center();
+    }
+
+    const SHIFT_AMOUNT = 24;
+
+    normalizedOptions.x ??= 0;
+    normalizedOptions.y ??= 0;
+
+    for (const window of windowsMap.values()) {
+      const x = window.options.x ?? 0;
+      const y = window.options.y ?? 0;
+
+      if (
+        normalizedOptions.x >= x &&
+        normalizedOptions.x <= x + window.options.width
+      ) {
+        normalizedOptions.x += SHIFT_AMOUNT;
+      }
+
+      if (
+        normalizedOptions.y >= y &&
+        normalizedOptions.y <= y + window.options.height
+      ) {
+        normalizedOptions.y += SHIFT_AMOUNT;
+      }
+    }
 
     instance.setContent(content || "");
 

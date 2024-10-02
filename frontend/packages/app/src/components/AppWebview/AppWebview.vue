@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { toRaw } from 'vue';
-
+import { toRaw } from "vue";
 
 const props = defineProps<{
   content?: string;
@@ -16,9 +15,13 @@ function injectLenzData(event: Event) {
   contentWindow.__LENZ_UI_INIT = toRaw(props.data ?? {});
 
   // Propagate iframe window events to the parent window
-  const EVENTS = new Set(Object.keys(window).filter((key) => key.startsWith("on")).map((key) => key.slice(2).toLowerCase()));
+  const EVENTS = new Set(
+    Object.keys(window)
+      .filter((key) => key.startsWith("on"))
+      .map((key) => key.slice(2).toLowerCase())
+  );
 
-  EVENTS.delete("beforeunload")
+  EVENTS.delete("beforeunload");
 
   for (const event of EVENTS) {
     contentWindow.addEventListener(event, (e) => {
@@ -26,9 +29,11 @@ function injectLenzData(event: Event) {
     });
   }
 
-  contentWindow.dispatchEvent(new CustomEvent("lenz:ui:init", {
-    detail: contentWindow.__LENZ_UI_INIT,
-  }));
+  contentWindow.dispatchEvent(
+    new CustomEvent("lenz:ui:init", {
+      detail: contentWindow.__LENZ_UI_INIT,
+    })
+  );
 }
 </script>
 <template>

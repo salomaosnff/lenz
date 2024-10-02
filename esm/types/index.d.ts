@@ -313,6 +313,10 @@ declare module "history" {
      */
     export function canRedo(key: string): boolean;
 }
+declare module "hooks" {
+    export function onAfter(event: string, callback: Function): any;
+    export function onBefore(event: string, callback: Function): any;
+}
 declare module "hotkeys" {
     /**
      * Módulo para gerenciar atalhos de teclado
@@ -468,14 +472,14 @@ declare module "menubar" {
      */
     export type MenuItem = MenuItemAction | MenuItemSeparator | MenuItemCheckboxGroup | MenuItemRadioGroup;
     /**
-     * Insere um novo item na barra de menu
-     * @param parent Caminho do item pai
-     * @param items Itens a serem inseridos
-     * @returns Disposer para remover os itens
+     * Adiciona itens a barra de menu
+     * @param items Itens a serem adicionados
+     * @param parentId Id do item pai
      */
-    export function addMenuItemsAt(parent: string[], items: MenuItem[]): LenzDisposer;
+    export function extendMenu(items: MenuItem[], parentId?: string): LenzDisposer;
 }
 declare module "ui" {
+    import type { LenzDisposer } from "types";
     global {
         interface Window {
             __LENZ_UI_INIT?: any;
@@ -550,6 +554,10 @@ declare module "ui" {
         isClosed(): boolean;
         /** Envia dados pelo canal */
         send(data: T): void;
+        /**
+         * Aguarda o fechamento do canal
+         */
+        waitClose(): Promise<void>;
     }
     /**
      * Canal de recebimento de dados
@@ -571,11 +579,18 @@ declare module "ui" {
          * @param signal AbortSignal para cancelar a operação
          */
         listen(signal?: AbortSignal): AsyncIterableIterator<T>;
+        /**
+         * Aguarda o fechamento do canal
+         */
+        waitClose(): Promise<void>;
     }
     /**
      * Canal de comunicação
      */
     export type Channel<T> = [SenderChannel<T>, ReceiverChannel<T>];
+    export class ChannelClosedError extends Error {
+        constructor();
+    }
     /**
      * Cria um novo canal de comunicação entre a extensão e a janela de interface
      * @returns Canal de comunicação que pode ser usado para enviar e receber dados entre a extensão e a janela de interface
@@ -591,6 +606,21 @@ declare module "ui" {
      * tx.send("Hello, world!");
      */
     export function createChannel<T>(): Channel<T>;
+    export interface LenzRef<T> {
+        value: T;
+        waitClose(): Promise<void>;
+        addListener(listener: (value: T) => void): LenzDisposer;
+        next(signal?: AbortSignal): Promise<T>;
+        listen(signal?: AbortSignal): AsyncIterableIterator<T>;
+        destroy(): void;
+        clone(): LenzRef<T>;
+    }
+    export function createCustomRef<T>({ get, set, }: {
+        get: () => T;
+        set: (value: T) => void;
+    }): LenzRef<T>;
+    export function createRef<T>(): LenzRef<T | undefined>;
+    export function createRef<T>(initialValue: T): LenzRef<T>;
     /**
      * Hook para aguardar a inicialização da janela de interface
      * @param cb Função a ser executada quando a janela de interface estiver pronta

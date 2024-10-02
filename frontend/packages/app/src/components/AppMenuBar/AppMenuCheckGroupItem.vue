@@ -7,6 +7,7 @@ const props = defineProps<{
   onUpdate: (value: any) => void;
   getValue: () => any
 }>();
+
 const hotkeyStore = useHotKeysStore();
 const commandStore = useCommandsStore();
 const hotKey = computed(() =>
@@ -20,7 +21,7 @@ const hotKey = computed(() =>
     :unchecked-value="(item as MenuItemCheckbox).uncheckedValue"
     :check-modifiers="{ radio: radio as true }"
     @update:check="onUpdate"
-    @click="item.command && commandStore.executeCommand(item.command)"
+    @click.stop="item.command && commandStore.executeCommand(item.command)"
   >
     <p>{{ item.title }}</p>
     <template v-if="hotKey" #right>

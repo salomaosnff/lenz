@@ -2,7 +2,6 @@
 import { useEditorStore } from "../store/editor";
 
 import { ref } from "vue";
-import AppPanel from "../components/AppPanel.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -38,32 +37,34 @@ watch(
 </script>
 <template>
   <div
-    class="w-full h-full flex flex-col pa-2 gap-2 bg--surface"
+    class="w-full h-full flex flex-col gap-2 bg--surface"
     :class="{
       'pointer-events-none': lockIframe,
     }"
   >
-    <AppMenubar />
-    <AppPanel>
-      <div class="flex items-center">
-        <span>Arquivo atual: </span>
-        <p class="px-4">{{ fileStore.currentFile?.filepath }}</p>
-        <span
-          v-if="fileStore.currentFile?.dirty"
-          class="text-3 font-bold fg--warning"
-          >Há alterações não salvas</span
-        >
+    <div class="flex gap-2 items-center">
+      <div class="inline-flex gap-2 font-bold ml-2">
+        <img src="/logo.png" alt="Logo" class="w-6 h-6" />
+        <span>Lenz Designer</span>
       </div>
-    </AppPanel>
+      <p>
+        {{ fileStore.currentFile?.filepath }}
+      </p>
+      <span
+        v-if="fileStore.currentFile?.dirty"
+        class="w-3 h-3 bg--warning rounded-full"
+        title="O arquivo foi modificado"
+      ></span>
+    </div>
+    <AppMenubar />
     <AppCommandPalette
-      class="fixed top-12 left-50% w-120 translate-x--50% z-99"
+      class="fixed top-12 left-50% w-120 translate-x--50% z-9999"
     />
-    <AppHotkeys class="fixed top-12 right-4 z-99" />
     <div
       class="app-editor-view w-full flex-1 pa-4 relative justify-center items-center"
     >
       <AppCanvas
-        v-if="fileStore.currentFile"
+        v-if="html"
         v-model="editor.currentDocument"
         v-model:active="editor.selectedElements"
         v-model:hover="editor.hoveredElement"
@@ -73,6 +74,10 @@ watch(
         :style="{
           maxWidth: `${settingsStore.settings.frame.width}px`,
         }"
+        @dom-update="
+          fileStore.currentFile &&
+            fileStore.writeFile(fileStore.currentFile?.filepath, $event)
+        "
       />
     </div>
     <AppWindowManager />

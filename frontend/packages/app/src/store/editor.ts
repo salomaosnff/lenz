@@ -1,21 +1,56 @@
+import { createRef } from "lenz:ui";
 import { defineStore } from "pinia";
 import { toRaw } from "vue";
-import { CanvasElement, createElementSelection } from "../components/AppCanvas/types";
-import { MenuItemRadioGroup } from "./menubar";
+import {
+  CanvasElement,
+  createElementSelection,
+} from "../components/AppCanvas/types";
 
 export const useEditorStore = defineStore("editor", () => {
   const menubarStore = useMenuBarStore();
   const settings = useSettingsStore();
-  const selectedElements = ref<CanvasElement[]>([]);
+  const fileStore = useFileStore();
+  const historyStore = useHistoryStore();
+
   const hoveredElement = ref<CanvasElement>();
   const currentDocument = shallowRef<Document>();
+  const selectionRef = markRaw(createRef());
+  const selectedElements = customRef<CanvasElement[]>((track, trigger) => {
+    return {
+      get() {
+        track();
+        if (!fileStore.currentFile) {
+          return [];
+        }
+        return historyStore.ensureHistory<any>(fileStore.currentFile.filepath, fileStore.currentFile.data)?.current.data.selection ?? []
+      },
+      set(value: CanvasElement[]) {
+        if (!fileStore.currentFile) {
+          return;
+        }
+        const history = historyStore.ensureHistory<any>(fileStore.currentFile.filepath, fileStore.currentFile.data);
+
+        history.current.data.selection = value;
+
+        trigger();
+      },
+    }
+  });
+
+  watch(
+    selectedElements,
+    () => {
+      selectionRef.value = toRaw(selectedElements.value).slice();
+    },
+    { immediate: true }
+  );
 
   function getSelection() {
     return toRaw(selectedElements.value).slice();
   }
 
   function setSelection(elements: HTMLElement[]) {
-    selectedElements.value = elements.map((el) => createElementSelection(el));
+    selectedElements.value = elements.filter(el => el).map((el) => createElementSelection(el));
   }
 
   function getHover() {
@@ -36,10 +71,10 @@ export const useEditorStore = defineStore("editor", () => {
     return document?.documentElement.outerHTML;
   }
 
-  menubarStore.addMenuItemsAt(
-    ["Visualizar"],
+  menubarStore.extendMenu(
     [
       {
+        id: "frame.size",
         type: "radio-group",
         title: "Tamanho da tela",
         getValue() {
@@ -56,6 +91,7 @@ export const useEditorStore = defineStore("editor", () => {
           return "desktop";
         },
         onUpdated(newValue: string) {
+          console.log("onUpdateFrameSize", newValue);
           if (newValue === "mobile") {
             settings.settings.frame.width = 480;
           }
@@ -70,24 +106,29 @@ export const useEditorStore = defineStore("editor", () => {
         },
         items: [
           {
+            id: "frame.size.desktop",
             title: "Desktop (1366x768)",
             checkedValue: "desktop",
           },
           {
+            id: "frame.size.tablet",
             title: "Tablet (1024x768)",
             checkedValue: "tablet",
           },
           {
+            id: "frame.size.mobile",
             title: "Mobile (480x800)",
             checkedValue: "mobile",
           },
         ],
-      } as MenuItemRadioGroup,
-      { type: "separator" },
-    ]
+      },
+      { type: "separator", id: "frame.size.separator", after: ["frame.size"] },
+    ],
+    "view"
   );
 
   return {
+    selectionRef,
     selectedElements,
     hoveredElement,
     currentDocument,

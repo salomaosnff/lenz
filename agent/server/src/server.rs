@@ -66,9 +66,8 @@ pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
     let server = hyper_util::server::conn::auto::Builder::new(hyper_util::rt::TokioExecutor::new());
     let graceful = hyper_util::server::graceful::GracefulShutdown::new();
     let mut ctrl_c = pin!(tokio::signal::ctrl_c());
-    let (quit_tx, quit_rx) = tokio::sync::oneshot::channel::<()>();
+    let (quit_tx, mut quit_rx) = tokio::sync::mpsc::channel::<()>(100);
     let quit_tx = Arc::new(tokio::sync::RwLock::new(Some(quit_tx)));
-    let mut quit_rx: std::pin::Pin<&mut tokio::sync::oneshot::Receiver<()>> = pin!(quit_rx);
 
     loop {
         let quit_tx = quit_tx.clone();
@@ -92,9 +91,12 @@ pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
                 tokio::spawn(graceful.watch(conn.into_owned()));
             },
 
-            _ = quit_rx.as_mut() => {
+            Some(_) = quit_rx.recv() => {
                 eprintln!("\r\x1b[2K\x1b[36mUm pedido de encerramento foi recebido, encerrando servidor...\x1b[0m");
-                break;
+                #[cfg(not(debug_assertions))]
+                {
+                    break;
+                }
             },
 
             _ = ctrl_c.as_mut() => {
@@ -119,7 +121,7 @@ pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
 async fn handle_request(
     req: Request<Incoming>,
     app: App,
-    quit_signal: Arc<tokio::sync::RwLock<Option<tokio::sync::oneshot::Sender<()>>>>,
+    quit_signal: Arc<tokio::sync::RwLock<Option<tokio::sync::mpsc::Sender<()>>>>,
 ) -> Result<http::Response<http_body_util::Full<Bytes>>, Infallible> {
     match *req.method() {
         Method::GET => match req.uri().path().trim_matches('/') {
@@ -173,7 +175,7 @@ async fn resolve_static(
 async fn resolve_invoke(
     req: Request<Incoming>,
     app: App,
-    quit_signal: Arc<tokio::sync::RwLock<Option<tokio::sync::oneshot::Sender<()>>>>,
+    quit_signal: Arc<tokio::sync::RwLock<Option<tokio::sync::mpsc::Sender<()>>>>,
 ) -> Result<http::Response<http_body_util::Full<Bytes>>, Infallible> {
     let request = match get_invoke_request(req).await {
         Some(request) => request,
@@ -210,7 +212,7 @@ async fn resolve_invoke(
             .unwrap()),
         InvokeResult::Quit => {
             if let Some(quit_signal) = quit_signal.write().await.take() {
-                quit_signal.send(()).ok();
+                quit_signal.send(()).await.ok();
             }
 
             Ok(response.body("".into()).unwrap())

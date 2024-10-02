@@ -31,5 +31,6 @@ declare module 'vue' {
     UiRadio: typeof import('./src/components/UiRadio/UiRadio.vue')['default']
     UiSelect: typeof import('./src/components/UiSelect/UiSelect.vue')['default']
     UiTextField: typeof import('./src/components/UiTextField/UiTextField.vue')['default']
+    UiWindow: typeof import('./src/components/UiWindow/UiWindow.vue')['default']
   }
 }

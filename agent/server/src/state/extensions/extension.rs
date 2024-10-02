@@ -39,7 +39,9 @@ impl Debug for Extension {
 
 impl Extension {
     pub fn from_dir(path: &PathBuf) -> Result<Self, ExtensionError> {
-        ExtensionManifest::from_path(path).map(|manifest| {
+        ExtensionManifest::from_path(path).inspect_err(|e| {
+            println!("Failed to load extension at {:?}: {}", path, e);
+        }).map(|manifest| {
             let built_in_extensions_dir = lenz_core::config::util::built_in_extensions();
 
             let mut ext = Extension {
@@ -49,6 +51,7 @@ impl Extension {
                 is_builtin: path.starts_with(built_in_extensions_dir),
                 plugin_instance: None,
             };
+
 
             ext.plugin_context
                 .import_map

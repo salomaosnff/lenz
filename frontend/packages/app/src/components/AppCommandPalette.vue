@@ -1,78 +1,196 @@
 <script setup lang="ts">
-const commandsStore = useCommandsStore();
-const search = ref("");
+import gsap from "gsap";
 
-window.addEventListener("keydown", (event) => {
-  const isInputActive =
-    document.activeElement?.tagName === "INPUT" ||
-    document.activeElement?.tagName === "TEXTAREA";
+const commandStore = useCommandsStore();
+const hotkeyStore = useHotKeysStore();
 
-  if (event.key === "F1") {
-    event.preventDefault();
-    event.stopImmediatePropagation();
+const query = ref("");
+const allCommands = computed(() => {
+  return Array.from(Object.values(commandStore.commands))
+    .filter((command) => command.name)
+    .map((command) => {
+      return {
+        key: hotkeyStore.commandToHotKey.get(command.id),
+        command,
+        frequency: commandStore.getFrequency(command.id),
+      };
+    })
+    .sort((a, b) => {
+      let scoreA = a.frequency;
+      let scoreB = b.frequency;
 
-    if (!isInputActive) {
-      commandsStore.showCommands = !commandsStore.showCommands;
-    }
-  }
-});
+      if (a.command.description) {
+        scoreA *= 10;
+      }
 
-const commandPalette = ref<HTMLElement>();
+      if (b.command.description) {
+        scoreB *= 10;
+      }
 
-onClickOutside(commandPalette, () => {
-  commandsStore.showCommands = false;
+      if (a.command.icon) {
+        scoreA *= 11;
+      }
+
+      if (b.command.icon) {
+        scoreB *= 11;
+      }
+
+      if (a.key) {
+        scoreA *= 11;
+      }
+
+      if (b.key) {
+        scoreB *= 11;
+      }
+
+      return scoreB - scoreA;
+    });
 });
 
 const filteredCommands = computed(() => {
-  const query = search.value.toLowerCase();
+  const search = query.value.toLowerCase().trim();
 
-  return Object.values(commandsStore.commands).filter(
-    (command) =>
-      (command && command.name?.toLowerCase().includes(query)) ||
-      command.description?.toLowerCase().includes(query)
-  );
+  if (!search) {
+    return allCommands.value;
+  }
+
+  return allCommands.value.filter((entry) => {
+    return (
+      entry.command &&
+      (entry.command.name?.toLowerCase()?.includes(search) ||
+        entry.command.description?.toLowerCase()?.includes(search))
+    );
+  });
 });
+
+const element = ref<HTMLElement>();
+
+onClickOutside(element, () => {
+  commandStore.showCommands = false;
+});
+
+const selectedIndex = ref(-1);
+const results = ref<HTMLElement[]>();
+
+watchEffect(() => {
+  if (!results.value) {
+    return;
+  }
+
+  if (selectedIndex.value < 0) {
+    selectedIndex.value = results.value.length - 1;
+    return;
+  }
+
+  if (selectedIndex.value >= results.value.length) {
+    selectedIndex.value = 0;
+  }
+
+  if (selectedIndex.value >= 0 && results.value) {
+    results.value[selectedIndex.value]?.scrollIntoView({
+      block: "nearest",
+    });
+  }
+});
+
+function onBeforeEnter(el: any) {
+  el.style.opacity = "0";
+  el.style.height = "0";
+  el.style.transform = "translateX(0rem)"
+}
+
+function onEnter(el: any, done: any) {
+  gsap.to(el, {
+    opacity: 1,
+    height: "auto",
+    transform: "translateX(0rem)",
+    // delay: el.dataset.index * 0.0125,
+    onComplete: done,
+  });
+}
+
+function onLeave(el: any, done: any) {
+  gsap.to(el, {
+    opacity: 0,
+    height: "0",
+    transform: "translateX(-4rem)",
+    // delay: el.dataset.index * 0.0125,
+    onComplete: done,
+  });
+}
 </script>
 <template>
   <Transition>
-    <AppPanel
-      v-if="commandsStore.showCommands"
-      ref="commandPalette"
-      class="app-command-palette bg--surface rounded-md flex flex-col gap-2 z-1"
+    <div
+      v-if="commandStore.showCommands"
+      class="app-hotkeys-pallete w-full max-w-768px translate-x--50% left-50% pa-4"
+      @keydown.esc="commandStore.showCommands = false"
+      @keydown.arrow-down="selectedIndex++"
+      @keydown.arrow-up="selectedIndex--"
+      @keydown.enter="
+        selectedIndex > 0 &&
+          ((commandStore.showCommands = false),
+          commandStore.executeCommand(
+            filteredCommands[selectedIndex].command.id
+          ))
+      "
     >
-      <UiTextField
-        :ref="(input: any) => input?.focus()"
-        v-model="search"
-        label="Paleta de comandos"
-        hide-messages
-        autofocus
-        placeholder="Pesquisar comandos..."
-        @keyup.esc="commandsStore.showCommands = false"
-      />
-      <ul class="max-h-100 overflow-y-scroll pr-2">
-        <template v-for="command in filteredCommands" :key="command.id">
-          <UiMenuItemSeparator />
+      <AppPanel ref="element" class="flex flex-col overflow-clip">
+        <h1 class="text-6">Paleta de comandos</h1>
+        <UiTextField
+          v-model="query"
+          type="search"
+          autofocus
+          class="w-full mt-4"
+          placeholder="Pesquisar comandos..."
+          @focus="selectedIndex = -1"
+        />
+        <TransitionGroup
+          tag="ul"
+          :css="false"
+          class="overflow-y-auto flex-1 max-h-100 pr-2"
+          @before-enter="onBeforeEnter"
+          @enter="onEnter"
+          @leave="onLeave"
+        >
           <li
-            class="app-cmd-palette__item pa-2 hover:bg--surface-muted cursor-pointer flex gap-3 items-start rounded-md"
+            v-for="({ key, command }, index) of filteredCommands"
+            :key="command.id"
+            ref="results"
+            :data-index="index"
+            class="overflow-hidden mb-1"
             @click="
-              commandsStore.executeCommand(command.id),
-                (commandsStore.showCommands = false)
+              commandStore.executeCommand(command.id),
+                (commandStore.showCommands = false)
             "
           >
-            <UiIcon :path="command.icon ?? ''" class="!w-6 !h-6" />
-            <div>
-              <p>{{ command.name }}</p>
-              <p class="text-3 fg--muted">{{ command.description }}</p>
+            <div
+              class="flex gap-2 rounded-md pa-2 cursor-pointer hover:bg--surface-muted items-center w-full"
+              :class="{ 'bg--surface-muted': selectedIndex === index }"
+            >
+              <UiIcon
+                :path="command.icon ?? ''"
+                class="block !w-8 !h-8 self-start mt-0.5"
+              />
+              <div class="flex-1">
+                <p>
+                  {{ command.name }}
+                </p>
+                <p class="text-3 fg--muted">{{ command.description }}</p>
+              </div>
+              <UiKbd v-if="key" class="text-3 py-1 ml-2">{{ key }}</UiKbd>
             </div>
           </li>
-        </template>
-      </ul>
-    </AppPanel>
+        </TransitionGroup>
+      </AppPanel>
+    </div>
   </Transition>
 </template>
 <style lang="scss">
-.app-command-palette {
-  box-shadow: 0 0 0 150vmax rgba(0, 0, 0, 0.5);
+.app-hotkeys-pallete {
+  & > .app-panel {
+    box-shadow: 0 0 0 150vmax rgba(0, 0, 0, 0.5);
+  }
 
   &.v-enter-active,
   &.v-leave-active {

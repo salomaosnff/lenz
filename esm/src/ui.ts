@@ -1,11 +1,10 @@
 /**
  * Módulo para generenciar janelas de interação com o usuário
- * @module lenz:ui 
+ * @module lenz:ui
  */
 
 import { ensureInitialized } from "./util.js";
 import type { LenzDisposer } from "./types.js";
-
 
 declare global {
   interface Window {
@@ -116,6 +115,11 @@ export interface SenderChannel<T> {
 
   /** Envia dados pelo canal */
   send(data: T): void;
+
+  /**
+   * Aguarda o fechamento do canal
+   */
+  waitClose(): Promise<void>;
 }
 
 /**
@@ -142,12 +146,23 @@ export interface ReceiverChannel<T> {
    * @param signal AbortSignal para cancelar a operação
    */
   listen(signal?: AbortSignal): AsyncIterableIterator<T>;
+
+  /**
+   * Aguarda o fechamento do canal
+   */
+  waitClose(): Promise<void>;
 }
 
 /**
  * Canal de comunicação
  */
 export type Channel<T> = [SenderChannel<T>, ReceiverChannel<T>];
+
+export class ChannelClosedError extends Error {
+  constructor() {
+    super("Channel is closed");
+  }
+}
 
 /**
  * Cria um novo canal de comunicação entre a extensão e a janela de interface
@@ -165,7 +180,9 @@ export type Channel<T> = [SenderChannel<T>, ReceiverChannel<T>];
  */
 export function createChannel<T>(): Channel<T> {
   let closed = false;
+
   const listeners = new Set<Function>();
+  const closeListeners = new Set<Function>();
 
   function isClosed() {
     return closed;
@@ -173,18 +190,33 @@ export function createChannel<T>(): Channel<T> {
 
   function close() {
     if (closed) {
-      throw new Error("Channel is already closed");
+      throw new ChannelClosedError();
     }
+
     closed = true;
+
     listeners.clear();
+    closeListeners.forEach((listener) => listener());
+    closeListeners.clear();
+  }
+
+  async function waitClose() {
+    if (isClosed()) {
+      return;
+    }
+
+    return new Promise<void>((resolve) => {
+      closeListeners.add(resolve);
+    });
   }
 
   const transmitter: SenderChannel<T> = {
     close,
+    waitClose,
     isClosed,
     send(data) {
       if (isClosed()) {
-        throw new Error("Cannot send data on a closed channel");
+        throw new ChannelClosedError();
       }
       listeners.forEach((listener) => listener(data));
     },
@@ -193,11 +225,12 @@ export function createChannel<T>(): Channel<T> {
   const receiver: ReceiverChannel<T> = {
     close,
     isClosed,
+    waitClose,
     async next(abortSignal?: AbortSignal) {
       return new Promise((resolve, reject) => {
         nextTick(() => {
           if (isClosed()) {
-            return reject(new Error("Cannot wait next on a closed channel"));
+            return reject(new ChannelClosedError());
           }
 
           let disposeAbortSignal: LenzDisposer | undefined;
@@ -205,13 +238,22 @@ export function createChannel<T>(): Channel<T> {
           const dispose = receiver.addListener((data) => {
             disposeAbortSignal?.();
             dispose();
+            closeListeners.delete(closeListener);
             resolve(data);
           });
+
+          const closeListener = () => {
+            disposeAbortSignal?.();
+            dispose();
+            reject(new ChannelClosedError());
+          };
+
+          closeListeners.add(closeListener);
 
           if (abortSignal) {
             const listener = () => {
               dispose();
-              reject(new Error("Channel next operation was aborted"));
+              reject(new ChannelClosedError());
             };
 
             abortSignal.addEventListener("abort", listener, { once: true });
@@ -222,17 +264,21 @@ export function createChannel<T>(): Channel<T> {
       });
     },
     async *listen(abortSignal) {
-      if (isClosed()) {
-        throw new Error("Cannot listen on a closed channel");
-      }
-
       while (!isClosed()) {
-        yield receiver.next(abortSignal);
+        try {
+          yield receiver.next(abortSignal);
+        } catch (error) {
+          if (error instanceof ChannelClosedError) {
+            break;
+          }
+
+          throw error;
+        }
       }
     },
     addListener(listener) {
       if (isClosed()) {
-        throw new Error("Cannot add listener to a closed channel");
+        throw new ChannelClosedError();
       }
 
       listeners.add(listener);
@@ -244,6 +290,85 @@ export function createChannel<T>(): Channel<T> {
   return [transmitter, receiver];
 }
 
+export interface LenzRef<T> {
+  value: T;
+  waitClose(): Promise<void>;
+  addListener(listener: (value: T) => void): LenzDisposer;
+  next(signal?: AbortSignal): Promise<T>;
+  listen(signal?: AbortSignal): AsyncIterableIterator<T>;
+  destroy(): void;
+  clone(): LenzRef<T>;
+}
+
+export function createCustomRef<T>({
+  get,
+  set,
+}: {
+  get: () => T;
+  set: (value: T) => void;
+}): LenzRef<T> {
+  const [tx, rx] = createChannel<T>();
+
+  const ref = {
+    get value() {
+      return get();
+    },
+    set value(value: T) {
+      set(value);
+
+      if (!tx.isClosed()) {
+        tx.send(value);
+      }
+    },
+    addListener(listener: (data: T) => void) {
+      return rx.addListener(listener);
+    },
+    listen(signal?: AbortSignal) {
+      return rx.listen(signal);
+    },
+    next(signal?:AbortSignal) {
+      return rx.next(signal);
+    },
+    destroy() {
+      if (!tx.isClosed()) {
+        tx.close();
+      }
+    },
+    waitClose() {
+      return rx.waitClose();
+    },
+    clone() {
+      const child = createCustomRef({
+        get: () => ref.value,
+        set(value) {
+          if (value !== ref.value) {
+            ref.value = value;
+          }
+        },
+      });
+
+      rx.waitClose().then(() => child.destroy());
+
+      ref.addListener((value: T) => {
+        child.value = value;
+      });
+
+      return child;
+    },
+  };
+
+  return ref
+}
+
+export function createRef<T>(): LenzRef<T | undefined>
+export function createRef<T>(initialValue: T): LenzRef<T>
+export function createRef<T>(initialValue?: T): LenzRef<T | undefined> {
+  return createCustomRef({
+    get: () => initialValue,
+    set: (value) => (initialValue = value),
+  })
+}
+
 /**
  * Hook para aguardar a inicialização da janela de interface
  * @param cb Função a ser executada quando a janela de interface estiver pronta
@@ -253,7 +378,11 @@ export function onUiInit(cb: Function) {
     return cb(window.__LENZ_UI_INIT);
   }
 
-  window.addEventListener("lenz:ui:init" as any, ({ detail }: CustomEvent) => cb(detail), {
-    once: true,
-  });
+  window.addEventListener(
+    "lenz:ui:init" as any,
+    ({ detail }: CustomEvent) => cb(detail),
+    {
+      once: true,
+    }
+  );
 }

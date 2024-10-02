@@ -6,7 +6,7 @@ const menuBarStore = useMenuBarStore();
 
 </script>
 <template>
-  <UiMenuBar class="app-menubar">
+  <UiMenuBar class="app-menubar gap-1">
     <template v-for="item in menuBarStore.menuItems">
       <AppMenuTree
         v-if="(!item.type || item.type === 'item') && item.children?.length"

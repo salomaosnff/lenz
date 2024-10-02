@@ -5,6 +5,7 @@ import UiRadio from "../UiRadio/UiRadio.vue";
 
 const props = defineProps<{
   disabled?: boolean;
+  icon?: string;
   checkedValue?: T;
   uncheckedValue?: T;
   "onUpdate:check"?: (value: T) => void;
@@ -30,7 +31,7 @@ function onPointerEnter() {
 }
 
 const hasCheck = computed(() => props["onUpdate:check"] !== undefined);
-const hasIcon = computed(() => hasCheck.value);
+const hasIcon = computed(() => hasCheck.value || props.icon);
 
 watch(
   hasCheck,
@@ -53,16 +54,15 @@ onUnmounted(() => {
 <template>
   <li
     tabindex="0"
-    class="whitespace-nowrap hover:bg--surface2 rounded-md gap-2 cursor-pointer flex"
+    class="whitespace-nowrap hover:bg--surface2 rounded-md gap-2 cursor-pointer flex overflow-hidden"
     :class="{
       'fg--muted pointer-events-none': disabled,
     }"
     @pointerenter="onPointerEnter"
   >
-    <div v-if="parentMenuGroup.hasIcons.value" class="w-16px" />
     <template v-if="hasCheck">
       <UiRadio
-        class="mx--25px w-full !cursor-inherit px-2"
+        class="w-max !cursor-inherit pl-1 pr-2"
         v-if="checkModifiers.radio"
         v-model="checkModel"
         :value="(checkedValue as any)"
@@ -76,7 +76,7 @@ onUnmounted(() => {
       </UiRadio>
       <UiCheckbox
         v-else
-        class="mx--25px w-full !cursor-inherit px-2"
+        class="w-full !cursor-inherit pl-1 pr-2"
         v-model="checkModel"
         :checked-value="checkedValue"
         :unchecked-value="uncheckedValue"
@@ -89,7 +89,14 @@ onUnmounted(() => {
         </div>
       </UiCheckbox>
     </template>
-    <div v-else class="py-1 px-2 flex gap-2 w-full items-center">
+    <div v-else class="py-1 px-2 flex gap-2 w-full items-center" :class="{
+      'pl-29px': parentMenuGroup.hasIcons.value && !hasIcon
+    }">
+      <UiIcon
+        v-if="props.icon"
+        :path="props.icon"
+        class="!w-16px !h-16px"
+      />
       <div class="flex-1">
         <slot></slot>
       </div>

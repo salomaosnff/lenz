@@ -1,0 +1,8 @@
+{
+  "id": "html",
+  "name": "Elementos HTML",
+  "main": "main.js",
+  "description": "Suporte para elementos básicos de HTML",
+  "version": "1.0.0",
+  "publisher": "Salomão Neto <contato@sallon.dev>"
+}

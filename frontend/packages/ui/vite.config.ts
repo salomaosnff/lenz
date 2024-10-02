@@ -16,13 +16,8 @@ export default defineConfig({
       deep: true,
       dirs: ['src/components'],
     }),
-    Externalize({
-      externals: [
-        /^lenz:/
-      ]
-    }),
     {
-      name: 'inject-import-map-script',
+      name: 'inject-lenz',
       transformIndexHtml(html) {
         return {
           html,
@@ -31,13 +26,18 @@ export default defineConfig({
               tag: 'script',
               injectTo: 'head-prepend',
               attrs: {
-                src: 'http://localhost:5369/importmap.js',
+                src: 'http://localhost:5369/lenz-init.js',
               },
             }
           ]
         }
       }
     },
+    Externalize({
+      externals: [
+        /^lenz:/
+      ]
+    })
   ],
   build: {
    rollupOptions: {

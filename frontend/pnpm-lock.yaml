@@ -44,6 +44,9 @@ importers:
       '@vueuse/core':
         specifier: ^11.0.1
         version: 11.1.0(vue@3.5.8(typescript@5.6.2))
+      gsap:
+        specifier: ^3.12.5
+        version: 3.12.5
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -90,8 +93,6 @@ importers:
       vue-tsc:
         specifier: ^2.0.29
         version: 2.1.6(typescript@5.6.2)
-
-  packages/icons: {}
 
   packages/ui:
     dependencies:
@@ -1180,6 +1181,9 @@ packages:
 
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
+
+  gsap@3.12.5:
+    resolution: {integrity: sha512-srBfnk4n+Oe/ZnMIOXt3gT605BX9x5+rh/prT2F1SsNJsU1XuMiP0E2aptW481OnonOGACZWBqseH5Z7csHxhQ==}
 
   gzip-size@6.0.0:
     resolution: {integrity: sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==}
@@ -2790,6 +2794,8 @@ snapshots:
   globals@14.0.0: {}
 
   graphemer@1.4.0: {}
+
+  gsap@3.12.5: {}
 
   gzip-size@6.0.0:
     dependencies:

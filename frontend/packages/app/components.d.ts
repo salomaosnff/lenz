@@ -10,7 +10,6 @@ declare module 'vue' {
     AppCanvas: typeof import('./src/components/AppCanvas/AppCanvas.vue')['default']
     AppCanvasInspectBox: typeof import('./src/components/AppCanvas/AppCanvasInspectBox.vue')['default']
     AppCommandPalette: typeof import('./src/components/AppCommandPalette.vue')['default']
-    AppHotkeys: typeof import('./src/components/AppHotkeys.vue')['default']
     AppMenubar: typeof import('./src/components/AppMenuBar/AppMenubar.vue')['default']
     AppMenuCheckGroupItem: typeof import('./src/components/AppMenuBar/AppMenuCheckGroupItem.vue')['default']
     AppMenuTree: typeof import('./src/components/AppMenuBar/AppMenuTree.vue')['default']
@@ -22,9 +21,8 @@ declare module 'vue' {
     AppSettingsNumberField: typeof import('./src/components/AppSettingsForm/fields/number/AppSettingsNumberField.vue')['default']
     AppSettingsSelect: typeof import('./src/components/AppSettingsForm/fields/select/AppSettingsSelect.vue')['default']
     AppSettingsTextField: typeof import('./src/components/AppSettingsForm/fields/text/AppSettingsTextField.vue')['default']
-    AppView: typeof import('./src/components/AppView.vue')['default']
     AppWebview: typeof import('./src/components/AppWebview/AppWebview.vue')['default']
-    AppWindow: typeof import('./src/components/AppWindow/AppWindow.vue')['default']
+    AppWebWindow: typeof import('./src/components/AppWindow/AppWebWindow.vue')['default']
     AppWindowManager: typeof import('./src/components/AppWindow/AppWindowManager.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -44,5 +42,6 @@ declare module 'vue' {
     UiRadio: typeof import('./../ui/src/components/UiRadio/UiRadio.vue')['default']
     UiSelect: typeof import('./../ui/src/components/UiSelect/UiSelect.vue')['default']
     UiTextField: typeof import('./../ui/src/components/UiTextField/UiTextField.vue')['default']
+    UiWindow: typeof import('./../ui/src/components/UiWindow/UiWindow.vue')['default']
   }
 }

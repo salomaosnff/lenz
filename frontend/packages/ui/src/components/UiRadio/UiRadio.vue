@@ -25,7 +25,7 @@ function check() {
 <template>
     <div v-color="color" :class="{ 'ui-radio--checked': isChecked }"
         class="ui-radio inline-flex gap-2 cursor-default items-center" @click="check">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-max h-max">
             <circle cx="12" cy="12" r="10.5" fill="none" stroke-width="1.5" />
             <circle cx="12" cy="12" r="0" />
         </svg>
