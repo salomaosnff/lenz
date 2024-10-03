@@ -50,7 +50,7 @@ Você pode adicionar um separador entre os itens de um submenu para agrupar coma
 
 ```ts
 import { addCommand } from 'lenz:commands';
-import { addMenuItemsAt, SEPARATOR } from 'lenz:menubar';  // [!code focus]
+import { addMenuItemsAt } from 'lenz:menubar';  // [!code focus]
 
 export function activate({ subscriptions }) {
     subscriptions.add(
@@ -64,19 +64,19 @@ export function activate({ subscriptions }) {
         })
     );  
     subscriptions.add(
-        addMenuItemsAt(['Meu Menu'], [      // [!code focus]
-            {                               // [!code focus]
-                type: 'item',               // [!code focus]
-                title: 'Meu Comando',       // [!code focus]
-                command: 'meu.comando',     // [!code focus]
-            },                              // [!code focus]
-            SEPARATOR,                      // [!code focus]
-            {                               // [!code focus]
-                type: 'item',               // [!code focus]
-                title: 'Meu Comando 2',     // [!code focus]
-                command: 'meu.comando',     // [!code focus]
-            },                              // [!code focus]
-        ])                                  // [!code focus]
+        addMenuItemsAt(['Meu Menu'], [                  // [!code focus]
+            {                                           // [!code focus]
+                type: 'item',                           // [!code focus]
+                title: 'Meu Comando',                   // [!code focus]
+                command: 'meu.comando',                 // [!code focus]
+            },                                          // [!code focus]
+            {   id: 'meu-separador', type: 'separator'},// [!code focus]
+            {                                           // [!code focus]
+                type: 'item',                           // [!code focus]
+                title: 'Meu Comando 2',                 // [!code focus]
+                command: 'meu.comando',                 // [!code focus]
+            },                                          // [!code focus]
+        ])                                              // [!code focus]
     );
 }
 ```
