@@ -8,6 +8,7 @@ import type { LenzDisposer } from "./types.js";
 
 declare global {
   interface Window {
+    /** Dados de inicialização da janela */
     __LENZ_UI_INIT?: any;
   }
 }
@@ -22,6 +23,7 @@ export interface WindowOptions {
   /**
    * Conteúdo da janela
    * Pode ser uma string contendo HTML ou uma URL que será carregada em um iframe controlado pela janela
+   * o conteúdo HTML será carregado utilizando a função `fetch()`, serão injetados estilos de tema na janela como variáveis CSS e o conteúdo será exibido em um iframe
    */
   content?: string | URL;
 
@@ -43,7 +45,7 @@ export interface WindowOptions {
   themed?: boolean;
 
   /**
-   * Dados adicionais que podem ser acessados pelo conteúdo da janela
+   * Dados a serem transferidos para a janela
    */
   data?: Record<string, unknown>;
 
@@ -57,8 +59,8 @@ export interface WindowOptions {
    */
   resizable?: boolean;
 
-  /** Remove as bordas da janela */
-  borderless?: boolean;
+  /** Remove a borda da janela */
+  frame?: boolean;
 
   /** Bloqueia a interação com o editor enquanto a janela estiver aberta */
   modal?: boolean;
@@ -290,21 +292,44 @@ export function createChannel<T>(): Channel<T> {
   return [transmitter, receiver];
 }
 
+/**
+ * Referência reativa para um valor
+ */
 export interface LenzRef<T> {
+  /** Valor atual da referência */
   value: T;
+  
+  /** Aguarda o fechamento do canal */
   waitClose(): Promise<void>;
+  
+  /** Adiciona um listener para receber dados */
   addListener(listener: (value: T) => void): LenzDisposer;
+  
+  /** Aguarda pelo próximo dado */
   next(signal?: AbortSignal): Promise<T>;
+  
+  /** Retorna um iterador assíncrono para escutar os dados */
   listen(signal?: AbortSignal): AsyncIterableIterator<T>;
+  
+  /** Fecha o canal */
   destroy(): void;
+
+  /** Cria uma cópia da referência */
   clone(): LenzRef<T>;
 }
 
+/**
+ * Cria uma referência reativa
+ * @param factory Função para criar a referência
+ * @returns Referência reativa
+ */
 export function createCustomRef<T>({
   get,
   set,
 }: {
+  /** Função para obter o valor da referência */
   get: () => T;
+  /** Função para definir o valor da referência */
   set: (value: T) => void;
 }): LenzRef<T> {
   const [tx, rx] = createChannel<T>();
@@ -360,7 +385,9 @@ export function createCustomRef<T>({
   return ref
 }
 
+/** Cria uma referência reativa vazia */
 export function createRef<T>(): LenzRef<T | undefined>
+/** Cria uma referência reativa com um valor inicial */
 export function createRef<T>(initialValue: T): LenzRef<T>
 export function createRef<T>(initialValue?: T): LenzRef<T | undefined> {
   return createCustomRef({

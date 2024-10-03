@@ -8,5 +8,5 @@
         "outDir": "dist",
         "lib": ["DOM", "ES2023", "DOM.Iterable"],
     },
-    "include": ["src/**/*.ts"],
+    "include": ["src/"],
 }

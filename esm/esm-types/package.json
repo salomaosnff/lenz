@@ -1,0 +1,8 @@
+{
+    "name": "@lenz-design/types",
+    "version": "0.1.0",
+    "author": "Salomão Neto <contato@sallon.dev>",
+    "description": "Tipagens do Lenz Designer",
+    "types": "types/",
+    "typings": "types/"
+}

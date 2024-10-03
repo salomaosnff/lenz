@@ -12,12 +12,14 @@ import { ensureInitialized } from "./util.js";
 export interface CommandContext {
   /**
    * Retorna a seleção atual do editor
+   * @deprecated Utilize `selection` obter reatividade.
    */
   getSelection(): Set<Selection>;
 
   /**
    * Define a seleção do editor
    * @param selection
+   * @deprecated Utilize `selection` obter reatividade.
    */
   setSelection(selection: HTMLElement[]): void;
 
@@ -50,7 +52,7 @@ export interface Command {
   /** Descrição do comando */
   description?: string;
 
-  /** Ícone do comando */
+  /** Ícone do comando deve ser uma string contendo um Path de tamanho 16x16 */
   icon?: string;
 
   /** Função que será executada ao chamar o comando */
@@ -60,7 +62,6 @@ export interface Command {
 /**
  * Adiciona um comando ao editor
  * @param command Identificador único do comando
- * @param callback Função que será executada ao chamar o comando
  * @returns Disposer para remover o comando
  *
  * @example
@@ -93,7 +94,7 @@ export function addCommand(command: Command): LenzDisposer {
  * @param args Argumentos que serão passados para o comando
  * @returns Resultado da execução do comando
  */
-export function executeCommand(command: string, ...args: any[]) {
+export function executeCommand<T>(command: string, ...args: any[]): Promise<T> {
   const commandStore = ensureInitialized().commands();
 
   if (!commandStore) {

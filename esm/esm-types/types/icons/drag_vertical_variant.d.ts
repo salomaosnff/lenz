@@ -1,0 +1,2 @@
+declare const _default: "M11 21H9V3H11V21M15 3H13V21H15V3Z";
+export default _default;

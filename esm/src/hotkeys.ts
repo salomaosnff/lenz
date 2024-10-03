@@ -6,7 +6,6 @@
 import type { LenzDisposer } from "./types.js";
 import { ensureInitialized } from "./util.js";
 
-
 /**
  * Mapeia combinacoes de teclas para comandos
  * @param hotKeys Mapeamento de teclas para comandos
