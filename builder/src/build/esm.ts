@@ -52,7 +52,7 @@ export function getBuildEsmTasks(options: Options): ListrTask[] {
       title: "Copiar arquivos de tipos dos módulos ECMAScript do agente",
       skip: () => !options.copyTypes,
       async task() {
-        const sourceDir = join(options.input, "types");
+        const sourceDir = join(options.input, "esm-types/types");
         const targetDir = join(options.output, "types");
 
         await copyFiles(sourceDir, targetDir);
