@@ -3,7 +3,7 @@
   "compilerOptions": {
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationDir": "esm-types/types",
+    "outFile": "esm-types/index.d.ts",
     "paths": {
       "lenz:*": ["./src/*"] // Mapeia "lenz:algo" para "src/algo"
     }

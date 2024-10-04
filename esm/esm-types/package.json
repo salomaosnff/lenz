@@ -1,8 +1,11 @@
 {
     "name": "@lenz-design/types",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "author": "Salomão Neto <contato@sallon.dev>",
     "description": "Tipagens do Lenz Designer",
-    "types": "types/",
-    "typings": "types/"
+    "types": "index.d.ts",
+    "private": false,
+    "publishConfig": {
+        "access": "public"
+    }
 }

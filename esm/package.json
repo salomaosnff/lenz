@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "private": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:js": "rm -rf dist && tsx build.ts",
-    "build:types": "rm -rf esm-types/types && tsc -p tsconfig.types.json",
-    "build:copy-dts": "for file in src/*.d.ts src/**/*.d.ts; do cp $file esm-types/types/$(basename $file); done",
-    "build": "pnpm build:js && pnpm build:types && pnpm build:copy-dts && pnpm docs:build",
+    "build:types": "rm -rf esm-types/types && tsc -p tsconfig.types.json && tsx post-process-types.ts",
+    "build": "pnpm build:js && pnpm build:types && pnpm docs:build",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs"
