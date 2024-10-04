@@ -1,17 +1,11 @@
-import { createChannel } from "lenz:ui";
+import type { Command, CommandContext } from "lenz:commands";
+import { createChannel, Ref as LenzRef } from "lenz:reactivity";
 import { defineStore } from "pinia";
-import aboutPage from "../assets/about.html?raw";
 
 import iconFire from "lenz:icons/fire";
 import iconAbout from "lenz:icons/information";
 
-export interface EditorCommand {
-  id: string;
-  name: string;
-  description: string;
-  icon?: string;
-  run(...args: any): any;
-}
+import aboutPage from "../assets/about.html?raw";
 
 export const useCommandsStore = defineStore("commands", () => {
   const hooksStore = useHooksStore();
@@ -22,10 +16,10 @@ export const useCommandsStore = defineStore("commands", () => {
 
   const frequencyMap = useLocalStorage<Record<string, number>>("commands.frequency", {});
 
-  const commands = ref<Record<string, EditorCommand>>({});
+  const commands = ref<Record<string, Command>>({});
   const showCommands = ref(false);
 
-  function registerCommand(command: EditorCommand) {
+  function registerCommand(command: Command) {
     return hooksStore.callHooks(
       "commands.register",
       () => {
@@ -59,8 +53,9 @@ export const useCommandsStore = defineStore("commands", () => {
           throw new Error(`Command with id ${id} does not exist`);
         }
 
-        const context = {
-          selection: editorStore.selectionRef.clone(),
+        const context: CommandContext = {
+          selection: LenzRef.clone(editorStore.selectionRef),
+          hover: LenzRef.clone(editorStore.hoverRef),
           getSelection: editorStore.getSelection,
           setSelection: editorStore.setSelection,
           getHover: editorStore.getHover,

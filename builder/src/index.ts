@@ -170,7 +170,7 @@ const pack = program
           task.newListr(
             getPackDebianTasks({
               input: plainDir,
-              output: resolve(process.cwd(), options.output, "deb"),
+              output: resolve(process.cwd(), options.output, "target"),
             })
           ),
       },
@@ -181,7 +181,7 @@ const pack = program
           task.newListr(
             getPackAppImageTasks({
               input: plainDir,
-              output: resolve(process.cwd(), options.output, "appimage"),
+              output: resolve(process.cwd(), options.output, "target"),
             })
           ),
       },
@@ -192,7 +192,7 @@ const pack = program
           task.newListr(
             await getPackArquiveTasks({
               input: plainDir,
-              output: resolve(process.cwd(), options.output, "archive"),
+              output: resolve(process.cwd(), options.output, "target"),
               noTarGz: options.noTarGz,
               noZip: options.noZip,
               noTarXz: options.noTarXz,

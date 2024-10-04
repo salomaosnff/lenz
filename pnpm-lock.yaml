@@ -89,6 +89,12 @@ importers:
         specifier: ^0.27.4
         version: 0.27.4(@babel/parser@7.25.6)(rollup@4.22.4)(vue@3.5.8(typescript@5.6.2))
 
+  vite-lenz:
+    dependencies:
+      vite:
+        specifier: ^5.4.1
+        version: 5.4.8(@types/node@22.6.1)
+
 packages:
 
   '@algolia/autocomplete-core@1.9.3':
@@ -1754,6 +1760,37 @@ packages:
 
   vite@5.4.7:
     resolution: {integrity: sha512-5l2zxqMEPVENgvzTuBpHer2awaetimj2BGkhBPdnwKbPNOlHsODU+oiazEZzLK7KhAnOrO+XGYJYn4ZlUhDtDQ==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': ^18.0.0 || >=20.0.0
+      less: '*'
+      lightningcss: ^1.21.0
+      sass: '*'
+      sass-embedded: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      sass-embedded:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+
+  vite@5.4.8:
+    resolution: {integrity: sha512-FqrItQ4DT1NC4zCUqMB4c4AZORMKIa0m8/URVCZ77OZ/QSNeJ54bU1vrFADbDsuwfIPcgknRkmqakQcgnL4GiQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -3496,6 +3533,15 @@ snapshots:
       vfile-message: 4.0.2
 
   vite@5.4.7(@types/node@22.6.1):
+    dependencies:
+      esbuild: 0.21.5
+      postcss: 8.4.47
+      rollup: 4.22.4
+    optionalDependencies:
+      '@types/node': 22.6.1
+      fsevents: 2.3.3
+
+  vite@5.4.8(@types/node@22.6.1):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.47

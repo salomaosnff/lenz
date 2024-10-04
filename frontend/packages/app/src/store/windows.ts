@@ -1,25 +1,8 @@
 import cssReset from "@unocss/reset/tailwind.css?raw";
+import { WindowOptions } from "lenz:ui";
 import _uniqueId from "lodash-es/uniqueId";
 import { defineStore } from "pinia";
 import { reactive } from "vue";
-
-export interface WindowOptions {
-  title?: string;
-  content?: string;
-  base?: URL;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  themed?: boolean;
-  data?: Record<string, unknown>;
-  resizable?: boolean;
-  borderless?: boolean;
-  modal?: boolean;
-  closable?: boolean;
-  movable?: boolean;
-  onClose?(): void | Promise<void>;
-}
 
 export interface WindowInstance {
   id: string;
@@ -271,6 +254,7 @@ export const useWindowStore = defineStore("window", () => {
       modal: false,
       movable: true,
       resizable: true,
+      frame: true,
       themed: true,
       async onClose() {
         for (const disposer of disposers) {

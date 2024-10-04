@@ -50,9 +50,12 @@ export interface WindowOptions {
   data?: Record<string, unknown>;
 
   /**
-   * Posição inicial da janela
+   * Posição horizontal da janela
    */
-  position?: { x: number; y: number };
+  x?: number;
+
+  /** Posição vertical da janela */
+  y?: number;
 
   /**
    * Define se a janela pode ser redimensionada pelo usuário
@@ -70,6 +73,11 @@ export interface WindowOptions {
 
   /** Define se a janela pode ser movida pelo usuário */
   movable?: boolean;
+
+  /**
+   * Função chamada quando a janela é fechada
+   */
+  onClose?(): void;
 }
 
 /**

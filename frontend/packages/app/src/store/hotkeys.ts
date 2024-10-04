@@ -1,106 +1,8 @@
+import { AnyKey, Hotkey, KeyTypes } from "lenz:hotkeys";
 import { defineStore } from "pinia";
 
 const ModifierList = ["Ctrl", "Alt", "Shift", "Cmd"] as const;
 const Modifier = new Set(ModifierList);
-
-type Modifier = typeof Modifier extends Set<infer T> ? T : never;
-
-type Navigation =
-  | "ArrowUp"
-  | "ArrowDown"
-  | "ArrowLeft"
-  | "ArrowRight"
-  | "Home"
-  | "End"
-  | "PageUp"
-  | "PageDown";
-
-type Function =
-  | "F1"
-  | "F2"
-  | "F3"
-  | "F4"
-  | "F5"
-  | "F6"
-  | "F7"
-  | "F8"
-  | "F9"
-  | "F10"
-  | "F11"
-  | "F12";
-
-type Special =
-  | "Enter"
-  | "Esc"
-  | "Tab"
-  | "Space"
-  | "Backspace"
-  | "Delete"
-  | "CapsLock"
-  | "NumLock"
-  | "ScrollLock"
-  | "PrintScreen"
-  | "Insert"
-  | "Pause";
-
-type Symbol =
-  | "Plus"
-  | "-"
-  | "="
-  | ";"
-  | ","
-  | "."
-  | "/"
-  | "\\"
-  | "'"
-  | "`"
-  | "["
-  | "]";
-
-type Letter =
-  | "A"
-  | "B"
-  | "C"
-  | "D"
-  | "E"
-  | "F"
-  | "G"
-  | "H"
-  | "I"
-  | "J"
-  | "K"
-  | "L"
-  | "M"
-  | "N"
-  | "O"
-  | "P"
-  | "Q"
-  | "R"
-  | "S"
-  | "T"
-  | "U"
-  | "V"
-  | "W"
-  | "X"
-  | "Y"
-  | "Z";
-
-type Number = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-
-export type Key =
-  | Modifier
-  | Navigation
-  | Function
-  | Special
-  | Symbol
-  | Letter
-  | Number;
-
-export type Hotkey =
-  | Key
-  | `${Modifier}+${Key}`
-  | `${Modifier}+${Modifier}+${Key}`
-  | `${Modifier}+${Modifier}+${Modifier}+${Key}`;
 
 function getKeyName(event: KeyboardEvent) {
   if (event.key === " ") {
@@ -123,7 +25,8 @@ function getKeyName(event: KeyboardEvent) {
     return "Plus";
   }
 
-  return event.key as Key;
+  return event.key as AnyKey;
+
 }
 
 export const useHotKeysStore = defineStore("hotkeys", () => {
@@ -131,7 +34,7 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
 
   const hotKeyToCommand = new Map<Hotkey, string>();
   const commandToHotKey = new Map<string, Hotkey>();
-  const currentPressedKeys = new Set<Key>();
+  const currentPressedKeys = new Set<AnyKey>();
   const activeElement = useActiveElement();
   const showHotKeys = ref(false);
 
@@ -166,11 +69,11 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
 
     const pressedKeys = Array.from(currentPressedKeys)
       .sort((a, b) => {
-        if (Modifier.has(a as Modifier) && !Modifier.has(b as Modifier)) {
+        if (Modifier.has(a as KeyTypes.Modifier) && !Modifier.has(b as KeyTypes.Modifier)) {
           return -1;
         }
 
-        if (Modifier.has(b as Modifier) && !Modifier.has(a as Modifier)) {
+        if (Modifier.has(b as KeyTypes.Modifier) && !Modifier.has(a as KeyTypes.Modifier)) {
           return 1;
         }
 
@@ -183,11 +86,11 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
       const keys = hotKey
         .split("+")
         .sort((a, b) => {
-          if (Modifier.has(a as Modifier) && !Modifier.has(b as Modifier)) {
+          if (Modifier.has(a as KeyTypes.Modifier) && !Modifier.has(b as KeyTypes.Modifier)) {
             return -1;
           }
 
-          if (Modifier.has(b as Modifier) && !Modifier.has(a as Modifier)) {
+          if (Modifier.has(b as KeyTypes.Modifier) && !Modifier.has(a as KeyTypes.Modifier)) {
             return 1;
           }
 

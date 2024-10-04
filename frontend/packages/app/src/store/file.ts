@@ -168,9 +168,11 @@ export const useFileStore = defineStore("file", () => {
     openFile(currentFilename.value);
   }
 
-  window.addEventListener("beforeunload", async () => {
-    await commandsStore.executeCommand("app.quit");
-  });
+  if (import.meta.env.PROD) {
+    window.addEventListener("beforeunload", async () => {
+      await commandsStore.executeCommand("app.quit");
+    });
+  }
 
   nextTick(() => {
     hotkeysStore.addHotKeys({

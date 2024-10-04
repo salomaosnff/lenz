@@ -23,7 +23,7 @@
       "./auto-imports.d.ts",
       "./components.d.ts",
       "./typed-router.d.ts",
-      "../ui/src/lenz-esm/icons.d.ts",
+      "@lenz-design/types",
     ]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "../ui/src/**/*.ts", "../ui/src/**/*.tsx", "../ui/src/**/*.vue", "src/pages/form"],

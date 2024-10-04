@@ -1,22 +1,12 @@
+import { ConfirmDialogOptions, PromptDialogOptions } from "lenz:dialog";
 import { defineStore } from "pinia";
 
-export interface PromptOptions {
+export interface PromptOptions extends PromptDialogOptions {
   type: "prompt";
-  title: string;
-  message?: string;
-  hidden?: boolean;
-  placeholder?: string;
-  defaultValue?: string;
-  confirmText?: string;
-  cancelText?: string;
 }
 
-export interface ConfirmOptions {
+export interface ConfirmOptions extends ConfirmDialogOptions {
   type: "confirm";
-  title: string;
-  message?: string;
-  confirmText?: string;
-  cancelText?: string;
 }
 
 export const useDialogStore = defineStore("dialog", () => {
@@ -29,7 +19,7 @@ export const useDialogStore = defineStore("dialog", () => {
     reject: (() => {}) as (reason?: any) => void,
   });
 
-  function prompt(options: Omit<PromptOptions, "type">) {
+  function prompt(options: PromptDialogOptions) {
     currentResolver.value?.reject(new Error("Dialog closed"));
     return new Promise<string>((resolve, reject) => {
       currentResolver.value = { resolve, reject };
@@ -52,7 +42,7 @@ export const useDialogStore = defineStore("dialog", () => {
     });
   }
 
-  function confirm(options: Omit<ConfirmOptions, "type">) {
+  function confirm(options: ConfirmDialogOptions) {
     return new Promise<string>((resolve, reject) => {
       currentResolver.value?.reject(new Error("Dialog closed"));
 

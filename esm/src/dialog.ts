@@ -57,6 +57,16 @@ export interface PromptDialogOptions {
   defaultValue?: string;
 
   /**
+   * Oculta os caracteres digitados
+   */
+  hidden?: boolean;
+
+  /**
+   * Texto exibido no campo de texto quando vazio
+   */
+  placeholder?: string;
+
+  /**
    * Texto do botão de confirmação
    * @default "OK"
    */

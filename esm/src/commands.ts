@@ -1,9 +1,10 @@
 /**
  * Módulo para gerenciar e executar comandos do editor
- * @module lenz:commands 
+ * @module lenz:commands
  */
 
-import type { LenzDisposer } from "./types.js";
+import { Ref } from "./reactivity.js";
+import type { ElementSelection, LenzDisposer } from "./types.js";
 import { ensureInitialized } from "./util.js";
 
 /**
@@ -11,17 +12,33 @@ import { ensureInitialized } from "./util.js";
  */
 export interface CommandContext {
   /**
-   * Retorna a seleção atual do editor
-   * @deprecated Utilize `selection` obter reatividade.
+   * Seleção atual do editor
    */
-  getSelection(): Set<Selection>;
+  selection: Ref<ElementSelection[]>;
+
+  /**
+   * Elemento onde o cursor está posicionado
+   */
+  hover: Ref<ElementSelection | undefined>;
+
+  /**
+   * Retorna a seleção atual do editor
+   * @deprecated Utilize `selection.value`
+   */
+  getSelection(): ElementSelection[];
 
   /**
    * Define a seleção do editor
    * @param selection
-   * @deprecated Utilize `selection` obter reatividade.
+   * @deprecated Utilize `selection.value`
    */
   setSelection(selection: HTMLElement[]): void;
+
+  /**
+   * Retorna o elemento onde o cursor está posicionado
+   * @deprecated Utilize `hover.value`
+   */
+  getHover(): ElementSelection | undefined;
 
   /**
    * Retorna o conteúdo do arquivo aberto no editor
@@ -31,7 +48,7 @@ export interface CommandContext {
   /**
    * Retorna o documento HTML atualmente aberto no editor
    */
-  getCurrentDocument(): Document;
+  getCurrentDocument(): Document | undefined;
 }
 
 /**
@@ -67,7 +84,7 @@ export interface Command {
  * @example
  * ```ts
  * import iconEarth from "lenz:icons/earth";
- * 
+ *
  * addCommand({
  *  id: "hello",
  *  name: "Exibir mensagem", // Se não informado, este comando não será exibido na paleta de comandos e não poderá ser executado programaticamente

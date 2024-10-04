@@ -208,10 +208,7 @@ export function getPackDebianTasks(options: PackDebianOptions): ListrTask<{
     {
       title: "Criar arquivo .deb usando dpkg-deb",
       async task(ctx, task) {
-        const packageFile = join(
-          options.output,
-          `${ctx.controlFile.data.Package}-v${ctx.controlFile.data.Version}-linux-${ctx.controlFile.data.Architecture}.deb`
-        );
+        const packageFile = join(options.output, `lenz-designer.deb`);
 
         await ensureDir(dirname(packageFile));
 

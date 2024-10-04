@@ -4,441 +4,23 @@ declare module "lenz:types" {
      * @internal
      */
     export type LenzDisposer = () => void;
-}
-declare module "lenz:util" {
-    global {
-        export interface Window {
-            /** Store do Editor */
-            __LENZ_STORE__?: any;
-        }
-    }
     /**
-     * Garante que o editor foi inicializado
-     * @returns Store do editor
+     * Representa a seleção de um elemento
      */
-    export function ensureInitialized(): Window['__LENZ_STORE__'];
-}
-declare module "lenz:commands" {
-    /**
-     * Módulo para gerenciar e executar comandos do editor
-     * @module lenz:commands
-     */
-    import type { LenzDisposer } from "lenz:types";
-    /**
-     * Representa o contexto de um comando
-     */
-    export interface CommandContext {
+    export interface ElementSelection {
         /**
-         * Retorna a seleção atual do editor
-         * @deprecated Utilize `selection` obter reatividade.
+         * O seletor CSS que pode ser usado para encontrar o elemento
          */
-        getSelection(): Set<Selection>;
+        selector: string;
         /**
-         * Define a seleção do editor
-         * @param selection
-         * @deprecated Utilize `selection` obter reatividade.
+         * O elemento selecionado
          */
-        setSelection(selection: HTMLElement[]): void;
+        element: HTMLElement;
         /**
-         * Retorna o conteúdo do arquivo aberto no editor
+         * O retângulo que circunda o elemento relativo à viewport
          */
-        getCurrentContent(): string;
-        /**
-         * Retorna o documento HTML atualmente aberto no editor
-         */
-        getCurrentDocument(): Document;
+        box: DOMRect;
     }
-    /**
-     * Representa um comando do editor
-     */
-    export interface Command {
-        /** Identificador único do comando */
-        id: string;
-        /**
-         * Nome do comando
-         *
-         * Caso não seja informado, o nome do comando não será exibido
-         * na paleta de comandos
-         */
-        name?: string;
-        /** Descrição do comando */
-        description?: string;
-        /** Ícone do comando deve ser uma string contendo um Path de tamanho 16x16 */
-        icon?: string;
-        /** Função que será executada ao chamar o comando */
-        run(context: CommandContext, ...args: any[]): any;
-    }
-    /**
-     * Adiciona um comando ao editor
-     * @param command Identificador único do comando
-     * @returns Disposer para remover o comando
-     *
-     * @example
-     * ```ts
-     * import iconEarth from "lenz:lenz:icons/earth";
-     *
-     * addCommand({
-     *  id: "hello",
-     *  name: "Exibir mensagem", // Se não informado, este comando não será exibido na paleta de comandos e não poderá ser executado programaticamente
-     *  description: "Exibe uma mensagem no console",
-     *  icon: iconEarth,
-     *  run(context) {
-     *    console.log("Olá, mundo!");
-     *  }
-     * });
-     */
-    export function addCommand(command: Command): LenzDisposer;
-    /**
-     * Executa um comando registrado no editor
-     * @param command Identificador único do comando
-     * @param args Argumentos que serão passados para o comando
-     * @returns Resultado da execução do comando
-     */
-    export function executeCommand<T>(command: string, ...args: any[]): Promise<T>;
-}
-declare module "lenz:dialog" {
-    /**
-     * Opções da janela de confirmação
-     */
-    export interface ConfirmDialogOptions {
-        /** Título da janela de confirmação */
-        title: string;
-        /** Mensagem exibida na janela de confirmação */
-        message: string;
-        /**
-         * Texto do botão de confirmação
-         * @default "OK"
-         */
-        confirmText?: string;
-        /**
-         * Texto do botão de cancelamento
-         * @default "Cancelar"
-         */
-        cancelText?: string;
-    }
-    /**
-     * Exibe uma janela de confirmação
-     * @param options Opções da janela de confirmação
-     * @returns Promise que será resolvida com `true` se o usuário confirmar a ação ou `false` caso contrário.
-     * @example
-     * ```ts
-     * const confirmed = await confirm({
-     *   title: "Confirmação",
-     *   message: "Deseja realmente excluir o item selecionado?"
-     * });
-     */
-    export function confirm(options: ConfirmDialogOptions): any;
-    /**
-     * Opções da janela de prompt
-     */
-    export interface PromptDialogOptions {
-        /** Título da janela de prompt */
-        title: string;
-        /** Mensagem exibida na janela de prompt */
-        message: string;
-        /** Valor padrão do campo de texto */
-        defaultValue?: string;
-        /**
-         * Texto do botão de confirmação
-         * @default "OK"
-         */
-        confirmText?: string;
-        /**
-         * Texto do botão de cancelamento
-         * @default "Cancelar"
-         */
-        cancelText?: string;
-    }
-    /**
-     * Exibe uma janela de prompt para o usuário inserir um texto
-     * @param options Opções da janela de prompt
-     * @returns Promise que será resolvida com o texto inserido pelo usuário ou o valor padrão caso o usuário cancele a ação.
-     * @example
-     * ```ts
-     * const name = await prompt({
-     *  title: "Informe seu nome",
-     *  message: "Digite seu nome completo",
-     *  defaultValue: "Fulano de Tal"
-     * });
-     * ```
-     */
-    export function prompt(options: PromptDialogOptions): any;
-}
-declare module "lenz:extensions" {
-    /**
-     * Obtém uma extensão pelo seu ID
-     * @param id
-     * @returns
-     */
-    export function getExtension(id: string): any;
-}
-declare module "lenz:file" {
-    /**
-     * Retorna o arquivo atualmente aberto no editor
-     * @returns
-     */
-    export function getCurrentFile(): any;
-    /**
-     * Abre um arquivo para edição no editor
-     * @param filepath Caminho do arquivo a ser aberto
-     */
-    export function open(filepath: string): Promise<void>;
-    /**
-     * Escreve conteúdo no arquivo atual
-     * @param content Conteúdo a ser escrito ou uma função que retorna o conteúdo
-     * @param writeHistory Se deve escrever no histórico de edições
-     */
-    export function write(content: string | ((lastContent: string) => string | Promise<string>), writeHistory?: boolean): Promise<void>;
-    /**
-     * Salva o arquivo atual
-     */
-    export function save(): Promise<void>;
-}
-declare module "lenz:history" {
-    /**
-     * Obtém o histórico de um estado ou cria um novo
-     * @param key Identificador do estado
-     * @param initialData Dados iniciais
-     * @returns
-     */
-    export function ensureHistory(key: string, initialData: string): any;
-    /**
-     * Salva um novo estado
-     * @param key Identificador do estado
-     * @param data Dados a serem salvos
-     * @returns
-     */
-    export function save(key: string, data: string): any;
-    /**
-     * Volta para o estado anterior
-     * @param key
-     * @returns
-     */
-    export function undo(key: string): any;
-    /**
-     * Refaz o próximo estado
-     * @param key
-     * @returns
-     */
-    export function redo(key: string): any;
-    /**
-     * Exclui todo o histórico deste estado
-     * @param key
-     * @returns
-     */
-    export function drop(key: string): any;
-    /**
-     * Obtém o estado atual
-     * @param key
-     * @returns
-     */
-    export function read(key: string): any;
-    /**
-     * Retorna se é possível voltar ao estado atual
-     * @param key
-     * @returns
-     */
-    export function canUndo(key: string): any;
-    /**
-     * Retorna se é possível refazer refazer o próximo estado
-     * @param key
-     * @returns
-     */
-    export function canRedo(key: string): any;
-}
-declare module "lenz:hooks" {
-    /**
-     * Executa um callback antes de um evento ser disparado
-     * @param event Evento a ser monitorado
-     * @param callback Função a ser executada
-     * @returns Disposer
-     */
-    export function onBefore(event: string, callback: Function): any;
-    /**
-     * Executa um callback depois de um evento ser disparado
-     * @param event Evento a ser monitorado
-     * @param callback Função a ser executada
-     * @returns Disposer
-     */
-    export function onAfter(event: string, callback: Function): any;
-}
-declare module "lenz:hotkeys" {
-    /**
-     * Módulo para gerenciar atalhos de teclado
-     * @module lenz:hotkeys
-     */
-    import type { LenzDisposer } from "lenz:types";
-    /**
-     * Mapeia combinacoes de teclas para comandos
-     * @param hotKeys Mapeamento de teclas para comandos
-     * @example
-     * ```ts
-     * addHotKeys({
-     *  "Ctrl+S": 'file.save',
-     *  "Ctrl+Z": 'history.undo',
-     * });
-     * @returns Disposer para remover as teclas de atalho
-     */
-    export function addHotKeys(hotKeys: Record<string, string>): LenzDisposer;
-}
-declare module "lenz:invoke" {
-    /**
-     * Erro de execução de comando
-     */
-    export class InvokeError extends Error {
-        constructor(message: string);
-    }
-    /**
-     * Invoca um comando no servidor de forma assíncrona
-     * @param command Comando a ser invocado
-     * @param args Argumentos do comando
-     * @returns Promise com o resultado da execução
-     */
-    export function invoke<T>(command: string, args?: Record<string, unknown>): Promise<T>;
-    /**
-     * Invoca um comando no servidor de forma síncrona
-     * @param command Comando a ser invocado
-     * @param args Argumentos do comando
-     * @returns Resultado da execução
-     */
-    export function invokeSync(command: string, args?: Record<string, unknown>): string | Promise<string> | Record<string, unknown> | Promise<Record<string, unknown> | null> | ArrayBuffer | Promise<ArrayBuffer> | null | undefined;
-}
-declare module "lenz:menubar" {
-    /**
-     * Módulo para gerenciar a barra de menu do editor
-     * @module lenz:menubar
-     */
-    import type { LenzDisposer } from "lenz:types";
-    /**
-     * Item de menu base
-     * @internal
-     */
-    interface MenuItemBase {
-        /** Identificador do item */
-        id?: string;
-        /** Itens que este item deve aparecer antes */
-        before?: string[];
-        /** Itens que este item deve aparecer depois */
-        after?: string[];
-        /** Função que retorna se o item deve ser visível */
-        isVisible?(state: any): boolean;
-    }
-    /**
-     * Item de menu de ação
-     */
-    export interface MenuItemAction extends MenuItemBase {
-        /** Identificador do item */
-        id: string;
-        /** Tipo do item */
-        type?: "item";
-        /** O ícone deve ser uma string contendo um Path SVG de tamanho 24x24 */
-        icon?: string;
-        /** Título do item */
-        title: string;
-        /** Comando a ser executado ao clicar no item */
-        command?: string;
-        /** Atalho de teclado para o item */
-        children?: MenuItem[];
-        /** Função que retorna se o item deve ser desabilitado */
-        isDisabled?(state: any): boolean;
-    }
-    /** Item de menu de separador */
-    export interface MenuItemSeparator extends MenuItemBase {
-        type: "separator";
-    }
-    /**
-     * Item de menu de grupo de checkbox
-     */
-    export interface MenuItemCheckboxGroup<T = any> extends MenuItemBase {
-        /** Identificador do item */
-        id: string;
-        /** Tipo do item */
-        type: "checkbox-group";
-        /** Título do grupo */
-        title?: string;
-        /** Função que retorna o valor do grupo */
-        getValue(): T;
-        /** Função chamada ao atualizar o valor do grupo */
-        onUpdated?(newValue: T): void;
-        /** Itens do grupo */
-        items: MenuItemCheckbox<T>[];
-    }
-    /**
-     * Item de menu de checkbox
-     */
-    export interface MenuItemRadioGroup<T = any> extends MenuItemBase {
-        /** Identificador do item */
-        id: string;
-        /** Tipo do item */
-        type: "radio-group";
-        /** Título do grupo */
-        title?: string;
-        /** Função que retorna o valor do grupo */
-        getValue(): T;
-        /** Função chamada ao atualizar o valor do grupo */
-        onUpdated?(newValue: T): void;
-        /** Itens do grupo */
-        items: MenuItemRadioGroupItem<T>[];
-    }
-    /**
-     * Item de menu de checkbox
-     */
-    export interface MenuItemCheckbox<T = any> extends MenuItemBase {
-        /** Identificador do item */
-        id: string;
-        /** Título do item */
-        title: string;
-        /** Comando a ser executado ao clicar no item */
-        command?: string;
-        /** Valor do item */
-        checkedValue?: T;
-        /** Valor do item quando desmarcado */
-        uncheckedValue?: T;
-        /** Função que retorna se o item deve ser desabilitado */
-        isDisabled?(state: any): boolean;
-    }
-    /**
-     * Item de menu de radio button
-     */
-    export interface MenuItemRadioGroupItem<T = any> extends MenuItemBase {
-        /** Identificador do item */
-        id: string;
-        /** Título do item */
-        title: string;
-        /** Valor do item */
-        checkedValue: T;
-        /** Comando a ser executado ao clicar no item */
-        command?: string;
-        /** Função que retorna se o item deve ser desabilitado */
-        isDisabled?(state: any): boolean;
-    }
-    /**
-     * Item de menu
-     */
-    export type MenuItem = MenuItemAction | MenuItemSeparator | MenuItemCheckboxGroup | MenuItemRadioGroup;
-    /**
-     * Adiciona itens a barra de menu
-     * @param items Itens a serem adicionados
-     * @param parentId Id do item pai (Itens sem parentId ou com parentId inexistente serão adicionados na raiz)
-     *
-     * @example
-     * ```ts
-     * extendMenu([
-     *  {
-     *    id: "meu.menu",
-     *    title: "Meu Menu",
-     *    children: [
-     *     {
-     *      id: "meu.menu.item",
-     *      title: "Meu Item",
-     *      command: "meu.menu.item",
-     *     },
-     *   ],
-     *  }
-     * ], "edit");
-     * ```
-     */
-    export function extendMenu(items: MenuItem[], parentId?: string): LenzDisposer;
 }
 declare module "lenz:reactivity" {
     import { LenzDisposer } from "lenz:types";
@@ -566,6 +148,568 @@ declare module "lenz:reactivity" {
      */
     export function ref<T>(value: T): Ref<T>;
 }
+declare module "lenz:util" {
+    global {
+        export interface Window {
+            /** Store do Editor */
+            __LENZ_STORE__?: any;
+        }
+    }
+    /**
+     * Garante que o editor foi inicializado
+     * @returns Store do editor
+     */
+    export function ensureInitialized(): Window['__LENZ_STORE__'];
+}
+declare module "lenz:commands" {
+    /**
+     * Módulo para gerenciar e executar comandos do editor
+     * @module lenz:commands
+     */
+    import { Ref } from "lenz:reactivity";
+    import type { ElementSelection, LenzDisposer } from "lenz:types";
+    /**
+     * Representa o contexto de um comando
+     */
+    export interface CommandContext {
+        /**
+         * Seleção atual do editor
+         */
+        selection: Ref<ElementSelection[]>;
+        /**
+         * Elemento onde o cursor está posicionado
+         */
+        hover: Ref<ElementSelection | undefined>;
+        /**
+         * Retorna a seleção atual do editor
+         * @deprecated Utilize `selection.value`
+         */
+        getSelection(): ElementSelection[];
+        /**
+         * Define a seleção do editor
+         * @param selection
+         * @deprecated Utilize `selection.value`
+         */
+        setSelection(selection: HTMLElement[]): void;
+        /**
+         * Retorna o elemento onde o cursor está posicionado
+         * @deprecated Utilize `hover.value`
+         */
+        getHover(): ElementSelection | undefined;
+        /**
+         * Retorna o conteúdo do arquivo aberto no editor
+         */
+        getCurrentContent(): string;
+        /**
+         * Retorna o documento HTML atualmente aberto no editor
+         */
+        getCurrentDocument(): Document | undefined;
+    }
+    /**
+     * Representa um comando do editor
+     */
+    export interface Command {
+        /** Identificador único do comando */
+        id: string;
+        /**
+         * Nome do comando
+         *
+         * Caso não seja informado, o nome do comando não será exibido
+         * na paleta de comandos
+         */
+        name?: string;
+        /** Descrição do comando */
+        description?: string;
+        /** Ícone do comando deve ser uma string contendo um Path de tamanho 16x16 */
+        icon?: string;
+        /** Função que será executada ao chamar o comando */
+        run(context: CommandContext, ...args: any[]): any;
+    }
+    /**
+     * Adiciona um comando ao editor
+     * @param command Identificador único do comando
+     * @returns Disposer para remover o comando
+     *
+     * @example
+     * ```ts
+     * import iconEarth from "lenz:lenz:icons/earth";
+     *
+     * addCommand({
+     *  id: "hello",
+     *  name: "Exibir mensagem", // Se não informado, este comando não será exibido na paleta de comandos e não poderá ser executado programaticamente
+     *  description: "Exibe uma mensagem no console",
+     *  icon: iconEarth,
+     *  run(context) {
+     *    console.log("Olá, mundo!");
+     *  }
+     * });
+     */
+    export function addCommand(command: Command): LenzDisposer;
+    /**
+     * Executa um comando registrado no editor
+     * @param command Identificador único do comando
+     * @param args Argumentos que serão passados para o comando
+     * @returns Resultado da execução do comando
+     */
+    export function executeCommand<T>(command: string, ...args: any[]): Promise<T>;
+}
+declare module "lenz:dialog" {
+    /**
+     * Opções da janela de confirmação
+     */
+    export interface ConfirmDialogOptions {
+        /** Título da janela de confirmação */
+        title: string;
+        /** Mensagem exibida na janela de confirmação */
+        message: string;
+        /**
+         * Texto do botão de confirmação
+         * @default "OK"
+         */
+        confirmText?: string;
+        /**
+         * Texto do botão de cancelamento
+         * @default "Cancelar"
+         */
+        cancelText?: string;
+    }
+    /**
+     * Exibe uma janela de confirmação
+     * @param options Opções da janela de confirmação
+     * @returns Promise que será resolvida com `true` se o usuário confirmar a ação ou `false` caso contrário.
+     * @example
+     * ```ts
+     * const confirmed = await confirm({
+     *   title: "Confirmação",
+     *   message: "Deseja realmente excluir o item selecionado?"
+     * });
+     */
+    export function confirm(options: ConfirmDialogOptions): any;
+    /**
+     * Opções da janela de prompt
+     */
+    export interface PromptDialogOptions {
+        /** Título da janela de prompt */
+        title: string;
+        /** Mensagem exibida na janela de prompt */
+        message: string;
+        /** Valor padrão do campo de texto */
+        defaultValue?: string;
+        /**
+         * Oculta os caracteres digitados
+         */
+        hidden?: boolean;
+        /**
+         * Texto exibido no campo de texto quando vazio
+         */
+        placeholder?: string;
+        /**
+         * Texto do botão de confirmação
+         * @default "OK"
+         */
+        confirmText?: string;
+        /**
+         * Texto do botão de cancelamento
+         * @default "Cancelar"
+         */
+        cancelText?: string;
+    }
+    /**
+     * Exibe uma janela de prompt para o usuário inserir um texto
+     * @param options Opções da janela de prompt
+     * @returns Promise que será resolvida com o texto inserido pelo usuário ou o valor padrão caso o usuário cancele a ação.
+     * @example
+     * ```ts
+     * const name = await prompt({
+     *  title: "Informe seu nome",
+     *  message: "Digite seu nome completo",
+     *  defaultValue: "Fulano de Tal"
+     * });
+     * ```
+     */
+    export function prompt(options: PromptDialogOptions): any;
+}
+declare module "lenz:extensions" {
+    /**
+     * Obtém uma extensão pelo seu ID
+     * @param id
+     * @returns
+     */
+    export function getExtension(id: string): any;
+}
+declare module "lenz:file" {
+    /**
+     * Retorna o arquivo atualmente aberto no editor
+     * @returns
+     */
+    export function getCurrentFile(): any;
+    /**
+     * Abre um arquivo para edição no editor
+     * @param filepath Caminho do arquivo a ser aberto
+     */
+    export function open(filepath: string): Promise<void>;
+    /**
+     * Escreve conteúdo no arquivo atual
+     * @param content Conteúdo a ser escrito ou uma função que retorna o conteúdo
+     * @param writeHistory Se deve escrever no histórico de edições
+     */
+    export function write(content: string | ((lastContent: string) => string | Promise<string>), writeHistory?: boolean): Promise<void>;
+    /**
+     * Salva o arquivo atual
+     */
+    export function save(): Promise<void>;
+}
+declare module "lenz:history" {
+    /**
+     * Representa um estado de um histórico em um determinado momento
+     */
+    export class SnapShot<T> {
+        /** Dados do snapshot */
+        data: T;
+        /** Snapshot anterior */
+        previous: SnapShot<T> | null;
+        /** Próximo snapshot */
+        next: SnapShot<T> | null;
+        constructor(
+        /** Dados do snapshot */
+        data: T, 
+        /** Snapshot anterior */
+        previous?: SnapShot<T> | null, 
+        /** Próximo snapshot */
+        next?: SnapShot<T> | null);
+    }
+    /**
+     * Representa um histórico de snapshots de um determinado estado
+     */
+    export class History<T> {
+        /** Dados iniciais */
+        data: T;
+        /** Capacidade máxima de snapshots */
+        capacity: number;
+        /** SnapShot mais antigo */
+        oldest: SnapShot<T>;
+        /** SnapShot atual */
+        current: SnapShot<T>;
+        /** Quantidade de snapshots registrados */
+        count: number;
+        constructor(
+        /** Dados iniciais */
+        data: T, 
+        /** Capacidade máxima de snapshots */
+        capacity?: number);
+        /**
+         * Retorna se é possível voltar ao estado anterior
+         */
+        get canUndo(): boolean;
+        /**
+         * Retorna se é possível refazer o próximo estado
+         */
+        get canRedo(): boolean;
+        /**
+         * Desfaz o estado atual
+         * @returns Dados do estado anterior
+         */
+        undo(): T;
+        /**
+         * Refaz o próximo estado
+         * @returns Dados do próximo estado
+         */
+        redo(): T;
+        /**
+         * Adiciona um novo estado ao histórico
+         * @param data Dados a serem salvos
+         * @returns Dados salvos
+         */
+        push(data: T): T;
+        /**
+         * Exclui todos os snapshots mais antigos que o snapshot atual
+         */
+        clear(): void;
+    }
+    /**
+     * Obtém o histórico de um estado ou cria um novo
+     * @param key Identificador do estado
+     * @param initialData Dados iniciais
+     * @returns
+     */
+    export function ensureHistory(key: string, initialData: string): any;
+    /**
+     * Salva um novo estado
+     * @param key Identificador do estado
+     * @param data Dados a serem salvos
+     * @returns
+     */
+    export function save(key: string, data: string): any;
+    /**
+     * Volta para o estado anterior
+     * @param key
+     * @returns
+     */
+    export function undo(key: string): any;
+    /**
+     * Refaz o próximo estado
+     * @param key
+     * @returns
+     */
+    export function redo(key: string): any;
+    /**
+     * Exclui todo o histórico deste estado
+     * @param key
+     * @returns
+     */
+    export function drop(key: string): any;
+    /**
+     * Obtém o estado atual
+     * @param key
+     * @returns
+     */
+    export function read(key: string): any;
+    /**
+     * Retorna se é possível voltar ao estado atual
+     * @param key
+     * @returns
+     */
+    export function canUndo(key: string): any;
+    /**
+     * Retorna se é possível refazer refazer o próximo estado
+     * @param key
+     * @returns
+     */
+    export function canRedo(key: string): any;
+}
+declare module "lenz:hooks" {
+    /**
+     * Executa um callback antes de um evento ser disparado
+     * @param event Evento a ser monitorado
+     * @param callback Função a ser executada
+     * @returns Disposer
+     */
+    export function onBefore(event: string, callback: Function): any;
+    /**
+     * Executa um callback depois de um evento ser disparado
+     * @param event Evento a ser monitorado
+     * @param callback Função a ser executada
+     * @returns Disposer
+     */
+    export function onAfter(event: string, callback: Function): any;
+}
+declare module "lenz:hotkeys" {
+    /**
+     * Módulo para gerenciar atalhos de teclado
+     * @module lenz:hotkeys
+     */
+    import type { LenzDisposer } from "lenz:types";
+    export namespace KeyTypes {
+        /**
+         * Teclas de modificação
+         */
+        type Modifier = "Ctrl" | "Alt" | "Shift" | "Cmd";
+        /**
+         * Teclas de navegação
+         */
+        type Navigation = "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight" | "Home" | "End" | "PageUp" | "PageDown";
+        /**
+         * Teclas de função
+         */
+        type Function = "F1" | "F2" | "F3" | "F4" | "F5" | "F6" | "F7" | "F8" | "F9" | "F10" | "F11" | "F12";
+        /**
+         * Teclas especiais
+         */
+        type Special = "Enter" | "Esc" | "Tab" | "Space" | "Backspace" | "Delete" | "CapsLock" | "NumLock" | "ScrollLock" | "PrintScreen" | "Insert" | "Pause";
+        /**
+         * Teclas de símbolos
+         */
+        type Symbol = "Plus" | "-" | "=" | ";" | "," | "." | "/" | "\\" | "'" | "`" | "[" | "]";
+        /**
+         * Teclas alfabéticas
+         */
+        type Alphabetic = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z";
+        /**
+         * Teclas numéricas
+         */
+        type Number = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+    }
+    /**
+     * Representa uma tecla qualquer do teclado
+     */
+    export type AnyKey = KeyTypes.Modifier | KeyTypes.Navigation | KeyTypes.Function | KeyTypes.Special | KeyTypes.Symbol | KeyTypes.Alphabetic | KeyTypes.Number;
+    type ExcludeRepeated<T> = T extends `${infer A}+${infer B}+${infer C}+${infer D}` ? `${A}+${Exclude<B, A | C | D>}+${Exclude<C, A | B | D>}+${Exclude<D, A | B | C>}` : T extends `${infer A}+${infer B}+${infer C}` ? `${A}+${Exclude<B, A | C>}+${Exclude<C, A | B>}` : T extends `${infer A}+${infer B}` ? `${A}+${Exclude<B, A>}` : T;
+    /**
+     * Representa uma combinação de teclas
+     */
+    export type Hotkey = AnyKey | ExcludeRepeated<`${KeyTypes.Modifier}+${AnyKey}`> | ExcludeRepeated<`${KeyTypes.Modifier}+${KeyTypes.Modifier}+${AnyKey}`> | ExcludeRepeated<`${KeyTypes.Modifier}+${KeyTypes.Modifier}+${KeyTypes.Modifier}+${AnyKey}`>;
+    /**
+     * Mapeia combinacoes de teclas para comandos
+     * @param hotKeys Mapeamento de teclas para comandos
+     * @example
+     * ```ts
+     * addHotKeys({
+     *  "Ctrl+S": 'file.save',
+     *  "Ctrl+Z": 'history.undo',
+     * });
+     * @returns Disposer para remover as teclas de atalho
+     */
+    export function addHotKeys(hotKeys: Record<string, string>): LenzDisposer;
+}
+declare module "lenz:invoke" {
+    /**
+     * Erro de execução de comando
+     */
+    export class InvokeError extends Error {
+        constructor(message: string);
+    }
+    /**
+     * Invoca um comando no servidor de forma assíncrona
+     * @param command Comando a ser invocado
+     * @param args Argumentos do comando
+     * @returns Promise com o resultado da execução
+     */
+    export function invoke<T>(command: string, args?: Record<string, unknown>): Promise<T>;
+    /**
+     * Invoca um comando no servidor de forma síncrona
+     * @param command Comando a ser invocado
+     * @param args Argumentos do comando
+     * @returns Resultado da execução
+     */
+    export function invokeSync(command: string, args?: Record<string, unknown>): string | Promise<string> | ArrayBuffer | Record<string, unknown> | Promise<Record<string, unknown> | null> | Promise<ArrayBuffer> | null | undefined;
+}
+declare module "lenz:menubar" {
+    /**
+     * Módulo para gerenciar a barra de menu do editor
+     * @module lenz:menubar
+     */
+    import type { LenzDisposer } from "lenz:types";
+    /**
+     * Item de menu base
+     * @internal
+     */
+    export interface MenuItemBase {
+        /** Identificador do item */
+        id?: string;
+        /** Itens que este item deve aparecer antes */
+        before?: string[];
+        /** Itens que este item deve aparecer depois */
+        after?: string[];
+        /** Função que retorna se o item deve ser visível */
+        isVisible?(state: any): boolean;
+    }
+    /**
+     * Item de menu de ação
+     */
+    export interface MenuItemAction extends MenuItemBase {
+        /** Identificador do item */
+        id: string;
+        /** Tipo do item */
+        type?: "item";
+        /** O ícone deve ser uma string contendo um Path SVG de tamanho 24x24 */
+        icon?: string;
+        /** Título do item */
+        title: string;
+        /** Comando a ser executado ao clicar no item */
+        command?: string;
+        /** Atalho de teclado para o item */
+        children?: MenuItem[];
+        /** Função que retorna se o item deve ser desabilitado */
+        isDisabled?(state: any): boolean;
+    }
+    /** Item de menu de separador */
+    export interface MenuItemSeparator extends MenuItemBase {
+        type: "separator";
+    }
+    /**
+     * Item de menu de grupo de checkbox
+     */
+    export interface MenuItemCheckboxGroup<T = any> extends MenuItemBase {
+        /** Identificador do item */
+        id: string;
+        /** Tipo do item */
+        type: "checkbox-group";
+        /** Título do grupo */
+        title?: string;
+        /** Função que retorna o valor do grupo */
+        getValue(): T;
+        /** Função chamada ao atualizar o valor do grupo */
+        onUpdated?(newValue: T): void;
+        /** Itens do grupo */
+        items: MenuItemCheckbox<T>[];
+    }
+    /**
+     * Item de menu de checkbox
+     */
+    export interface MenuItemRadioGroup<T = any> extends MenuItemBase {
+        /** Identificador do item */
+        id: string;
+        /** Tipo do item */
+        type: "radio-group";
+        /** Título do grupo */
+        title?: string;
+        /** Função que retorna o valor do grupo */
+        getValue(): T;
+        /** Função chamada ao atualizar o valor do grupo */
+        onUpdated?(newValue: T): void;
+        /** Itens do grupo */
+        items: MenuItemRadioGroupItem<T>[];
+    }
+    /**
+     * Item de menu de checkbox
+     */
+    export interface MenuItemCheckbox<T = any> extends MenuItemBase {
+        /** Identificador do item */
+        id: string;
+        /** Título do item */
+        title: string;
+        /** Comando a ser executado ao clicar no item */
+        command?: string;
+        /** Valor do item */
+        checkedValue?: T;
+        /** Valor do item quando desmarcado */
+        uncheckedValue?: T;
+        /** Função que retorna se o item deve ser desabilitado */
+        isDisabled?(state: any): boolean;
+    }
+    /**
+     * Item de menu de radio button
+     */
+    export interface MenuItemRadioGroupItem<T = any> extends MenuItemBase {
+        /** Identificador do item */
+        id: string;
+        /** Título do item */
+        title: string;
+        /** Valor do item */
+        checkedValue: T;
+        /** Comando a ser executado ao clicar no item */
+        command?: string;
+        /** Função que retorna se o item deve ser desabilitado */
+        isDisabled?(state: any): boolean;
+    }
+    /**
+     * Item de menu
+     */
+    export type MenuItem = MenuItemAction | MenuItemSeparator | MenuItemCheckboxGroup | MenuItemRadioGroup;
+    /**
+     * Adiciona itens a barra de menu
+     * @param items Itens a serem adicionados
+     * @param parentId Id do item pai (Itens sem parentId ou com parentId inexistente serão adicionados na raiz)
+     *
+     * @example
+     * ```ts
+     * extendMenu([
+     *  {
+     *    id: "meu.menu",
+     *    title: "Meu Menu",
+     *    children: [
+     *     {
+     *      id: "meu.menu.item",
+     *      title: "Meu Item",
+     *      command: "meu.menu.item",
+     *     },
+     *   ],
+     *  }
+     * ], "edit");
+     * ```
+     */
+    export function extendMenu(items: MenuItem[], parentId?: string): LenzDisposer;
+}
 declare module "lenz:ui" {
     import type { LenzDisposer } from "lenz:types";
     global {
@@ -604,12 +748,11 @@ declare module "lenz:ui" {
          */
         data?: Record<string, unknown>;
         /**
-         * Posição inicial da janela
+         * Posição horizontal da janela
          */
-        position?: {
-            x: number;
-            y: number;
-        };
+        x?: number;
+        /** Posição vertical da janela */
+        y?: number;
         /**
          * Define se a janela pode ser redimensionada pelo usuário
          */
@@ -622,6 +765,10 @@ declare module "lenz:ui" {
         closable?: boolean;
         /** Define se a janela pode ser movida pelo usuário */
         movable?: boolean;
+        /**
+         * Função chamada quando a janela é fechada
+         */
+        onClose?(): void;
     }
     /**
      * Cria uma nova janela de interface

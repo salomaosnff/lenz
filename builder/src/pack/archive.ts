@@ -12,7 +12,7 @@ export interface PackArchiveOptions {
 }
 
 export async function getPackArquiveTasks(options: PackArchiveOptions): Promise<ListrTask[]> {
-  const prefix = "lenz-designer-linux-x64";
+  const prefix = "lenz-designer";
 
   await ensureDir(options.output);
 

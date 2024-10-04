@@ -106,14 +106,12 @@ export function getPackAppImageTasks(options: PackAppImageOptions): ListrTask<{
           dirname(fileURLToPath(import.meta.url)),
           "../../vendor/appimagetool-x86_64.AppImage"
         );
-        const appImageFile = join(
-          options.output,
-          `${ctx.package.id}-v${ctx.package.version}-linux-${ctx.package.architecture}.deb`
-        );
 
-        await ensureDir(dirname(appImageFile));
+        const output = join(options.output, `lenz-designer.AppImage`);
 
-        const execute = command(`${appimagetoolExec} ${ctx.workdir}`, {
+        await ensureDir(dirname(output));
+
+        const execute = command(`${appimagetoolExec} ${ctx.workdir} ${output}`, {
           cwd: options.output,
           env: {
             ARCH: ctx.package.architecture,

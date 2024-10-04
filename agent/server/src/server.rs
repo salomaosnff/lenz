@@ -60,7 +60,9 @@ pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
 
     #[cfg(not(debug_assertions))]
     {
-        open_browser()
+        if std::env::args().all(|arg| arg != "--no-browser") {
+            open_browser()
+        }
     }
 
     let server = hyper_util::server::conn::auto::Builder::new(hyper_util::rt::TokioExecutor::new());

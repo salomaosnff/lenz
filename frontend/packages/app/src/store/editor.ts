@@ -1,10 +1,10 @@
-import { createRef } from "lenz:ui";
+import { ref as createRef } from "lenz:reactivity";
+import { ElementSelection } from "lenz:types";
+
 import { defineStore } from "pinia";
 import { toRaw } from "vue";
-import {
-  CanvasElement,
-  createElementSelection,
-} from "../components/AppCanvas/types";
+
+import { createElementSelection } from "../components/AppCanvas/types";
 
 export const useEditorStore = defineStore("editor", () => {
   const menubarStore = useMenuBarStore();
@@ -12,30 +12,48 @@ export const useEditorStore = defineStore("editor", () => {
   const fileStore = useFileStore();
   const historyStore = useHistoryStore();
 
-  const hoveredElement = ref<CanvasElement>();
+  const hoveredElement = ref<ElementSelection>();
   const currentDocument = shallowRef<Document>();
-  const selectionRef = markRaw(createRef());
-  const selectedElements = customRef<CanvasElement[]>((track, trigger) => {
+  const selectionRef = markRaw(createRef<ElementSelection[]>([]));
+  const hoverRef = markRaw(createRef<ElementSelection | undefined>());
+
+  const selectedElements = customRef<ElementSelection[]>((track, trigger) => {
     return {
       get() {
         track();
         if (!fileStore.currentFile) {
           return [];
         }
-        return historyStore.ensureHistory<any>(fileStore.currentFile.filepath, fileStore.currentFile.data)?.current.data.selection ?? []
+        return (
+          historyStore.ensureHistory<any>(
+            fileStore.currentFile.filepath,
+            fileStore.currentFile.data
+          )?.current.data.selection ?? []
+        );
       },
-      set(value: CanvasElement[]) {
+      set(value: ElementSelection[]) {
         if (!fileStore.currentFile) {
           return;
         }
-        const history = historyStore.ensureHistory<any>(fileStore.currentFile.filepath, fileStore.currentFile.data);
+        const history = historyStore.ensureHistory<any>(
+          fileStore.currentFile.filepath,
+          fileStore.currentFile.data
+        );
 
         history.current.data.selection = value;
 
         trigger();
       },
-    }
+    };
   });
+
+  watch(
+    hoveredElement,
+    (value) => {
+      hoverRef.value = toRaw(value);
+    },
+    { immediate: true }
+  );
 
   watch(
     selectedElements,
@@ -50,7 +68,9 @@ export const useEditorStore = defineStore("editor", () => {
   }
 
   function setSelection(elements: HTMLElement[]) {
-    selectedElements.value = elements.filter(el => el).map((el) => createElementSelection(el));
+    selectedElements.value = elements
+      .filter((el) => el)
+      .map((el) => createElementSelection(el));
   }
 
   function getHover() {
@@ -91,7 +111,6 @@ export const useEditorStore = defineStore("editor", () => {
           return "desktop";
         },
         onUpdated(newValue: string) {
-          console.log("onUpdateFrameSize", newValue);
           if (newValue === "mobile") {
             settings.settings.frame.width = 480;
           }
@@ -129,6 +148,7 @@ export const useEditorStore = defineStore("editor", () => {
 
   return {
     selectionRef,
+    hoverRef,
     selectedElements,
     hoveredElement,
     currentDocument,

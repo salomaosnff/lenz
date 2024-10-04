@@ -10,7 +10,7 @@ import { ensureInitialized } from "./util.js";
  * Item de menu base
  * @internal
  */
-interface MenuItemBase {
+export interface MenuItemBase {
   /** Identificador do item */
   id?: string;
 
