@@ -260,7 +260,7 @@ export class Ref<T> extends ChannelPort<T, T> {
 /**
  * Objeto get/set para referência reativa
  */
-export interface RefGetSet<T> {
+interface RefGetSet<T> {
   /**
    * Função para obter o valor da referência
    */

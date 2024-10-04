@@ -1,4 +1,4 @@
-# Módulo de comandos
+# Módulo de histórico
 
 O módulo de histórico é responsável por gerenciar históricos de estados do editor.
 

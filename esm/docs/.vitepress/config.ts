@@ -125,6 +125,10 @@ export default defineConfig({
               link: "/api/modules/menubar",
             },
             {
+              text: "reactivity",
+              link: "/api/modules/reactivity",
+            },
+            {
               text: "ui",
               link: "/api/modules/ui",
             },

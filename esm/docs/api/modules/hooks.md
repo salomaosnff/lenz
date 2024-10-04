@@ -1,4 +1,4 @@
-# Módulo de comandos
+# Módulo de Hooks
 
 O módulo de hooks é responsável por gerenciar eventos do Editor.
 
