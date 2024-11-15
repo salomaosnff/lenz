@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "html.td",
+  "title": "HTML5 <td> Element Attributes",
+  "type": "object",
+  "allOf": [
+    { "$ref": "base.html" },
+    {
+      "type": "object",
+      "properties": {
+        "colspan": {
+          "type": "integer",
+          "title": "Colunas"
+        },
+        "rowspan": {
+          "type": "integer",
+          "title": "Linhas"
+        },
+        "headers": {
+          "type": "string",
+          "title": "Cabeçalhos"
+        }
+      }
+    }
+  ]
+}

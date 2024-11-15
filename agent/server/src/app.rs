@@ -115,10 +115,15 @@ impl AppState {
             }
         });
 
+        static_assets.add("/vendor/", config.vendor_dir.clone());
         static_assets.add("/esm/", config.esm_dir.clone());
 
+        let mut importmap = search_esm_files(&config.esm_dir, None);
+
+        importmap.insert("vue".into(), "http://localhost:5369/vendor/vue.js".into());
+
         Arc::new(Self {
-            import_map: tokio::sync::RwLock::new(search_esm_files(&config.esm_dir, None)),
+            import_map: tokio::sync::RwLock::new(importmap),
             extension_host: tokio::sync::RwLock::new(ExtensionHost::new(config.clone())),
             static_files: tokio::sync::RwLock::new(static_assets),
             invoke_handlers: tokio::sync::RwLock::new(invoke_handlers),

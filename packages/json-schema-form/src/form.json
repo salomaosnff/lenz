@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Formulário de Produto",
+  "type":"object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "nome": {
+      "type": "string",
+      "title": "Nome"
+    },
+    "preco": {
+      "type": "number",
+      "title": "Preço"
+    },
+    "quantidade": {
+      "type": "integer",
+      "title": "Quantidade"
+    },
+    "descricao": {
+      "type": "string",
+      "title": "Descrição"
+    },
+    "tags": {
+      "type": "array",
+      "title": "Tags",
+      "items": {
+        "type": "string"
+      }
+    },
+    "contato": {
+      "type": "object",
+      "title": "Contato",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "E-mail"
+        },
+        "telefone": {
+          "type": "string",
+          "title": "Telefone"
+        }
+      }
+    }
+  }
+}

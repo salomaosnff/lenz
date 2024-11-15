@@ -1,4 +1,3 @@
 packages:
-  - 'builder'
-  - 'frontend'
-  - 'esm'
+  - 'packages/*'
+  - 'extensions/*/frontend'

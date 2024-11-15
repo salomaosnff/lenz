@@ -16,8 +16,6 @@ pub fn install_dir() -> PathBuf {
             .expect("Failed to get canonical path")
             .to_path_buf();
 
-        println!("install_dir: {:?}", x);
-
         x
     }
 }
@@ -32,6 +30,14 @@ pub fn esm_dir() -> PathBuf {
     let dir = std::env::var("LENZ_ESM_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|_| resources_dir().join("esm"));
+
+    dir
+}
+
+pub fn vendor_dir() -> PathBuf {
+    let dir = std::env::var("LENZ_ESM_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| resources_dir().join("vendor"));
 
     dir
 }

@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "html.ul",
+  "title": "HTML5 <ul> Element Attributes",
+  "type": "object",
+  "allOf": [
+    { "$ref": "base.html" },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Tipo",
+          "description": "Especifica o tipo de marcador.",
+          "enum": ["disc", "circle", "square", "decimal", "decimal-leading-zero", "lower-roman", "upper-roman", "lower-greek", "lower-latin", "upper-latin", "armenian", "georgian", "lower-alpha", "upper-alpha", "none"]
+        }
+      }
+    }
+  ]
+}

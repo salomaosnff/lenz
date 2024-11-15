@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outFile": "../esm-types/index.d.ts",
+    "paths": {
+      "lenz:*": ["./src/*"] // Mapeia "lenz:algo" para "src/algo"
+    }
+  }
+}

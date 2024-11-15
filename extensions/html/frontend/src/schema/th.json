@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "html.th",
+  "title": "HTML5 <th> Element Attributes",
+  "type": "object",
+  "allOf": [
+    { "$ref": "html.td" },
+    {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "title": "Escopo",
+          "enum": ["row", "col", "rowgroup", "colgroup"]
+        },
+        "abbr": {
+          "type": "string",
+          "title": "Abreviação",
+          "description": "Especifica uma abreviação ou um acrônimo para o conteúdo da célula."
+        }
+      }
+    }
+  ]
+}

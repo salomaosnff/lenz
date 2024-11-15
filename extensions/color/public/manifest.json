@@ -1,0 +1,8 @@
+{
+  "id": "css.theme",
+  "name": "Tema e cores da página",
+  "main": "main.js",
+  "description": "Habilita o suporte a temas e cores personalizadas na página",
+  "version": "1.0.0",
+  "publisher": "Salomão Neto <contato@sallon.dev>"
+}

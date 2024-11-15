@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HTML5 <button> Element Attributes",
+  "$id": "html.button",
+  "type": "object",
+  "allOf": [
+    { "$ref": "base.html" },
+    {
+      "type": "object",
+      "properties": {
+        "autofocus": {
+          "type": "boolean",
+          "title": "Foco Automático",
+          "description": "Especifica que o botão deve obter o foco automaticamente quando a página é carregada."
+        },
+        "disabled": {
+          "type": "boolean",
+          "title": "Desativado",
+          "description": "Especifica que o botão deve ser desativado."
+        },
+        "name": {
+          "type": "string",
+          "title": "Nome",
+          "description": "Especifica o nome do botão."
+        },
+        "type": {
+          "type": "string",
+          "title": "Tipo",
+          "description": "Especifica o tipo de botão.",
+          "enum": ["button", "reset", "submit"]
+        },
+        "value": {
+          "type": "string",
+          "title": "Valor",
+          "description": "Especifica o valor do botão."
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "html.ol",
+  "title": "HTML5 <ol> Element Attributes",
+  "type": "object",
+  "allOf": [
+    { "$ref": "base.html" },
+    {
+      "type": "object",
+      "properties": {
+        "reversed": {
+          "type": "boolean",
+          "title": "Reverso",
+          "description": "Especifica que a ordem dos itens da lista deve ser decrescente."
+        },
+        "start": {
+          "type": "integer",
+          "title": "Início",
+          "description": "Especifica o valor inicial do contador."
+        },
+        "type": {
+          "type": "string",
+          "title": "Tipo",
+          "description": "Especifica o tipo de marcador.",
+          "enum": ["1", "A", "a", "I", "i"],
+          "default": "1",
+          "examples": ["1"]
+        }
+      }
+    }
+  ]
+}
