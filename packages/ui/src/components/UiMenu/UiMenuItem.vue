@@ -18,6 +18,7 @@ const parentMenuGroup = inject<{
   currentItem: Ref<string>;
   countIcons: Ref<number>;
   hasIcons: Ref<boolean>;
+  dispose(): void;
 } | null>("menu-group", null);
 
 if (!parentMenuGroup) {
@@ -65,7 +66,7 @@ onUnmounted(() => {
         class="w-max !cursor-inherit pl-1 pr-2"
         v-if="checkModifiers.radio"
         v-model="checkModel"
-        :value="(checkedValue as any)"
+        :value="checkedValue as any"
       >
         <div class="py-1 pr-2 flex gap-2 items-center">
           <div class="flex-1">
@@ -89,14 +90,14 @@ onUnmounted(() => {
         </div>
       </UiCheckbox>
     </template>
-    <div v-else class="py-1 px-2 flex gap-2 w-full items-center" :class="{
-      'pl-29px': parentMenuGroup.hasIcons.value && !hasIcon
-    }">
-      <UiIcon
-        v-if="props.icon"
-        :path="props.icon"
-        class="!w-16px !h-16px"
-      />
+    <div
+      v-else
+      class="py-1 px-2 flex gap-2 w-full items-center"
+      :class="{
+        'pl-29px': parentMenuGroup.hasIcons.value && !hasIcon,
+      }"
+    >
+      <UiIcon v-if="props.icon" :path="props.icon" class="!w-16px !h-16px" />
       <div class="flex-1">
         <slot></slot>
       </div>

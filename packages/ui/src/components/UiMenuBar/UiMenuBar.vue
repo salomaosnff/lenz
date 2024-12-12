@@ -9,7 +9,10 @@ provide('menu-group', {
     is_menu_bar: true,
     currentItem,
     countIcons,
-    hasIcons
+    hasIcons,
+    dispose() {
+        currentItem.value = undefined;
+    }
 })
 </script>
 <template>
@@ -19,7 +22,7 @@ provide('menu-group', {
 </template>
 <style>
 .ui-menubar {
-    & > * {
+    &>* {
         padding: 0 0.5rem;
     }
 }

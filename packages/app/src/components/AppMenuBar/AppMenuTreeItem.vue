@@ -15,6 +15,7 @@ const menubar = inject("menu-group") as {
   currentItem: Ref<string | undefined>;
   countIcons: Ref<number>;
   hasIcons: ComputedRef<boolean>;
+  dispose(): void;
 };
 
 if (props.icon) {
@@ -24,7 +25,10 @@ if (props.icon) {
 <template>
   <UiMenuItem
     :icon
-    @click="props.command && commandStore.executeCommand(props.command), menubar.currentItem.value = undefined"
+    @click="
+      menubar.dispose(),
+        props.command && commandStore.executeCommand(props.command)
+    "
   >
     <p>{{ title }}</p>
     <template v-if="hotKey" #right>

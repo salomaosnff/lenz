@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import { computed, provide, ref } from 'vue';
+import { computed, inject, provide, ref } from 'vue';
 
 const currentItem = ref<string>();
 const countIcons = ref(0);
 
 const hasIcons = computed(() => countIcons.value > 0);
 
-provide('menu-group', {
+export interface Provider {
+    currentItem: typeof currentItem
+    countIcons: typeof countIcons
+    hasIcons: typeof hasIcons
+    parent: typeof parent
+    dispose(): void
+}
+
+const parent = inject<null | Provider>('menu-group', null);
+
+provide<Provider>('menu-group', {
     currentItem,
     countIcons,
-    hasIcons
+    hasIcons,
+    parent,
+    dispose: parent?.dispose ?? (() => { })
 })
 </script>
 <template>
