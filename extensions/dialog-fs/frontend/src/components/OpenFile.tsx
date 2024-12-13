@@ -16,7 +16,7 @@ export interface AppData {
   filters: Record<string, string>;
 }
 
-export default function App(props: { getData: () => AppData }) {
+export default function App(props: { getData: () => AppData; save?: boolean }) {
   const { result, filters = {} } = props.getData();
   const isMultiple = false;
   const [isGrid, setIsGrid] = useState(true);
@@ -25,6 +25,7 @@ export default function App(props: { getData: () => AppData }) {
   const [filter, setFilter] = useState<string>(
     (Object.values(filters)[0] ?? "*") as string
   );
+  const [filename, setFilename] = useState<string>();
   const [sortBy] = useState([
     {
       key: "kind",
@@ -73,10 +74,33 @@ export default function App(props: { getData: () => AppData }) {
 
   function onSelect(entry: Entry) {
     if (entry.kind === "File") {
-      select(entry);
+      if (props.save) {
+        const parts = entry.path.split("/");
+        setFilename(parts.pop());
+
+        select({
+          ...entry,
+          path: parts.join("/"),
+        });
+      } else {
+        select(entry);
+      }
     } else if (entry.kind === "Directory") {
       setSelection(new Set());
       onOpen(entry);
+    }
+  }
+
+  function onConfirm() {
+    if (props.save) {
+      if (filename) {
+        result.value = `${currentPath}/${filename}`;
+      }
+    }
+    if (selection.size === 1) {
+      result.value = selection.values().next()?.value ?? null;
+    } else {
+      result.value = Array.from(selection);
     }
   }
 
@@ -124,6 +148,15 @@ export default function App(props: { getData: () => AppData }) {
 
       <div className="bg--surface flex justify-end">
         <div className="footer flex justify-end gap-2 pa-2 overflow-hidden">
+          {props.save && (
+            <input
+              className="bg-transparent pl-2 pr-2  h-full flex-1"
+              placeholder="Nome do Arquivo"
+              autoFocus
+              value={filename}
+              onChange={(e) => setFilename(e.currentTarget.value)}
+            />
+          )}
           <label className="inline-flex pr-2 bg--surface-muted cursor-pointer">
             <select
               value={filter}
@@ -145,10 +178,8 @@ export default function App(props: { getData: () => AppData }) {
           </button>
           <button
             className="btn bg--primary rounded-md"
-            onClick={() =>
-              selection.size === 1 &&
-              (result.value = selection.values().next()?.value)
-            }
+            onClick={onConfirm}
+            disabled={!selection.size}
           >
             Confirmar
           </button>

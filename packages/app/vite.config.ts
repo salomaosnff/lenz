@@ -1,5 +1,6 @@
+import { monaco } from "@bithero/monaco-editor-vite-plugin";
 import vue from "@vitejs/plugin-vue";
-import path from "path";
+import path, { join } from "path";
 import Uno from "unocss/vite";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
@@ -7,8 +8,7 @@ import VueRouter from "unplugin-vue-router/vite";
 import url from "url";
 import { defineConfig } from "vite";
 
-import Lenz from '@lenz-design/vite-plugin';
-
+import Lenz from "@lenz-design/vite-plugin";
 
 const PROJECT_ROOT = path.dirname(url.fileURLToPath(import.meta.url));
 
@@ -20,7 +20,14 @@ export default defineConfig({
     Uno({
       configFile: "../ui/uno.config.ts",
     }),
-    Lenz(),
+    monaco({
+      features: "all",
+      languages: ["typescript", "javascript", "json", "css", "html"],
+      globalAPI: true,
+    }),
+    Lenz({
+      lenzExecutable: join(PROJECT_ROOT, "../../dist/plain/bin/lenz"),
+    }),
     AutoImport({
       imports: ["vue", "vue-router", "@vueuse/core"],
       dirs: [
@@ -62,8 +69,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        api: 'modern-compiler'
-      }
-    }
-  }
+        api: "modern-compiler",
+      },
+    },
+  },
 });

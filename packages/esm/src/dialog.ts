@@ -1,6 +1,6 @@
 /**
  * Módulo para criar diálogos de confirmação e prompts
- * @module lenz:dialog 
+ * @module lenz:dialog
  */
 
 import { ensureInitialized } from "./util.js";
@@ -77,6 +77,31 @@ export interface PromptDialogOptions {
    * @default "Cancelar"
    */
   cancelText?: string;
+
+  /**
+   * Tipo do campo de texto
+   * @default "text"
+   */
+  inputType?:
+    | "text"
+    | "password"
+    | "email"
+    | "number"
+    | "tel"
+    | "url"
+    | "search"
+    | "date"
+    | "time"
+    | "datetime-local"
+    | "month"
+    | "week"
+    | "color";
+
+  /**
+   * Função que retorna sugestões para o campo de texto
+   * @param value Texto digitado pelo usuário
+   */
+  getSuggestions?(value: string): Promise<PromptSuggestion[]>;
 }
 
 /**
@@ -94,4 +119,47 @@ export interface PromptDialogOptions {
  */
 export function prompt(options: PromptDialogOptions) {
   return ensureInitialized().dialog().prompt(options);
+}
+
+/**
+ * Representa uma sugestão para um prompt
+ */
+export interface PromptSuggestion {
+  /** Texto da sugestão */
+  title: string;
+
+  /** Descrição da sugestão */
+  description?: string;
+
+  /** Valor a ser retornado caso a sugestão seja selecionada */
+  value: any;
+}
+
+/**
+ * Cria uma função de busca de sugestões para um campo de texto
+ * @param suggestions Lista de sugestões disponíveis
+ * @returns Função que retorna as sugestões que contém o texto digitado pelo usuário
+ */
+export function searchSuggestions(suggestions: PromptSuggestion[]) {
+  return async (value: string) => {
+    const lower = value.toLowerCase().trim();
+
+    if (!lower) {
+      return suggestions;
+    }
+
+    return suggestions.filter((s) => {
+      const text = String(s.title)
+        .concat(s.description ?? "")
+        .concat(s.value ?? "")
+        .toLowerCase()
+        .trim();
+
+      if (!text) {
+        return false;
+      }
+
+      return text.includes(lower);
+    });
+  };
 }

@@ -1,5 +1,5 @@
 import { prompt } from "lenz:dialog";
-import { createWindow } from "lenz:dialog";
+import { createWindow } from "lenz:ui";
 
 import iconSelectAll from "lenz:icons/select_all";
 import iconDelete from "lenz:icons/delete";
@@ -105,7 +105,7 @@ export function setTextContent() {
 export function insertParagraph() {
   return {
     id: "html.insert.paragraph",
-    hotKey: "P",
+    hotKey: "Shift+P",
     name: "Inserir parágrafo",
     icon: iconParagraph,
     description: "Cria um novo elemento <p> no elemento selecionado",
@@ -510,14 +510,13 @@ export function editAttributes() {
       }
 
       lastWindow = createWindow({
-        width: 840,
-        height: 390,
+        width: 720,
+        height: 520,
         themed: true,
         title: "Atributos do Elemento",
         content: (parent) =>
           EditAttributesWidget(parent, { selection }),
         onClose() {
-          scope.dispose();
           lastWindow = null;
         },
       });

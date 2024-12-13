@@ -2,6 +2,7 @@ import { ListrTask } from "listr2";
 import { execaCommand as command } from "execa";
 import { join } from "path";
 import { copyFiles } from "../util";
+import { isChanged } from "../hash";
 
 export interface Options {
   input: string;
@@ -15,7 +16,7 @@ export function getBuildEsmTasks(options: Options): ListrTask[] {
   return [
     {
       title: "Transpilar módulos ECMAScript do agente",
-      skip: () => !options.esm,
+      skip: async () => !options.esm,
       async task(_, task) {
         task.output = "Instalando dependências...";
         const install = command("pnpm install", {
@@ -40,7 +41,7 @@ export function getBuildEsmTasks(options: Options): ListrTask[] {
     },
     {
       title: "Copiar módulos ECMAScript do agente",
-      skip: () => !options.esmCopy,
+      skip: async () => !options.esmCopy,
       async task() {
         const sourceDir = join(options.input, "dist");
         const targetDir = join(options.output, "esm");
@@ -50,7 +51,7 @@ export function getBuildEsmTasks(options: Options): ListrTask[] {
     },
     {
       title: "Copiar arquivos de tipos dos módulos ECMAScript do agente",
-      skip: () => !options.copyTypes,
+      skip: async () => !options.copyTypes || !await isChanged(join(options.input, "esm-types/index.d.ts")),
       async task() {
         const sourceDir = join(options.input, "../esm-types/index.d.ts");
         const targetDir = join(options.output, "types");

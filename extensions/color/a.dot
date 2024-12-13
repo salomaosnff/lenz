@@ -1,0 +1,4 @@
+digraph G {
+    "Definição de Requisitos" -> "Planejamento" -> "Experimentos" -> "Escolha\nda tecnologia" -> "Desenvolvimento\ndo Agente" -> "Desenvolvimento\nda Interface do Usuário" -> "Desenvolvimento\nda API de extensões" -> "Documentação\nda API de extensões" -> "Desenvolvimento\nde extensões embutidas" -> "Validação" -> "Desenvolvimento\nde extensões embutidas";
+    "Validação" -> "Empacotamento";
+}

@@ -4,6 +4,7 @@ import { CanvasElement, createElementSelection } from "./types";
 
 const props = defineProps<{
   html: string;
+  hidden?: boolean;
 }>();
 
 const documentModel = defineModel<Document>();
@@ -125,7 +126,7 @@ whenever(
     );
 
     // Propagate iframe window events to the parent window
-    const EVENTS: string[] = ['pointerdown', 'click'];
+    const EVENTS: string[] = ["pointerdown", "click"];
 
     for (const event of EVENTS) {
       iframe.value?.contentWindow?.addEventListener(event, (e) => {
@@ -253,24 +254,26 @@ defineExpose({
       @load="loaded = true"
     ></iframe>
 
-    <AppCanvasInspectBox
-      v-for="(item, i) in activeModel"
-      :key="i"
-      :item="item"
-      active
-    />
-    <AppCanvasInspectBox
-      v-if="
-        hoverModel &&
-        !(
-          activeModel &&
-          activeModel.some((el) =>
-            el.element.isSameNode((hoverModel as CanvasElement).element)
+    <template v-if="!hidden">
+      <AppCanvasInspectBox
+        v-for="(item, i) in activeModel"
+        :key="i"
+        :item="item"
+        active
+      />
+      <AppCanvasInspectBox
+        v-if="
+          hoverModel &&
+          !(
+            activeModel &&
+            activeModel.some((el) =>
+              el.element.isSameNode((hoverModel as CanvasElement).element)
+            )
           )
-        )
-      "
-      :item="hoverModel"
-    />
+        "
+        :item="hoverModel"
+      />
+    </template>
 
     <UiIcon
       v-if="!loaded"

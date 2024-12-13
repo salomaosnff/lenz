@@ -7,9 +7,9 @@ const props = defineProps<{
 const modelValue = defineModel<string>();
 </script>
 <template>
-  <input
-    v-model="modelValue"
-    type="checkbox"
-    :title="schema.description"
-  />
+  <select v-model="modelValue" :title="schema.description">
+    <option :value="undefined">Selecione...</option>
+    <option :value="true">Sim</option>
+    <option :value="false">Não</option>
+  </select>
 </template>

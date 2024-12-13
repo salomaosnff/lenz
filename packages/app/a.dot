@@ -1,0 +1,62 @@
+digraph G {
+    "Web" -> "Protocolo de rede";
+    "Web" -> "Frontend";
+    "Web" -> "Backend";
+    "Web" -> "Browser";
+    
+    "Browser" -> "Chromium";
+    "Browser" -> "Webkit2gtk";
+    
+    "Desktop" -> "Tauri";
+    "Desktop" -> "Electron";
+    "Desktop" -> "Nw.js";
+    
+    "Protocolo de rede" -> "HTTP";
+    "Protocolo de rede" -> "WebSockets";
+    
+    "Frontend" -> "HTML";
+    "Frontend" -> "CSS";
+    "Frontend" -> "JavaScript";
+    "Frontend" -> "Frameworks reativos";
+    "Frontend" -> "Gerenciador de estado";
+    
+    "Backend" -> "Node.js";
+    "Backend" -> "Rust";
+    "Backend" -> "Servidor Web";
+    
+    "CSS" -> "Pré-processador de CSS" -> "SASS";
+    "CSS" -> "CSS Frameworks";
+    "CSS" -> "CSS Atômico" -> "Engine de CSS Atômico";
+    
+    "Engine de CSS Atômico" -> "TailwindCSS";
+    "Engine de CSS Atômico" -> "UnoCSS";
+    
+    "CSS Frameworks" -> "Bootstrap";
+    "CSS Frameworks" -> "TailwindCSS";
+    
+    "JavaScript" -> "Transpiladores" -> "TypeScript";
+    "JavaScript" -> "Modularidade" -> "ES Modules" -> "Import Maps";
+    "JavaScript" -> "Gerenciador de pacotes" -> "PNPM";
+    "JavaScript" -> "Linter" -> "EsLint";
+    "JavaScript" -> "Formatador de código" -> "Prettier";
+    
+    "Frameworks reativos" -> "Vue.js";
+    "Gerenciador de estado" -> "Pinia";
+    
+    "Electron" -> "Node.js";
+    "Electron" -> "Chromium";
+    
+    "Tauri" -> "Rust";
+    "Tauri" -> "Wry";
+    "Tauri" -> "Tao";
+    
+    "Wry" -> "Webkit2gtk";
+    
+    "Rust" -> "Crate" -> "Cargo";
+    "Rust" -> "Formatador de código" -> "Rustfmt";
+    "Rust" -> "Linter" -> "Clippy";
+    "Rust" -> "Tokio";
+    "Rust" -> "Hyper";
+    "Tokio" -> "Async" -> "Threads";
+    "Hyper" -> "Servidor Web";
+}

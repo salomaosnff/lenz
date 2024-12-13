@@ -1,31 +1,58 @@
 <script setup lang="ts">
-import { PromptOptions } from '../store/dialog';
+import { PromptSuggestion } from "lenz:dialog";
+import { PromptOptions } from "../store/dialog";
 
 const dialogStore = useDialogStore();
 const value = ref<string>();
 
-watch(() => (dialogStore.currentDialog as PromptOptions)?.defaultValue, (val) => {
-  value.value = val;
-}, {
-  immediate: true
-});
+watch(
+  () => (dialogStore.currentDialog as PromptOptions)?.defaultValue,
+  (val) => {
+    value.value = val;
+  },
+  {
+    immediate: true,
+  }
+);
 
 function respond(fn: (value: any) => void, v: any) {
   fn(v);
-  value.value = ''
+  value.value = "";
 }
 
-const {Escape} = useMagicKeys()
+const { Escape } = useMagicKeys();
 
 whenever(Escape, () => {
-  if (!dialogStore.currentResolver) return
-  dialogStore.currentResolver.reject(new Error('User canceled'))
-})
+  if (!dialogStore.currentResolver) return;
+  dialogStore.currentResolver.reject(new Error("User canceled"));
+});
 
+const suggestions = ref<PromptSuggestion[]>([]);
+
+watchDebounced(
+  value,
+  async (val) => {
+    if (
+      dialogStore.currentDialog?.type !== "prompt" ||
+      !dialogStore.currentDialog?.getSuggestions
+    ) {
+      return;
+    }
+
+    suggestions.value = await dialogStore.currentDialog.getSuggestions(
+      val ?? ""
+    );
+  },
+  { debounce: 150, immediate: true }
+);
 </script>
 <template>
   <Transition>
-    <form v-if="dialogStore.currentDialog && dialogStore.currentResolver" class="app-prompt" @submit.prevent>
+    <form
+      v-if="dialogStore.currentDialog && dialogStore.currentResolver"
+      class="app-prompt"
+      @submit.prevent
+    >
       <AppPanel v-if="dialogStore.currentDialog?.type === 'confirm'">
         <div class="flex gap-2 items-end">
           <div class="flex-1">
@@ -65,7 +92,11 @@ whenever(Escape, () => {
 
             <UiTextField
               v-model="value"
-              :type="dialogStore.currentDialog.hidden ? 'password' : 'text'"
+              :type="
+                dialogStore.currentDialog.hidden
+                  ? 'password'
+                  : dialogStore.currentDialog.inputType
+              "
               :placeholder="dialogStore.currentDialog.placeholder"
               hide-messages
               autofocus
@@ -77,7 +108,10 @@ whenever(Escape, () => {
               flat
               color="primary"
               @click="
-                respond(dialogStore.currentResolver.reject, new Error('User canceled'))
+                respond(
+                  dialogStore.currentResolver.reject,
+                  new Error('User canceled')
+                )
               "
               >{{ dialogStore.currentDialog.cancelText }}</UiBtn
             >
@@ -85,13 +119,36 @@ whenever(Escape, () => {
               color="primary"
               type="submit"
               @click="
-                respond(dialogStore.currentResolver.resolve, (
+                respond(
+                  dialogStore.currentResolver.resolve,
                   value ?? dialogStore.currentDialog.defaultValue
-                ))
+                )
               "
-              >{{ dialogStore.currentDialog.confirmText }}</UiBtn>
+              >{{ dialogStore.currentDialog.confirmText }}</UiBtn
+            >
           </div>
         </div>
+        <ul>
+          <li
+            v-for="{ value, title = value, description = value } of suggestions"
+            :key="value"
+            class="overflow-hidden mb-1"
+            @click="respond(dialogStore.currentResolver.resolve, value)"
+          >
+            <div
+              class="flex gap-2 rounded-md pa-2 cursor-pointer hover:bg--surface-muted items-center w-full"
+            >
+              <div class="flex-1">
+                <p>
+                  {{ title }}
+                </p>
+                <p v-if="description" class="text-3 fg--muted">
+                  {{ description }}
+                </p>
+              </div>
+            </div>
+          </li>
+        </ul>
       </AppPanel>
     </form>
   </Transition>
@@ -99,7 +156,8 @@ whenever(Escape, () => {
 <style lang="scss">
 .app-prompt {
   box-shadow: 0 0 0 150vmax rgba(0, 0, 0, 0.5);
-  
+  border-radius: 0.5rem;
+
   &.v-enter-active,
   &.v-leave-active {
     transition: all 0.3s;

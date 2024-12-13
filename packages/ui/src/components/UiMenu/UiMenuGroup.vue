@@ -41,17 +41,16 @@ function close() {
 </script>
 <template>
     <UiOverlayMenu :origin="parentMenuGroup?.is_menu_bar ? 'bottom-start' : 'right-start'" close-on-click
-        :visible="parentMenuGroup?.currentItem.value === id"
-        :offset="parentMenuGroup?.is_menu_bar ? 3 : 4"
+        :visible="parentMenuGroup?.currentItem.value === id" :offset="parentMenuGroup?.is_menu_bar ? 3 : 4"
         @close="close">
         <template #activator="bind">
-            <slot name="activator" :ref="bind.setActivatorRef" @pointerenter="onPointerEnter">
+            <slot name="activator" :ref="bind.setActivatorRef">
                 <li :ref="bind.setActivatorRef" tabindex="0"
                     class="whitespace-nowrap hover:bg--surface2 py-1 px-2 gap-2 cursor-pointer flex rounded-md" :class="{
                         'pl-28px': parentMenuGroup.hasIcons.value && !icon,
                         'bg--surface2': parentMenuGroup?.currentItem.value === id,
                         'fg--muted pointer-events-none': disabled
-                    }"  @click="onClick">
+                    }" @click="onClick">
                     <UiIcon v-if="icon" :path="icon" class="!w-16px !h-16px" />
 
                     <div class="flex-1">

@@ -5,6 +5,5 @@
     "description": "Extensão para abrir janela de arquivos",
     "dynlib": "dynlib/lenz_extension_file_dialog",
     "publisher": "Salomão Neto <contato@sallon.dev>",
-    "version": "1.0.0",
-    "main": "main.js"
+    "version": "1.0.0"
 }

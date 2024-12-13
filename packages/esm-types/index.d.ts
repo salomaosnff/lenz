@@ -400,6 +400,16 @@ declare module "lenz:dialog" {
          * @default "Cancelar"
          */
         cancelText?: string;
+        /**
+         * Tipo do campo de texto
+         * @default "text"
+         */
+        inputType?: "text" | "password" | "email" | "number" | "tel" | "url" | "search" | "date" | "time" | "datetime-local" | "month" | "week" | "color";
+        /**
+         * Função que retorna sugestões para o campo de texto
+         * @param value Texto digitado pelo usuário
+         */
+        getSuggestions?(value: string): Promise<PromptSuggestion[]>;
     }
     /**
      * Exibe uma janela de prompt para o usuário inserir um texto
@@ -415,6 +425,23 @@ declare module "lenz:dialog" {
      * ```
      */
     export function prompt(options: PromptDialogOptions): any;
+    /**
+     * Representa uma sugestão para um prompt
+     */
+    export interface PromptSuggestion {
+        /** Texto da sugestão */
+        title: string;
+        /** Descrição da sugestão */
+        description?: string;
+        /** Valor a ser retornado caso a sugestão seja selecionada */
+        value: any;
+    }
+    /**
+     * Cria uma função de busca de sugestões para um campo de texto
+     * @param suggestions Lista de sugestões disponíveis
+     * @returns Função que retorna as sugestões que contém o texto digitado pelo usuário
+     */
+    export function searchSuggestions(suggestions: PromptSuggestion[]): (value: string) => Promise<PromptSuggestion[]>;
 }
 declare module "lenz:extensions" {
     /**

@@ -32,7 +32,7 @@ function waitForPort(port) {
 
 function startLenz(executable) {
   return new Promise((resolve, reject) => {
-    console.log("Inicializando o Lenz...");
+    console.log("Inicializando o Lenz...", executable);
     const lenz = spawn(executable, ["--no-browser"]);
 
     lenz.addListener("error", reject);

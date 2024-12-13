@@ -2,6 +2,7 @@ import { ListrTask } from "listr2";
 import { execaCommand as command } from "execa";
 import { join } from "path";
 import { copyFiles } from "../util";
+import { isChanged } from "../hash";
 
 export interface BuildAgentOptions {
   input: string;
@@ -48,7 +49,7 @@ export async function getBuildAgentTasks(
     },
     {
       title: "Copiar recursos do agente",
-      skip: () => options.skipResources,
+      skip: async () => options.skipResources || !await isChanged(join(options.input, "agent/server/resources/**/*")),
       task: async () => {
         const resourcesSource = join(options.input, "agent", "server", "resources");
         const resourcesTarget = join(options.output, "resources");

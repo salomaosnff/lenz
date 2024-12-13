@@ -11,17 +11,15 @@ import { getPackDebianTasks } from "./pack/deb";
 import { getPackArquiveTasks } from "./pack/archive";
 import { getPackAppImageTasks } from "./pack/appimage";
 import { getBuildEsmTasks } from "./build/esm";
+import { clearHashs, isChanged } from "./hash";
 
-let outDirDeleted = false;
 
 const ROOT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../');
 const ROOT_PROJECT = dirname(ROOT_DIR);
 
 async function clean(options: any) {
-  if (!outDirDeleted) {
-    outDirDeleted = true;
-    await remove(join(process.cwd(), options.output));
-  }
+  await remove(join(process.cwd(), options.output));
+  await clearHashs()
 }
 
 program
@@ -29,15 +27,7 @@ program
   .description("Uma ferramenta de linha de comando para construir o Lenz Designer")
   .version("0.0.1")
   .option("-i, --input <input>", "Diretório de entrada", relative(process.cwd(), ROOT_PROJECT))
-  .option("-o, --output <output>", "Diretório de saída", "dist")
-  .option(
-    "-I, --incremental",
-    "Compilação incremental, não limpa o diretório de saída"
-  );
-
-program.on("option:incremental", function () {
-  outDirDeleted = true;
-});
+  .option("-o, --output <output>", "Diretório de saída", "dist");
 
 
 program
@@ -50,6 +40,7 @@ program
   .option("--no-esm-copy", "Não copiar módulos ECMAScript")
   .option("--no-types", "Não copiar tipos de módulos ECMAScript")
   .option("--no-frontend-copy", "Não copiar arquivos de frontend")
+  .option("--clean", "Limpar diretório de saída")
   .option(
     "--include-extensions <...include>",
     "Incluir extensões no agente"
@@ -66,12 +57,14 @@ program
   .action(async function () {
     const options = this.optsWithGlobals();
 
-    await clean(options);
+    if (options.clean) {
+      await clean(options);
+    }
 
     await new Listr([
       {
         title: "Agente",
-        skip: () => !options.agent,
+        skip: async () => !options.agent || !await isChanged(resolve(process.cwd(), options.input, "agent/{src,server/resources}/**/*")),
         task: async (_, task) =>
           task.newListr(
             await getBuildAgentTasks({
@@ -85,7 +78,7 @@ program
       },
       {
         title: "Módulos ECMAScript",
-        skip: () => !options.esm,
+        skip: async () => !options.esm || !await isChanged(resolve(process.cwd(), options.input, "packages/esm/src/**/*")),
         async task(_, task) {
           return task.newListr(
             getBuildEsmTasks({
@@ -105,7 +98,7 @@ program
       },
       {
         title: "Extensões Embutidas",
-        skip: () => !options.extensions,
+        skip: async () => !options.extensions || !await isChanged(resolve(process.cwd(), options.extensionsDir, "**/*")),
         task: async (_, task) =>
           task.newListr(
             await getBuildExtensionsTask({
@@ -123,7 +116,7 @@ program
       },
       {
         title: "Frontend",
-        skip: () => !options.frontend,
+        skip: async () => !options.frontend || !await isChanged(resolve(process.cwd(), options.input, "packages/app/**/*")),
         task: async (_, task) =>
           task.newListr(
             getBuildFrontendTasks({

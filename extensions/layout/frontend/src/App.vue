@@ -62,7 +62,7 @@ function debouncedSend() {
   clearTimeout(timer);
   timer = setTimeout(() => {
     result.value = {
-      ...form.value
+      ...form.value,
     };
   }, 1000 / 30);
 }
@@ -134,7 +134,8 @@ const gridColumnType = computed({
 
 const gridColumnRepeatCount = computed({
   get() {
-    const match = form.value["grid-template-columns"]?.match(/repeat\((.+?),.+?\)/);
+    const match =
+      form.value["grid-template-columns"]?.match(/repeat\((.+?),.+?\)/);
 
     if (!match) return "";
     if (/^\d+$/.test(match[1])) return parseInt(match[1]);
@@ -282,7 +283,7 @@ const prettyGridTemplateAreas = computed({
 </script>
 
 <template>
-  <form @submit.prevent>
+  <form @submit.prevent class="widget-layout-form">
     <!-- Grupo de Exibição -->
     <fieldset>
       <legend>Exibição</legend>
@@ -379,7 +380,7 @@ const prettyGridTemplateAreas = computed({
     </template>
 
     <!-- Grupo de Itens Flex -->
-    <fieldset v-if="isFlex">
+    <fieldset v-if="isParentFlex">
       <legend>Tamanho</legend>
 
       <label for="flex-grow">
@@ -512,68 +513,3 @@ const prettyGridTemplateAreas = computed({
     </div>
   </form>
 </template>
-<style scoped>
-.flex-1 {
-  flex: 1;
-}
-
-.full-width {
-  min-width: 100%;
-  flex: 1;
-}
-
-.flex {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  min-width: 270px;
-
-  & > * {
-    flex-basis: 128px;
-    flex-grow: 1;
-  }
-}
-form {
-  padding: 1rem;
-  gap: 1rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-}
-fieldset {
-  display: flex;
-  gap: 1rem;
-  align-items: start;
-  flex-wrap: wrap;
-
-  & > * {
-    flex-basis: 128px;
-    flex-grow: 1;
-  }
-}
-
-label {
-  display: block;
-}
-
-input,
-select {
-  width: 100%;
-}
-
-pre {
-  overflow: auto;
-}
-
-.preview {
-  & pre {
-    width: 280px;
-    font-size: 12px;
-    word-break: normal;
-    white-space: pre-wrap;
-  }
-
-  & > p {
-    margin-top: 1rem;
-  }
-}
-</style>

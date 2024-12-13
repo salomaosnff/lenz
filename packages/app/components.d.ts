@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppCanvas: typeof import('./src/components/AppCanvas/AppCanvas.vue')['default']
     AppCanvasInspectBox: typeof import('./src/components/AppCanvas/AppCanvasInspectBox.vue')['default']
+    AppCodeEditor: typeof import('./src/components/AppCodeEditor.vue')['default']
     AppCommandPalette: typeof import('./src/components/AppCommandPalette.vue')['default']
     AppMenubar: typeof import('./src/components/AppMenuBar/AppMenubar.vue')['default']
     AppMenuCheckGroupItem: typeof import('./src/components/AppMenuBar/AppMenuCheckGroupItem.vue')['default']

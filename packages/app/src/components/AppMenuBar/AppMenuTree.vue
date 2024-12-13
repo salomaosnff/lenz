@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MenuItem } from "../../store/menubar";
+import { MenuItem } from "lenz:menubar";
 import AppMenuTreeItem from "./AppMenuTreeItem.vue";
 
 defineProps<{
@@ -11,10 +11,12 @@ defineProps<{
 const commandStore = useCommandsStore();
 
 function getIcon(item: MenuItem) {
-  if (item.type && item.type !== 'item') {
-    return
-  }  
-  return item.icon ?? (item.command && commandStore.getCommand(item.command)?.icon);
+  if (item.type && item.type !== "item") {
+    return;
+  }
+  return (
+    item.icon ?? (item.command && commandStore.getCommand(item.command)?.icon)
+  );
 }
 </script>
 <template>
@@ -49,7 +51,11 @@ function getIcon(item: MenuItem) {
         :icon="getIcon(item)"
       />
       <template v-else>
-        <AppMenuTreeItem :title="item.title" :command="item.command" :icon="getIcon(item)" />
+        <AppMenuTreeItem
+          :title="item.title"
+          :command="item.command"
+          :icon="getIcon(item)"
+        />
       </template>
     </template>
   </UiMenuGroup>

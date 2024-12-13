@@ -4,6 +4,7 @@ import { exists } from "fs-extra";
 import { readFile, readdir } from "fs/promises";
 import { basename, dirname, join } from "node:path";
 import { copyFiles } from "../util";
+import { isChanged } from "../hash";
 
 export interface BuildExtensionsOptions {
   input: string;
@@ -59,6 +60,7 @@ export async function getBuildExtensionsTask(
   return [
     {
       title: "Compilar workspace de extensões utilizando cargo",
+      skip: async () => !await isChanged(join(options.input, "*/src/**/*")),
       task: async (_, task) => {
         const execute = command("cargo build --release", {
           cwd: options.input,
@@ -76,6 +78,10 @@ export async function getBuildExtensionsTask(
         task.newListr(
           extensions.map((ext) => ({
             title: `Construir "${ext}"`,
+            skip: async () => !await isChanged([
+              join(options.input, ext, "public/**/*"),
+              join(options.input, ext, "frontend/src/**/*"),
+            ]),
             task: (_, task) =>
               task.newListr([
                 {
@@ -121,6 +127,10 @@ export async function getBuildExtensionsTask(
                 },
                 {
                   title: `Copiar arquivos`,
+                  skip: async () => !await isChanged([
+                    join(options.input, ext, "public/**/*"),
+                    join(options.input, "target", "release/*"),
+                  ]),
                   task: async (_, task) => {
                     const inputExtensionDir = join(options.input, ext);
                     const outputExtensionDir = join(options.output, ext);

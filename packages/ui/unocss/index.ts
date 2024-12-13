@@ -35,7 +35,7 @@ export function presetLuxUi(): Preset<LuxUiTheme> {
             background: "#F5F7FA",
             foreground: "#000000",
             surface: "#FFFFFF",
-            surface2: "#F2F2F2",
+            surface2: "#0000000c",
 
             danger: "#D0021B",
             warning: "#F8A532",
@@ -51,7 +51,7 @@ export function presetLuxUi(): Preset<LuxUiTheme> {
             background: "#121212",
             foreground: "#E0E0E0",
             surface: "#1E1E1E",
-            surface2: "#333333",
+            surface2: "#ffffff0c",
 
             danger: "#FF5C5C",
             warning: "#FFA726",

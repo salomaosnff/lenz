@@ -4,6 +4,7 @@ import { addHotKeys } from "lenz:hotkeys";
 import { extendMenu } from "lenz:menubar";
 import { createWindow } from "lenz:ui";
 import { ref, watch, createScope } from "lenz:reactivity";
+import { prompt } from "lenz:dialog";
 
 // Ícones
 import iconJustify from "lenz:icons/align_horizontal_distribute";
@@ -17,7 +18,7 @@ import iconOrderLow from "lenz:icons/priority_low";
 import iconDirection from "lenz:icons/rotate_right_variant";
 import iconLayout from "lenz:icons/view_quilt";
 
-import LayoutWindowWidget from "./www/layout.lenz.es.js"
+import LayoutWindowWidget, { BoxWindowWidget } from "./www/layout.lenz.es.js";
 
 export function activate({ subscriptions }) {
   let lastWindow;
@@ -53,6 +54,9 @@ export function activate({ subscriptions }) {
       "Ctrl+ArrowRight": "flex.order.add",
       "Ctrl+ArrowLeft": "flex.order.sub",
       1: "flex.toggle.fill",
+      M: "spacing.margin",
+      G: "spacing.gap",
+      P: "spacing.padding",
     })
   );
 
@@ -123,7 +127,6 @@ export function activate({ subscriptions }) {
       name: "Configuração de Layout",
       icon: iconFlexbox,
       async run({ getCurrentContent, selection }) {
-
         if (lastWindow) {
           lastWindow.focus();
           return;
@@ -146,7 +149,6 @@ export function activate({ subscriptions }) {
             { immediate: true }
           );
         });
-
 
         scope.run(() => {
           watch(result, async (style) => {
@@ -177,7 +179,8 @@ export function activate({ subscriptions }) {
           height: 390,
           themed: true,
           title: "Configurações de Layout",
-          content: (parent) => LayoutWindowWidget(parent, { result, selection, parentElement }),
+          content: (parent) =>
+            LayoutWindowWidget(parent, { result, selection, parentElement }),
           onClose() {
             scope.dispose();
             lastWindow = null;
@@ -348,9 +351,113 @@ export function activate({ subscriptions }) {
 
           element.style.setProperty(property, newValue);
         }
-
-        return context.getCurrentContent();
       },
     })
+  );
+
+  subscriptions.add(
+    addCommand({
+      id: "spacing.margin",
+      name: "Definir espaçamento externo (margem)",
+      icon: iconLayout,
+      run: async ({ selection }) => {
+        if (!selection.value.length) return;
+
+        const value =
+          selection.value[0].element.style.getPropertyValue("margin");
+
+        const margin = await prompt({ message: "Digite a margem:" }, value);
+
+        for (const { element } of selection.value) {
+          element.style.setProperty("margin", margin);
+        }
+      },
+    })
+  );
+
+  subscriptions.add(
+    addCommand({
+      id: "spacing.padding",
+      name: "Definir espaçamento interno (padding)",
+      icon: iconLayout,
+      run: async ({ selection }) => {
+        if (!selection.value.length) return;
+
+        const value =
+          selection.value[0].element.style.getPropertyValue("padding");
+
+        const padding = await prompt({ message: "Digite o padding:" }, value);
+
+        for (const { element } of selection.value) {
+          element.style.setProperty("padding", padding);
+        }
+      },
+    })
+  );
+
+  subscriptions.add(
+    addCommand({
+      id: "spacing.gap",
+      name: "Definir espaçamento entre elementos",
+      icon: iconLayout,
+      run: async ({ selection }) => {
+        if (!selection.value.length) return;
+
+        const value = selection.value[0].element.style.getPropertyValue("gap");
+
+        const gap = await prompt({ message: "Digite o gap:" }, value);
+
+        for (const { element } of selection.value) {
+          element.style.setProperty("gap", gap);
+        }
+      },
+    })
+  );
+
+  subscriptions.add(
+    (() => {
+      let isOpen = false;
+
+      return addCommand({
+        id: "css.box",
+        name: "Definir configuração de caixa",
+        async run({ selection }) {
+          if (!selection.value.length || isOpen) return;
+
+          const scope = createScope();
+
+          const result = ref();
+
+          scope.run(() => {
+            watch(result, async (style) => {
+              for (const { element } of selection.value) {
+                for (const [property, value] of Object.entries(style ?? {})) {
+                  if ((value ?? null) === null) {
+                    element.style.removeProperty(property);
+                  } else {
+                    element.style.setProperty(property, value);
+                  }
+                }
+              }
+            });
+          });
+
+          isOpen = true;
+
+          lastWindow = createWindow({
+            width: 840,
+            height: 390,
+            themed: true,
+            title: "Configurações de Caixa",
+            content: (parent) => BoxWindowWidget(parent, { result, selection }),
+            onClose() {
+              isOpen = false;
+              scope.dispose();
+              lastWindow = null;
+            },
+          });
+        },
+      });
+    })()
   );
 }

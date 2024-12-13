@@ -2,6 +2,7 @@ import { ListrTask } from "listr2";
 import { execaCommand as command } from "execa";
 import { join } from "path";
 import { copyFiles } from "../util";
+import { isChanged } from "../hash";
 
 export interface BuildFrontendOptions {
   input: string;

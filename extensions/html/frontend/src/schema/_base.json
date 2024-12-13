@@ -24,48 +24,21 @@
         "title": "Título",
         "description": "Especifica informações adicionais sobre o elemento, geralmente exibidas como uma dica quando o cursor está sobre o elemento."
       },
-      "lang": {
-        "type": "string",
-        "title": "Idioma",
-        "description": "Especifica o idioma do conteúdo do elemento.",
-        "examples": ["en", "pt-BR", "fr"]
-      },
       "dir": {
         "type": "string",
         "title": "Direção do Texto",
         "description": "Especifica a direção do texto para o conteúdo do elemento.",
         "enum": ["ltr", "rtl", "auto"]
       },
-      "hidden": {
-        "type": "boolean",
-        "title": "Oculto",
-        "description": "Indica que o elemento está temporariamente fora da visualização."
-      },
       "tabindex": {
         "type": "integer",
         "title": "Índice de Tabulação",
         "description": "Especifica a ordem de navegação do elemento ao utilizar a tecla Tab."
       },
-      "accesskey": {
-        "type": "string",
-        "title": "Tecla de Atalho",
-        "description": "Define uma tecla de atalho para ativar ou focar o elemento."
-      },
-      "draggable": {
-        "type": "boolean",
-        "title": "Arrastável",
-        "description": "Indica se o elemento pode ser arrastado."
-      },
-      "spellcheck": {
-        "type": "boolean",
-        "title": "Verificação Ortográfica",
-        "description": "Indica se o conteúdo do elemento deve ser verificado quanto a erros ortográficos."
-      },
       "contenteditable": {
-        "type": "string",
+        "type": "boolean",
         "title": "Conteúdo Editável",
-        "description": "Indica se o conteúdo do elemento é editável pelo usuário.",
-        "enum": ["true", "false"]
+        "description": "Indica se o conteúdo do elemento é editável pelo usuário."
       }
     }
   }

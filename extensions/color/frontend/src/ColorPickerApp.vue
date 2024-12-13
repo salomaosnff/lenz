@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import ThemeColorPicker from './components/ThemeColorPicker.vue';
-import * as LenzReactivity from 'lenz:reactivity'
+import { ref } from "vue";
+import ThemeColorPicker from "./components/ThemeColorPicker.vue";
+import * as LenzReactivity from "lenz:reactivity";
 
-const value = ref('var(--color-primary)')
+const value = ref("var(--color-primary)");
 
 const props = defineProps<{
   getData(): {
@@ -11,7 +11,7 @@ const props = defineProps<{
   };
 }>();
 
-const { result } = props.getData()
+const { result } = props.getData();
 </script>
 
 <template>

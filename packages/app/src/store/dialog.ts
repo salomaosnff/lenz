@@ -28,12 +28,14 @@ export const useDialogStore = defineStore("dialog", () => {
         currentDialog.value = {
           type: "prompt",
           title: options.title,
+          inputType: options.inputType ?? "text",
           message: options.message,
           cancelText: options.cancelText ?? "Cancelar",
           confirmText: options.confirmText ?? "OK",
           defaultValue: options.defaultValue ?? "",
           hidden: options.hidden ?? false,
           placeholder: options.placeholder ?? "Digite...",
+          getSuggestions: options.getSuggestions,
         };
       });
     }).finally(() => {

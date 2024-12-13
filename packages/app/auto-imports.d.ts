@@ -326,4 +326,22 @@ declare global {
   // @ts-ignore
   export type { Component, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { PromptOptions, ConfirmOptions } from './src/store/dialog'
+  import('./src/store/dialog')
+  // @ts-ignore
+  export type { EditorFile } from './src/store/file'
+  import('./src/store/file')
+  // @ts-ignore
+  export type { ButtonToolbarItem, CustomButtonToolbarItem, ToggleGroupToolbarItem, ToggleGroupItem, SeparatorToolbarItem, PopupToolbarItem } from './src/store/toolbar'
+  import('./src/store/toolbar')
+  // @ts-ignore
+  export type { WindowInstance } from './src/store/windows'
+  import('./src/store/windows')
+  // @ts-ignore
+  export type { ProvideFormOptions, UseForm, UseFormFieldOptions, UseFormField } from '../ui/src/composable/useForm'
+  import('../ui/src/composable/useForm')
+  // @ts-ignore
+  export type { UseMovableOptions } from '../ui/src/composable/useMovable'
+  import('../ui/src/composable/useMovable')
 }

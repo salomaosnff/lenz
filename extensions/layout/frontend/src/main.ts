@@ -1,28 +1,59 @@
-import './style.css'
+import "./style.scss";
 
-import { createApp } from 'vue'
+import { LenzDisposer } from "lenz:types";
+import { createApp } from "vue";
 
-import App from './App.vue'
+import App from "./App.vue";
+import BoxConfig from "./BoxConfig.vue";
+
+let countInjects = 0;
+
+const link = document.createElement("link");
+
+const styleUrl = import.meta.url.replace(/[^/]+$/g, "style.css");
+
+link.rel = "stylesheet";
+link.href = styleUrl;
+link.id = "widget-layout-style";
+
+function injectStyle(): LenzDisposer {
+  if (countInjects++ === 0) {
+    document.head.appendChild(link);
+  }
+
+  return () => {
+    if (--countInjects === 0) {
+      link.remove();
+    }
+  };
+}
 
 export default function (parent: HTMLElement, data: any) {
-    const link = document.createElement('link')
+  const app = createApp(App, {
+    getData: () => data,
+  });
 
-    const styleUrl = import.meta.url.replace(/[^/]+$/g, 'style.css')
+  const disposeStyle = injectStyle();
 
-    link.rel = 'stylesheet'
-    link.href = styleUrl
-    link.id = 'widget-layout-style'
+  app.mount(parent);
 
-    document.head.appendChild(link)
+  return () => {
+    app.unmount();
+    disposeStyle();
+  };
+}
 
-    const app = createApp(App, {
-        getData: () => data
-    })
+export function BoxWindowWidget(parent: HTMLElement, data: any) {
+  const app = createApp(BoxConfig, {
+    getData: () => data,
+  });
 
-    app.mount(parent)
+  const disposeStyle = injectStyle();
 
-    return () => {
-        app.unmount()
-        link.remove()
-    }
+  app.mount(parent);
+
+  return () => {
+    app.unmount();
+    disposeStyle();
+  };
 }

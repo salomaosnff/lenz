@@ -2,16 +2,20 @@ import { defineStore } from "pinia";
 
 import * as fs from "lenz:fs";
 
-
 import { invoke } from "lenz:invoke";
 import { isEqual } from "lodash-es";
 import { useHistoryStore } from "./history";
 
 import iconQuit from "lenz:icons/close_circle";
 import iconSave from "lenz:icons/content_save";
-import iconFile from 'lenz:icons/file_document_outline';
+import iconFile from "lenz:icons/file_document_outline";
 import icon_redo from "lenz:icons/redo";
 import icon_undo from "lenz:icons/undo";
+
+import {
+  openFile as openFileDialog,
+  saveFile as openSaveDialog,
+} from "lenz:file-dialog";
 
 export class EditorFile {
   dirty = false;
@@ -61,7 +65,9 @@ export const useFileStore = defineStore("file", () => {
   const autoSaveTimers = new Map<string, number>();
 
   const openedFiles = ref<Map<string, EditorFile>>(new Map());
-  const currentFilename = useLocalStorage<string>("lenz.file.last_opened", "");
+  const recents = useLocalStorage<string[]>("lenz.file.recents", []);
+  const currentFilename = ref<string>();
+
   const currentFile = computed(() => {
     if (!currentFilename.value) {
       return;
@@ -105,6 +111,10 @@ export const useFileStore = defineStore("file", () => {
 
     openedFiles.value.set(filepath, file);
     currentFilename.value = filepath;
+    recents.value = [
+      filepath,
+      ...recents.value.filter((f) => f !== filepath),
+    ].slice(0, 10);
 
     return file;
   }
@@ -181,6 +191,25 @@ export const useFileStore = defineStore("file", () => {
       "Ctrl+Z": "file.undo",
       "Ctrl+Y": "file.redo",
       "Ctrl+Q": "app.quit",
+      "Ctrl+N": "file.new.html",
+    });
+
+    commandsStore.registerCommand({
+      id: "file.new.html",
+      name: "Nova página",
+      icon: iconFile,
+      description: "Criar uma nova página HTML",
+      async run() {
+        const filepath = await openSaveDialog({
+          title: "Salvar arquivo HTML",
+          filters: {
+            "Páginas HTML": ["*html"],
+          },
+        });
+
+        await fs.writeFile(filepath, "<!DOCTYPE html>\n<html>\n</html>");
+        await openFile(filepath);
+      },
     });
 
     commandsStore.registerCommand({
@@ -189,14 +218,12 @@ export const useFileStore = defineStore("file", () => {
       icon: iconFile,
       description: "Abrir uma página HTML",
       async run() {
-        const filepath = await commandsStore.executeCommand<string>(
-          "dialog.file.open",
-          {
-            filters: {
-              "Páginas HTML": ["*html"],
-            },
-          }
-        );
+        const filepath = await openFileDialog({
+          title: "Abrir arquivo HTML",
+          filters: {
+            "Páginas HTML": ["*html"],
+          },
+        });
         await openFile(filepath);
       },
     });
@@ -252,6 +279,11 @@ export const useFileStore = defineStore("file", () => {
 
     menubarStore.extendMenu(
       [
+        {
+          title: "Novo arquivo HTML",
+          id: "file.new.html",
+          command: "file.new.html",
+        },
         {
           title: "Abrir arquivo HTML",
           id: "file.open.html",
@@ -326,6 +358,7 @@ export const useFileStore = defineStore("file", () => {
 
   return {
     openedFiles,
+    recents,
     openFile,
     closeFile,
     saveFile,

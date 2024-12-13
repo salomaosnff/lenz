@@ -1,23 +1,21 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import Lenz from '@lenz-design/vite-plugin'
+import Lenz from "@lenz-design/vite-plugin";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    Lenz(),
-  ],
+  plugins: [vue(), Lenz()],
   build: {
-    target: 'es2023',
+    target: "es2023",
     rollupOptions: {
-      external: (id) => id.startsWith("lenz:") || id === 'vue'
+      external: (id) => id.startsWith("lenz:") || id === "vue",
     },
     lib: {
       entry: "src/main.ts",
       name: "Lenz",
-      formats: ['es'],
+      formats: ["es"],
       fileName: (format) => `layout.lenz.${format}.js`,
-    }
+      cssFileName: "style",
+    },
   },
 });
