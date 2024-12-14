@@ -17,7 +17,7 @@ export default defineConfig({
       name: "LenzFileDialog",
       formats: ["es"],
       fileName: (format) => `file-dialog.lenz.${format}.js`,
-      cssFileName: "style.css",
+      cssFileName: "style",
     },
     target: "esnext",
   },

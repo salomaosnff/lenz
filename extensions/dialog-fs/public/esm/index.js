@@ -1,5 +1,4 @@
 import { OpenFileDialog, SaveFileDialog } from "../www/file-dialog.lenz.es.js";
-import { ref, createScope, watch } from "lenz:reactivity";
 import { createWindow } from "lenz:ui";
 
 export function openFile({
@@ -9,23 +8,18 @@ export function openFile({
   filters,
 }) {
   return new Promise((resolve) => {
-    const result = ref(null);
-    const scope = createScope();
-
     const w = createWindow({
       title,
       width,
       height,
-      content: (parent) => OpenFileDialog(parent, { result, filters }),
-    });
-
-    scope.run(() => {
-      watch(result, (value) => {
-        scope.dispose();
-
-        w.close();
-        resolve(value);
-      });
+      content: (parent) =>
+        OpenFileDialog(parent, {
+          filters,
+          onResult(value) {
+            w.close();
+            resolve(value);
+          },
+        }),
     });
   });
 }
@@ -37,23 +31,19 @@ export function saveFile({
   filters,
 }) {
   return new Promise((resolve) => {
-    const result = ref(null);
-    const scope = createScope();
-
     const w = createWindow({
       title,
       width,
       height,
-      content: (parent) => SaveFileDialog(parent, { result, filters }),
-    });
-
-    scope.run(() => {
-      watch(result, (value) => {
-        scope.dispose();
-
-        w.close();
-        resolve(value);
-      });
+      content: (parent) =>
+        SaveFileDialog(parent, {
+          onResult(result) {
+            console.log("result", result);
+            w.close();
+            resolve(result);
+          },
+          filters,
+        }),
     });
   });
 }

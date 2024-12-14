@@ -9,15 +9,14 @@ import iconList from "lenz:icons/view_list";
 import { BreadCrumb } from "./BreadCrumb/bread-crumb";
 import { FileList } from "./FileList/FileList";
 import { Locals } from "./FileList/Locals";
-import { Ref } from "lenz:reactivity";
 
 export interface AppData {
-  result: Ref<string | null>;
+  onResult(result: string | null | string[]): void;
   filters: Record<string, string>;
 }
 
 export default function App(props: { getData: () => AppData; save?: boolean }) {
-  const { result, filters = {} } = props.getData();
+  const { onResult, filters = {} } = props.getData();
   const isMultiple = false;
   const [isGrid, setIsGrid] = useState(true);
   const [currentPath, setCurrentPath] = useState<string>();
@@ -92,15 +91,22 @@ export default function App(props: { getData: () => AppData; save?: boolean }) {
   }
 
   function onConfirm() {
+    console.log("confirm", {
+      filename,
+      currentPath,
+      selection,
+      save: props.save,
+    });
     if (props.save) {
       if (filename) {
-        result.value = `${currentPath}/${filename}`;
+        console.log("onResult", `${currentPath}/${filename}`);
+        onResult(`${currentPath}/${filename}`);
       }
     }
     if (selection.size === 1) {
-      result.value = selection.values().next()?.value ?? null;
+      onResult(selection.values().next()?.value ?? null);
     } else {
-      result.value = Array.from(selection);
+      onResult(Array.from(selection));
     }
   }
 
@@ -172,7 +178,7 @@ export default function App(props: { getData: () => AppData; save?: boolean }) {
           </label>
           <button
             className="btn bg--surface-muted rounded-md"
-            onClick={() => (result.value = null)}
+            onClick={() => onResult(null)}
           >
             Cancelar
           </button>
