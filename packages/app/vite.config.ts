@@ -1,4 +1,3 @@
-import { monaco } from "@bithero/monaco-editor-vite-plugin";
 import vue from "@vitejs/plugin-vue";
 import path, { join } from "path";
 import Uno from "unocss/vite";
@@ -20,11 +19,11 @@ export default defineConfig({
     Uno({
       configFile: "../ui/uno.config.ts",
     }),
-    monaco({
-      features: "all",
-      languages: ["typescript", "javascript", "json", "css", "html"],
-      globalAPI: true,
-    }),
+    // monaco({
+    //   features: "all",
+    //   languages: ["typescript", "javascript", "json", "css", "html"],
+    //   globalAPI: true,
+    // }),
     Lenz({
       lenzExecutable: join(PROJECT_ROOT, "../../dist/plain/bin/lenz"),
     }),
