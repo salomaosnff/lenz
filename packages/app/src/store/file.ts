@@ -203,7 +203,7 @@ export const useFileStore = defineStore("file", () => {
         const filepath = await openSaveDialog({
           title: "Salvar arquivo HTML",
           filters: {
-            "Páginas HTML": ["*html"],
+            "Páginas HTML": ["*.html"],
           },
         });
 
@@ -240,7 +240,7 @@ export const useFileStore = defineStore("file", () => {
         const filepath = await openFileDialog({
           title: "Abrir arquivo HTML",
           filters: {
-            "Páginas HTML": ["*html"],
+            "Páginas HTML": ["*.html"],
           },
         });
         await openFile(filepath);

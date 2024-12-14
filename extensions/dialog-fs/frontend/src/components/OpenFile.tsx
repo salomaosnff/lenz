@@ -1,5 +1,5 @@
 import { Icon } from "./icons";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Entry } from "../types";
 
 import iconfolderUp from "lenz:icons/chevron_left";
@@ -21,8 +21,8 @@ export default function App(props: { getData: () => AppData; save?: boolean }) {
   const [isGrid, setIsGrid] = useState(true);
   const [currentPath, setCurrentPath] = useState<string>();
   const [selection, setSelection] = useState<Set<string>>(new Set());
-  const [filter, setFilter] = useState<string>(
-    (Object.values(filters)[0] ?? "*") as string
+  const [filter, setFilter] = useState<string[]>(
+    (Object.values(filters)[0] ?? ["*"]) as any as string[]
   );
   const [filename, setFilename] = useState<string>();
   const [sortBy] = useState([
@@ -98,9 +98,14 @@ export default function App(props: { getData: () => AppData; save?: boolean }) {
       save: props.save,
     });
     if (props.save) {
+      let path = `${currentPath}/${filename}`;
+
       if (filename) {
-        console.log("onResult", `${currentPath}/${filename}`);
-        onResult(`${currentPath}/${filename}`);
+        if (filter?.[0] && !/^.+\.(.+)$/.test(filename)) {
+          console.log("path", path);
+          path = filter[0].replace("*", path);
+        }
+        onResult(path);
       }
     }
     if (selection.size === 1) {
@@ -160,7 +165,43 @@ export default function App(props: { getData: () => AppData; save?: boolean }) {
               placeholder="Nome do Arquivo"
               autoFocus
               value={filename}
-              onChange={(e) => setFilename(e.currentTarget.value)}
+              onInput={(e) => {
+                const filename = e.currentTarget.value;
+                setFilename(filename);
+
+                if (filename) {
+                  select({
+                    kind: "File",
+                    path: `${currentPath}/${filename}`,
+                    name: filename,
+                    created_at: 0,
+                    is_hidden: false,
+                    modified_at: 0,
+                    size: 0,
+                    display_as: "file",
+                  });
+                } else {
+                  setSelection(new Set());
+                }
+              }}
+              onBlur={(e) => {
+                let filename = e.currentTarget.value;
+
+                if (filter?.[0] && !/^.+\.(.+)$/.test(filename)) {
+                  filename = filter[0].replace("*", filename);
+                }
+
+                select({
+                  kind: "File",
+                  path: `${currentPath}/${filename}`,
+                  name: filename,
+                  created_at: 0,
+                  is_hidden: false,
+                  modified_at: 0,
+                  size: 0,
+                  display_as: "file",
+                });
+              }}
             />
           )}
           <label className="inline-flex pr-2 bg--surface-muted cursor-pointer">
