@@ -15,13 +15,11 @@ use crate::state::invoke_handlers::get_invoke_request;
 use std::pin::pin;
 
 async fn countdown(message: &str, seconds: u32) {
-    eprint!("\x1b[?25l");
     for i in (1..=seconds).rev() {
         eprint!("\x1b[33m({}s) {}\x1b[0m", i, message);
         tokio::time::sleep(Duration::from_secs(1)).await;
         eprint!("\x1b[2K\r");
     }
-    eprint!("\x1b[?25h");
 }
 
 pub fn open_browser() {
@@ -41,6 +39,9 @@ pub fn create_response() -> http::response::Builder {
 }
 
 pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
+    // Hide cursor
+    eprint!("\x1b[?25l");
+    
     let listener = match TcpListener::bind(ADDR).await {
         Ok(listener) => listener,
         Err(e) => match e.kind() {
@@ -113,9 +114,12 @@ pub async fn start(app: App) -> Result<(), Box<dyn std::error::Error>> {
             eprintln!("\x1b[32mTodas as conexões foram encerradas.\x1b[0m");
         },
         _ = countdown("Aguardando conexões ativas...", 10) => {
-            eprintln!("\x1b[31mTempo limite atingido, encerrando servidor...\x1b[0m");
+            eprintln!("\n\x1b[31mTempo limite atingido, encerrando servidor...\x1b[0m");
         }
     }
+
+    // Show cursor
+    eprint!("\x1b[?25h");
 
     Ok(())
 }
