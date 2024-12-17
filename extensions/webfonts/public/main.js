@@ -1,12 +1,9 @@
 /// <reference types="../frontend/node_modules/@lenz-design/types" />
 
 import { addCommand } from "lenz:commands";
-import { write } from "lenz:file";
 import { addHotKeys } from "lenz:hotkeys";
 import { extendMenu } from "lenz:menubar";
 import { createWindow } from "lenz:ui";
-import { ref, watch, createScope } from "lenz:reactivity";
-import { prompt } from "lenz:dialog";
 
 // Ícones
 import iconFont from "lenz:icons/format_font";

@@ -29,7 +29,7 @@ const scope = LenzReactivity.createScope(() => {
     });
 
     const style =
-      selectedElements.length === 1 ? selectedElements[0].style : undefined;
+      selectedElements.length > 0 ? selectedElements[0].style : undefined;
 
     if (!style) {
       form.value = undefined;

@@ -19,6 +19,10 @@ import iconHeading from "lenz:icons/format_header1";
 import iconHeadingIncrease from "lenz:icons/format_header_increase";
 import iconUnGroup from "lenz:icons/ungroup";
 import iconEditAttributes from "lenz:icons/pencil_box_outline";
+import iconSelectParent from "lenz:icons/select_arrow_up";
+import iconSelectChildren from "lenz:icons/select_group";
+import iconSelectPreviousSibling from "lenz:icons/arrow_left_bold_box_outline";
+import iconSelectNextSibling from "lenz:icons/arrow_right_bold_box_outline";
 
 import { createElement } from "./util.js";
 import EditAttributesWidget from "./www/html.lenz.es.js";
@@ -394,6 +398,90 @@ export function unGroupElements() {
   };
 }
 
+export function selectParent() {
+  return {
+    id: "html.select.parent",
+    name: "Selecionar pai",
+    hotKey: "Ctrl+ArrowUp",
+    description: "Seleciona o elemento pai do elemento selecionado",
+    icon: iconSelectParent,
+    run({ getSelection, setSelection }) {
+      const elements = new Set();
+
+      for (const { element } of getSelection()) {
+        if (element.parentElement) {
+          elements.add(element.parentElement);
+        }
+      }
+
+      setSelection(Array.from(elements));
+    },
+  };
+}
+
+export function selectChildren() {
+  return {
+    id: "html.select.children",
+    name: "Selecionar filhos",
+    hotKey: "Ctrl+Shift+A",
+    description: "Seleciona os elementos filhos do elemento selecionado",
+    icon: iconSelectChildren,
+    run({ getSelection, setSelection }) {
+      const elements = new Set();
+
+      for (const { element } of getSelection()) {
+        for (const child of element.children) {
+          elements.add(child);
+        }
+      }
+
+      setSelection(Array.from(elements));
+    },
+  };
+}
+
+export function selectPreviousSibling() {
+  return {
+    id: "html.select.previous.sibling",
+    name: "Selecionar irmão anterior",
+    hotKey: "Ctrl+Shift+ArrowLeft",
+    description: "Seleciona o irmão anterior do elemento selecionado",
+    icon: iconSelectPreviousSibling,
+    run({ getSelection, setSelection }) {
+      const elements = new Set();
+
+      for (const { element } of getSelection()) {
+        if (element.previousElementSibling) {
+          elements.add(element.previousElementSibling);
+        }
+      }
+
+      setSelection(Array.from(elements));
+    },
+  };
+}
+
+export function selectNextSibling() {
+  return {
+    id: "html.select.next.sibling",
+    name: "Selecionar irmão seguinte",
+    hotKey: "Ctrl+Shift+ArrowRight",
+    description: "Seleciona o irmão seguinte do elemento selecionado",
+    icon: iconSelectNextSibling,
+    run({ getSelection, setSelection }) {
+      const elements = new Set();
+
+      for (const { element } of getSelection()) {
+        if (element.nextElementSibling) {
+          elements.add(element.nextElementSibling);
+        }
+      }
+
+      setSelection(Array.from(elements));
+    },
+  };
+}
+
 export function moveUp() {
   return {
     id: "html.element.move.up",
@@ -514,8 +602,7 @@ export function editAttributes() {
         height: 520,
         themed: true,
         title: "Atributos do Elemento",
-        content: (parent) =>
-          EditAttributesWidget(parent, { selection }),
+        content: (parent) => EditAttributesWidget(parent, { selection }),
         onClose() {
           lastWindow = null;
         },
