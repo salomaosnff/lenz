@@ -3,7 +3,7 @@ import icon_refresh from "lenz:icons/refresh";
 import { CanvasElement, createElementSelection } from "./types";
 
 const props = defineProps<{
-  html: string;
+  html?: string;
   hidden?: boolean;
 }>();
 
@@ -14,6 +14,10 @@ const activeModel = defineModel<CanvasElement[]>("active");
 const hotKeysStore = useHotKeysStore();
 
 const currentHTML = computed(() => {
+  if (!props.html) {
+    return "";
+  }
+
   const dom = new DOMParser().parseFromString(props.html, "text/html");
   return dom.documentElement.outerHTML;
 });

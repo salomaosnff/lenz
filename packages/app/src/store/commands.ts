@@ -1,5 +1,4 @@
 import type { Command, CommandContext } from "lenz:commands";
-import { createChannel } from "lenz:reactivity";
 import { defineStore } from "pinia";
 
 import iconFire from "lenz:icons/fire";
@@ -14,7 +13,10 @@ export const useCommandsStore = defineStore("commands", () => {
   const windowsStore = useWindowStore();
   const editorStore = useEditorStore();
 
-  const frequencyMap = useLocalStorage<Record<string, number>>("commands.frequency", {});
+  const frequencyMap = useLocalStorage<Record<string, number>>(
+    "commands.frequency",
+    {}
+  );
 
   const commands = ref<Record<string, Command>>({});
   const showCommands = ref(false);
@@ -119,7 +121,10 @@ export const useCommandsStore = defineStore("commands", () => {
 
         windowsStore.createWindow({
           content: (el) => {
-            const page = new DOMParser().parseFromString(aboutPage, "text/html");
+            const page = new DOMParser().parseFromString(
+              aboutPage,
+              "text/html"
+            );
             const heads = Array.from(page.head.querySelectorAll("link, style"));
             const body = Array.from(page.body.children);
 
@@ -131,12 +136,17 @@ export const useCommandsStore = defineStore("commands", () => {
               el.appendChild(child);
             });
 
-            const checkbox = el.querySelector("#not-show-again") as HTMLInputElement;
-            checkbox.checked = localStorage.getItem("about.notShowAgain") === "true";
-
+            const checkbox = el.querySelector(
+              "#not-show-again"
+            ) as HTMLInputElement;
+            checkbox.checked =
+              localStorage.getItem("about.notShowAgain") === "true";
 
             checkbox.addEventListener("change", () => {
-              localStorage.setItem("about.notShowAgain", checkbox.checked ? "true" : "false");
+              localStorage.setItem(
+                "about.notShowAgain",
+                checkbox.checked ? "true" : "false"
+              );
             });
 
             return () => {
@@ -152,6 +162,7 @@ export const useCommandsStore = defineStore("commands", () => {
           width: 600,
           height: Math.min(532, document.body.clientHeight - 64),
           resizable: false,
+          collapsible: false,
           modal: true,
           movable: false,
           themed: true,
@@ -188,6 +199,22 @@ export const useCommandsStore = defineStore("commands", () => {
   function getFrequency(id: string) {
     return frequencyMap.value[id] || 0;
   }
+
+  registerCommand({
+    id: "view.preview",
+    name: "Pré-visualizar",
+    run({ getCurrentContent }) {
+      const url = URL.createObjectURL(
+        new Blob([getCurrentContent()], { type: "text/html" })
+      );
+
+      const win = window.open(url, "_blank");
+
+      win?.addEventListener("close", () => {
+        URL.revokeObjectURL(url);
+      });
+    },
+  });
 
   return {
     showCommands,

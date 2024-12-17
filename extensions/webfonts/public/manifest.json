@@ -1,0 +1,8 @@
+{
+  "id": "css.webfonts",
+  "name": "CSS Webfonts",
+  "main": "main.js",
+  "description": "Habilita o suporte a fontes web no CSS",
+  "version": "1.0.0",
+  "publisher": "Salomão Neto <contato@sallon.dev>"
+}

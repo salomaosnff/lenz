@@ -1,0 +1,72 @@
+.widget-layout-form {
+  padding: 1rem;
+  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+
+  & summary {
+    cursor: pointer;
+  }
+
+  & .flex-1 {
+    flex: 1;
+  }
+
+  & .full-width {
+    min-width: 100%;
+    flex: 1;
+  }
+
+  & .flex {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    min-width: 270px;
+
+    & > * {
+      flex-basis: 128px;
+      flex-grow: 1;
+    }
+  }
+  & fieldset {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+    flex-wrap: wrap;
+
+    & > * {
+      flex-basis: 128px;
+      flex-grow: 1;
+    }
+  }
+
+  & label {
+    display: block;
+  }
+
+  & input,
+  & select {
+    width: 100%;
+  }
+
+  & pre {
+    overflow: auto;
+  }
+
+  & .preview {
+    & pre {
+      width: 280px;
+      font-size: 12px;
+      word-break: normal;
+      white-space: pre-wrap;
+    }
+
+    & > p {
+      margin-top: 1rem;
+    }
+  }
+
+  & .m-0 {
+    margin: 0;
+  }
+}

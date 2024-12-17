@@ -142,6 +142,11 @@ export const useEditorStore = defineStore("editor", () => {
         ],
       },
       { type: "separator", id: "frame.size.separator", after: ["frame.size"] },
+      {
+        id: "view.preview",
+        title: "Pré-visualizar",
+        command: "view.preview",
+      },
     ],
     "view"
   );

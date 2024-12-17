@@ -15,13 +15,12 @@ export interface WindowInstance {
   close(): void;
 }
 
-
 export const useWindowStore = defineStore("window", () => {
   const windowsMap = reactive(new Map<string, WindowInstance>());
 
   function createWindow(options: WindowOptions): WindowInstance {
     const id = _uniqueId("window-");
-    const {  onClose, ...rest } = options;
+    const { onClose, ...rest } = options;
     const disposers = new Set<() => void>();
     const normalizedOptions = reactive({
       title: "Window",
