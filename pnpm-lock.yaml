@@ -159,6 +159,37 @@ importers:
         specifier: ^2.0.29
         version: 2.1.10(typescript@5.7.2)
 
+  extensions/icons/frontend:
+    dependencies:
+      '@mdi/js':
+        specifier: 7.4.47
+        version: 7.4.47
+      vue:
+        specifier: ^3.5.12
+        version: 3.5.13(typescript@5.7.2)
+    devDependencies:
+      '@lenz-design/types':
+        specifier: workspace:*
+        version: link:../../../packages/esm-types
+      '@lenz-design/vite-plugin':
+        specifier: workspace:*
+        version: link:../../../packages/vite-lenz
+      '@vitejs/plugin-vue':
+        specifier: ^5.1.2
+        version: 5.2.1(vite@5.4.11(@types/node@22.10.2)(sass@1.83.0))(vue@3.5.13(typescript@5.7.2))
+      typescript:
+        specifier: ^5.6.3
+        version: 5.7.2
+      unocss:
+        specifier: ^0.63.4
+        version: 0.63.6(postcss@8.4.49)(rollup@4.28.1)(typescript@5.7.2)(vite@5.4.11(@types/node@22.10.2)(sass@1.83.0))
+      vite:
+        specifier: ^5.4.8
+        version: 5.4.11(@types/node@22.10.2)(sass@1.83.0)
+      vue-tsc:
+        specifier: ^2.0.29
+        version: 2.1.10(typescript@5.7.2)
+
   extensions/layout/frontend:
     dependencies:
       vue:
