@@ -50,6 +50,9 @@ function updateSelection() {
     "grid-template-columns":
       style.getPropertyValue("grid-template-columns") || undefined,
     "grid-area": style.getPropertyValue("grid-area") || undefined,
+    "grid-column-start":
+      style.getPropertyValue("grid-column-start") || undefined,
+    "grid-column-end": style.getPropertyValue("grid-column-end") || undefined,
   };
 }
 
@@ -84,6 +87,40 @@ const isFlex = computed(
 const isGrid = computed(
   () => form.value.display === "grid" || form.value.display === "inline-grid"
 );
+
+const endIsSpan = computed({
+  get() {
+    return form.value["grid-column-end"]?.includes("span");
+  },
+  set(value: boolean) {
+    const oldValue = form.value["grid-column-end"];
+
+    const newValue = oldValue?.replace("span", "");
+
+    if (value) {
+      form.value["grid-column-end"] = `${newValue || 1} span`;
+    } else {
+      form.value["grid-column-end"] = newValue;
+    }
+  },
+});
+
+const gridColumnEnd = computed({
+  get() {
+    const match = form.value["grid-column-end"]?.match(/(\d+)/);
+
+    if (!match) return "";
+
+    return parseInt(match[1]);
+  },
+  set(value: number) {
+    if (endIsSpan.value) {
+      form.value["grid-column-end"] = `span ${value}`;
+    } else {
+      form.value["grid-column-end"] = value.toString();
+    }
+  },
+});
 
 const gridColumnType = computed({
   get() {
@@ -307,13 +344,44 @@ const prettyGridTemplateAreas = computed({
         />
       </label>
 
-      <label v-if="isParentGrid && gridAreas.length">
-        <p>Área do grid:</p>
-        <select v-model="form['grid-area']" name="grid-area">
-          <option :value="undefined">Nenhuma</option>
-          <option v-for="area in gridAreas" :value="area">{{ area }}</option>
-        </select>
-      </label>
+      <template v-if="isParentGrid">
+        <label v-if="gridAreas.length">
+          <p>Área do grid:</p>
+          <select v-model="form['grid-area']" name="grid-area">
+            <option :value="undefined">Nenhuma</option>
+            <option v-for="area in gridAreas" :value="area">{{ area }}</option>
+          </select>
+        </label>
+        <template v-else>
+          <label>
+            <p>Coluna inicial:</p>
+            <input
+              type="number"
+              v-model="form['grid-column-start']"
+              name="grid-column-start"
+              placeholder="Ex: 1, 2, 3"
+            />
+          </label>
+          <label>
+            <p>Extender coluna</p>
+            <input
+              type="checkbox"
+              v-model="endIsSpan"
+              name="grid-column-end-span"
+            />
+          </label>
+          <label>
+            <p v-if="endIsSpan">Valor a ser estendido:</p>
+            <p v-else>Coluna final:</p>
+            <input
+              type="number"
+              v-model="gridColumnEnd"
+              name="grid-column-end"
+              placeholder="Ex: 1, 2, 3"
+            />
+          </label>
+        </template>
+      </template>
 
       <template v-if="isFlex">
         <label>
