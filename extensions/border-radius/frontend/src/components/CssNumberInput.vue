@@ -18,7 +18,7 @@ function incrementValue(amount = 1) {
   }
 
   const [, valueText, unit = ""] =
-    modelValue.value.match(/^(-?(?:\d+)?(?:\.\d+)?)([a-z]+)?$/) || [];
+    modelValue.value.match(/^(-?(?:\d+)?(?:\.\d+)?)([a-z]+|%)?$/) || [];
   const value = parseFloat(valueText);
 
   if (isNaN(value)) {
