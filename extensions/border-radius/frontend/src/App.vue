@@ -206,18 +206,18 @@ const code = computed(() => {
                 />
               </label>
               <label>
-                <p>Inferior Direita:</p>
-                <CssNumberInput
-                  v-model="borderBottomRightRadius"
-                  name="border-bottom-right-radius"
-                  default-unit="px"
-                />
-              </label>
-              <label>
                 <p>Inferior Esquerda:</p>
                 <CssNumberInput
                   v-model="borderBottomLeftRadius"
                   name="border-bottom-left-radius"
+                  default-unit="px"
+                />
+              </label>
+              <label>
+                <p>Inferior Direita:</p>
+                <CssNumberInput
+                  v-model="borderBottomRightRadius"
+                  name="border-bottom-right-radius"
                   default-unit="px"
                 />
               </label>
