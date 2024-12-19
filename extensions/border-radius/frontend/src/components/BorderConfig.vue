@@ -5,13 +5,12 @@ import CssNumberInput from "./CssNumberInput.vue";
 const modelValue = defineModel<string>();
 
 const border = computed(() => {
-  const [width = "0", style = "solid", color = "black"] =
-    modelValue.value?.split(" ") ?? [];
+  const [width, style, color] = modelValue.value?.split(" ") ?? [];
 
   return {
-    width,
-    style,
-    color,
+    width: width || "0px",
+    style: style || "solid",
+    color: color || "#000000",
   };
 });
 
@@ -30,7 +29,7 @@ const borderStyle = computed({
 });
 
 const borderColor = computed({
-  get: () => border.value.color,
+  get: () => border.value.color ?? "#000000",
   set: (value: string) => {
     modelValue.value = `${border.value.width} ${border.value.style} ${value}`;
   },

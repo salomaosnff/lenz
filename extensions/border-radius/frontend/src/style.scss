@@ -1,0 +1,121 @@
+.flex {
+  display: flex;
+}
+.flex-1 {
+  flex: 1;
+}
+.preview {
+  display: flex;
+  flex-direction: column;
+
+  & pre {
+    width: 280px;
+    height: 100%;
+    font-size: 12px;
+    word-break: normal;
+    white-space: pre-wrap;
+    overflow: auto;
+    padding: 8px;
+    max-height: 90%;
+    flex: 1;
+  }
+
+  & fieldset {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  & > p {
+    margin-top: 1rem;
+  }
+}
+.widget-border-form {
+  padding: 1rem;
+  gap: 1rem;
+
+  & summary {
+    cursor: pointer;
+  }
+
+  & .full-width {
+    min-width: 100%;
+    flex: 1;
+  }
+
+  & .flex {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    min-width: 270px;
+
+    & > * {
+      flex-basis: 128px;
+      flex-grow: 1;
+    }
+  }
+
+  & label {
+    display: block;
+    width: 100%;
+  }
+
+  & input,
+  & select {
+    width: 100%;
+  }
+
+  & pre {
+    overflow: auto;
+  }
+
+  & fieldset {
+    & > label {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 1rem;
+
+      & * {
+        flex: 1;
+      }
+      & > p {
+        min-width: 100%;
+      }
+    }
+  }
+
+  & .m-0 {
+    margin: 0;
+  }
+
+  & .icon-list {
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  & .icons-widget-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+    list-style: none;
+    text-align: center;
+    gap: 2px;
+    padding: 0;
+
+    & > * {
+      padding: 4px;
+      overflow: hidden;
+      font-size: 12px;
+      cursor: pointer;
+
+      &:hover {
+        background: #0001;
+      }
+
+      & > svg {
+        display: block;
+        margin: 0 auto;
+      }
+    }
+  }
+}
