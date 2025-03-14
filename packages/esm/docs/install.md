@@ -28,34 +28,34 @@ Se você não sabe qual pacote baixar, escolha o pacote .AppImage, ele é portá
         <th>Notas</th>
         <th>Download</th>
     </tr>
-    <tr>
+    <!-- <tr>
         <td>Debian/Ubuntu e derivados</td>
         <td>Pacote Debian (.deb)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.deb">Baixar arquivo</a></td>
-    </tr>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.deb">Baixar arquivo</a></td>
+    </tr> -->
     <tr>
         <td rowspan="4">Todas as distribuições Linux</td>
         <td>Executável portátil (.AppImage)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.AppImage">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.AppImage">Baixar arquivo</a></td>
     </tr>
     <tr>
         <td>Arquivo compactado (.tar.gz)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.tar.gz">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.tar.gz">Baixar arquivo</a></td>
     </tr>
     <tr>
         <td>Arquivo compactado (.tar.xz)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.tar.xz">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.tar.xz">Baixar arquivo</a></td>
     </tr>
     <tr>
         <td>Arquivo compactado (.zip)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.1.0/lenz-designer.zip">Baixar arquivo</a></td>
+        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.zip">Baixar arquivo</a></td>
     </tr>
     </tbody>
 </table>
 
-## Debian/Ubuntu e derivados
+<!-- ## Debian/Ubuntu e derivados
 
-Para instalar o Lenz Designer no Debian/Ubuntu e derivados, [baixe o pacote .deb](https://github.com/salomaosnff/lenz-designer/releases/download/v0.1.0/lenz-designer.deb) e execute o comando abaixo no terminal para instalar o pacote:
+Para instalar o Lenz Designer no Debian/Ubuntu e derivados, [baixe o pacote .deb](https://github.com/salomaosnff/lenz-designer/releases/download/v0.2.0/lenz-designer.deb) e execute o comando abaixo no terminal para instalar o pacote:
 
 ```bash
 sudo dpkg -i lenz-designer.deb
@@ -63,7 +63,7 @@ sudo dpkg -i lenz-designer.deb
 
 ::: warning
 É necessário privilégios de administrador para instalar o pacote .deb.
-:::
+::: -->
 
 ## AppImage (portátil)
 
