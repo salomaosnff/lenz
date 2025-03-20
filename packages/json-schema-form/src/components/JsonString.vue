@@ -15,15 +15,10 @@ const type = computed(() => {
 </script>
 <template>
   <div class="form-json-string">
-    <input
-      v-model="modelValue"
-      :type
-      :minlength="schema.minLength"
-      :maxlength="schema.maxLength"
+    <input v-model="modelValue" :type :minlength="schema.minLength" :maxlength="schema.maxLength"
       :pattern="schema.pattern"
-      :placeholder="Array.isArray(schema.examples) ? schema.examples.join(', ') : schema.examples?.toString()"
-      :title="schema.description"
-    />
+      :placeholder="Array.isArray(schema.examples) && schema.examples.length > 0 ? `Ex. ${schema.examples.join(', ')}` : (schema.examples?.toString())"
+      :title="schema.description" />
     <p v-if="schema.description"></p>
   </div>
 </template>

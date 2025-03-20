@@ -15,6 +15,11 @@ export function getMenuBar() {
         command: "html.insert.paragraph",
       },
       {
+        id: "html.insert.input",
+        title: "Campo de entrada <input>",
+        command: "html.insert.input"
+      },
+      {
         id: "html.insert.heading",
         title: "Título <h1>",
         command: "html.insert.heading",

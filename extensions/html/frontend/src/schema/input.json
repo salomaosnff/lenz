@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HTML5 <input> Element Attributes",
+  "$id": "html.input",
+  "type": "object",
+  "allOf": [
+    { "$ref": "base.html" },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Tipo",
+          "enum": [
+            "button",
+            "checkbox",
+            "color",
+            "date",
+            "datetime-local",
+            "email",
+            "file",
+            "hidden",
+            "image",
+            "month",
+            "number",
+            "password",
+            "radio",
+            "range",
+            "reset",
+            "search",
+            "submit",
+            "tel",
+            "text",
+            "time",
+            "url",
+            "week"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "title": "Nome"
+        },
+        "value": {
+          "type": "string",
+          "title": "Valor"
+        },
+        "accept": {
+          "type": "string",
+          "title": "Tipos de Arquivo Aceitos",
+          "examples": ["image/png", "image/*"]
+        },
+        "autocomplete": {
+          "type": "string",
+          "title": "Autocompletar",
+          "enum": ["on", "off"]
+        },
+        "autofocus": {
+          "type": "boolean",
+          "title": "Autofoco"
+        },
+        "checked": {
+          "type": "boolean",
+          "title": "Marcado"
+        },
+        "disabled": {
+          "type": "boolean",
+          "title": "Desabilitado"
+        }
+      }
+    }
+  ]
+}

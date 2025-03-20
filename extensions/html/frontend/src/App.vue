@@ -16,26 +16,34 @@ const props = defineProps<{
 
 const schema = ref<JSONSchema7>();
 const attrs = ref<Record<string, string>>({});
-const tagName = ref<string>();
+const tagName = ref<string[]>();
 
 const { selection } = props.getData();
 
 function updateSelection() {
-  const element = selection.value[0]?.element;
-  const tag = element.tagName.toLowerCase();
-
-  tagName.value = tag;
+  tagName.value = selection.value.map(({ element }) => element.tagName.toLowerCase());
 
   attrs.value = Object.fromEntries(
-    Array.from(element.attributes).map((attr) => [attr.name, attr.value])
+    selection.value.flatMap(({ element }) =>
+      Array.from(element.attributes).map((attr) => [attr.name, attr.value])
+    )
   );
 
   schema.value = (() => {
-    try {
-      return schemaStore.getDerefSchema(`html.${tag}`);
-    } catch {
-      return schemaStore.getDerefSchema("base.html");
+    const result = structuredClone(schemaStore.getDerefSchema("base.html"));
+
+    for (const { element } of selection.value) {
+      const tag = element.tagName.toLowerCase();
+
+      try {
+        const schema = schemaStore.getDerefSchema(`html.${tag}`);
+        Object.assign(result.properties, schema.allOf[1].properties);
+      } catch {
+        continue;
+      }
     }
+
+    return result
   })();
 }
 
@@ -63,21 +71,24 @@ function debouncedSend() {
 watch(attrs, debouncedSend, { deep: true });
 
 const html = computed(() => {
-  let str = "<" + selection.value[0]?.element.tagName.toLowerCase();
 
-  for (const [key, value] of Object.entries(attrs.value)) {
-    str += `\n  ${key}`;
+  return selection.value.map(({ element }) => {
+    let str = "<" + element.tagName.toLowerCase();
 
-    if (value === undefined || value === "" || value === null) {
-      continue;
+    for (const [key, value] of Object.entries(attrs.value)) {
+      str += `\n  ${key}`;
+
+      if (value === undefined || value === "" || value === null) {
+        continue;
+      }
+
+      str += `="${value}"`;
     }
 
-    str += `="${value}"`;
-  }
+    str += "\n>";
 
-  str += "\n>";
-
-  return str;
+    return str;
+  }).join("\n");
 });
 </script>
 
@@ -90,14 +101,10 @@ const html = computed(() => {
         html
       }}</pre>
     </div>
-    <p v-if="tagName" class="mt-4">
-      Aprenda mais sobre <code>&lt;{{ tagName }}&gt;</code> em
-      <a
-        :href="`https://developer.mozilla.org/pt-BR/docs/Web/HTML/Element/${tagName}`"
-        target="_blank"
-        rel="noopener"
-        >MDN Web Docs</a
-      >
+    <p v-for="tag in tagName" class="mt-4">
+      Aprenda mais sobre <code>&lt;{{ tag }}&gt;</code> em
+      <a :href="`https://developer.mozilla.org/pt-BR/docs/Web/HTML/Element/${tag}`" target="_blank" rel="noopener">MDN
+        Web Docs</a>
     </p>
   </div>
 </template>

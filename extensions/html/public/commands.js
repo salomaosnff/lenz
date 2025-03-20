@@ -123,6 +123,23 @@ export function insertParagraph() {
   };
 }
 
+export function insertInput() {
+  return {
+    id: "html.insert.input",
+    hotKey: "Shift+I",
+    name: "Inserir campo de texto",
+    icon: iconButton,
+    description: "Cria um novo elemento <input> no elemento selecionado",
+    run: (context) =>
+      insertElement(context, "input", {
+        attrs: {
+          type: "text",
+          placeholder: "Digite algo...",
+        },
+      }),
+  }
+}
+
 export function insertButton() {
   return {
     id: "html.insert.button",
