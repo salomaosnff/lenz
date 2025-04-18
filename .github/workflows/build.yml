@@ -10,36 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v4
+      - name: Install FUSE
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fuse
+      - name: Check out repository
+        uses: actions/checkout@v4
+        
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js with Corepack
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+
+      - name: Build project
+        run: pnpm make build
+
+      - name: Pack as AppImage
+        run: pnpm make pack --appimage
       
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      - name: Pack as tar.gz and tar.xz
+        run: pnpm make pack --archive
 
-    - name: Set up Node.js with Corepack
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22'
-        cache: 'pnpm'
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
 
-    - name: Install dependencies
-      run: |
-        pnpm install
-
-    - name: Build project
-      run: pnpm make build
-
-    - name: Pack as AppImage
-      run: pnpm make pack --appimage
-    
-    - name: Pack as tar.gz and tar.xz
-      run: pnpm make pack --archive
-
-    - name: Release
-      uses: softprops/action-gh-release@v2
-      with:
-
-        files: |
-          dist/lenz-designer.AppImage
-          dist/lenz-designer.tar.gz
-          dist/lenz-designer.tar.xz
+          files: |
+            dist/lenz-designer.AppImage
+            dist/lenz-designer.tar.gz
+            dist/lenz-designer.tar.xz
