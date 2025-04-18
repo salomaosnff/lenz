@@ -11,18 +11,13 @@ jobs:
 
     steps:
     - name: Check out repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Node.js with Corepack
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: 'lts'
+        node-version: 'latest'
         cache: 'pnpm'
-
-    - name: Set up Rust
-      uses: actions/setup-rust@v1
-      with:
-        rust-version: 'stable'
 
     - name: Install dependencies
       run: |
@@ -43,3 +38,12 @@ jobs:
         body: "Release created from GitHub Actions"
         files: |
           ./path/to/your/appimage/file
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        
+        files: |
+          dist/lenz-designer.AppImage
+          dist/lenz-designer.tar.gz
+          dist/lenz-designer.tar.xz
