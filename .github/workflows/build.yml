@@ -30,19 +30,10 @@ jobs:
     - name: Pack as AppImage
       run: pnpm make pack --appimage
 
-    - name: Create release
-      uses: gh-cli/create-release@v1
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: "Release ${{ github.ref }}"
-        body: "Release created from GitHub Actions"
-        files: |
-          ./path/to/your/appimage/file
-
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
-        
+
         files: |
           dist/lenz-designer.AppImage
           dist/lenz-designer.tar.gz
