@@ -12,6 +12,11 @@ jobs:
     steps:
     - name: Check out repository
       uses: actions/checkout@v4
+      
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
 
     - name: Set up Node.js with Corepack
       uses: actions/setup-node@v4
@@ -21,7 +26,6 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pnpm i -g pnpm
         pnpm install
 
     - name: Build project
@@ -29,6 +33,9 @@ jobs:
 
     - name: Pack as AppImage
       run: pnpm make pack --appimage
+    
+    - name: Pack as tar.gz and tar.xz
+      run: pnpm make pack --archive
 
     - name: Release
       uses: softprops/action-gh-release@v2
