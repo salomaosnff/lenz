@@ -6,7 +6,7 @@ on:
       - main
 permissions:
   contents: write
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,6 +18,10 @@ jobs:
           sudo apt-get install -y fuse
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: ⚡ Cache
         uses: actions/cache@v4
@@ -54,7 +58,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.sha }}
+          tag_name: ${{ steps.vars.outputs.sha_short }}
           files: |
             dist/target/lenz-designer.AppImage
             dist/target/lenz-designer.tar.gz
