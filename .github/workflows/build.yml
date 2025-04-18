@@ -54,6 +54,6 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            dist/lenz-designer.AppImage
-            dist/lenz-designer.tar.gz
-            dist/lenz-designer.tar.xz
+            dist/target/lenz-designer.AppImage
+            dist/target/lenz-designer.tar.gz
+            dist/target/lenz-designer.tar.xz
