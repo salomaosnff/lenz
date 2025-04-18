@@ -31,20 +31,20 @@ export async function getPackArquiveTasks(options: PackArchiveOptions): Promise<
         await execute;
       },
     },
-    {
-      title: "Criar pacote zip",
-      skip: () => options.noZip,
-      async task(_, task) {
-        const archiveFilename = join(options.output, `${prefix}.zip`);
+    // {
+    //   title: "Criar pacote zip",
+    //   skip: () => options.noZip,
+    //   async task(_, task) {
+    //     const archiveFilename = join(options.output, `${prefix}.zip`);
 
-        const execute = command(`zip -r ${archiveFilename} ${options.input}`);
+    //     const execute = command(`zip -r ${archiveFilename} ${options.input}`);
 
-        execute.stdout.pipe(task.stdout());
-        execute.stderr.pipe(task.stdout());
+    //     execute.stdout.pipe(task.stdout());
+    //     execute.stderr.pipe(task.stdout());
 
-        await execute;
-      },
-    },
+    //     await execute;
+    //   },
+    // },
     {
       title: "Criar pacote tar.xz",
       skip: () => options.noTarXz,
