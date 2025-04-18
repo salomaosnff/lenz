@@ -16,6 +16,16 @@ jobs:
           sudo apt-get install -y fuse
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: ⚡ Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            agent/target
+            extensions/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
         
       - name: Install pnpm
         uses: pnpm/action-setup@v4
