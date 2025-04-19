@@ -139,6 +139,59 @@ program
           ),
       },
       {
+        title: "Criar AppStream.xml",
+        skip: async () => !options.agent,
+        async task() {
+          const appStream = `<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.sallon.lenz</id>
+  
+  <name>Lenz Designer</name>
+  <summary>Editor de páginas web</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  
+  <description>
+    <p>
+      Um editor de páginas Web para todos
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">dev.sallon.lenz.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://i.imgur.com/eN6BMvV.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://i.imgur.com/vHOsCLu.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://i.imgur.com/VvHdzvJ.png</image>
+    </screenshot>
+  </screenshots>
+</component>`
+
+          const appStreamPath = resolve(
+            process.cwd(),
+            options.output,
+            "plain",
+            "metainfo",
+            "dev.sallon.lenz.metainfo.xml"
+          );
+
+          await ensureDir(dirname(appStreamPath));
+
+          await writeFile(appStreamPath, appStream, 'utf-8');
+        }
+      },
+      {
         title: "Criar lançador",
         skip: async () => !options.agent,
         async task() {

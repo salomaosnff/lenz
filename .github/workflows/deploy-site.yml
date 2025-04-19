@@ -46,6 +46,20 @@ jobs:
         pnpm flatpak:bundle
         cp -r repo docs/flatpak
 
+    - name: "Create FlatpakRef"
+      run: |
+        echo <<EOF > docs/lenz.flatpakref
+        [Flatpak Ref]
+        Title=Lenz Designer
+        Name=dev.sallon.lenz
+        Branch=master
+        Runtime=org.freedesktop.Platform//24.08
+        Url=https://sallon.dev/lenz/flatpak
+        Arch=x86_64
+        Comment=Um editor de páginas HTML para todos
+        Icon=dev.sallon.lenz
+        EOF
+
     - name: Upload docs to GitHub Pages
       uses: actions/upload-pages-artifact@v3
       with:

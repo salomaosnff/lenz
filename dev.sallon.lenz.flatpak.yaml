@@ -19,7 +19,7 @@ finish-args:
   - --filesystem=home
 
 modules:
-  - name: Lenz Designer
+  - name: lenz
     buildsystem: simple
     build-commands:
       - rm -rf node_modules packages/*/node_modules extensions/*/frontend/node_modules
@@ -28,6 +28,7 @@ modules:
       - cp -r dist/plain/extensions /app/extensions/
       - cp -r dist/plain/resources /app/resources/
       - mkdir -p /app/share/applications && cp -r dist/plain/launchers/* /app/share/applications
+      - mkdir -p /app/share/metainfo && cp -r dist/plain/metainfo/* /app/share/metainfo
       - install -Dm644 dist/plain/resources/icon.png /app/share/icons/hicolor/128x128/apps/dev.sallon.lenz.png
       - install -Dm755 dist/plain/bin/lenz /app/bin/lenz
     sources:
