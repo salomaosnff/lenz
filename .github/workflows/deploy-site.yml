@@ -48,7 +48,7 @@ jobs:
 
     - name: "Create FlatpakRef"
       run: |
-        echo <<EOF > docs/lenz.flatpakref
+        cat <<EOF > docs/lenz.flatpakref
         [Flatpak Ref]
         Title=Lenz Designer
         Name=dev.sallon.lenz
