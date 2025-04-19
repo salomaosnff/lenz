@@ -2,6 +2,35 @@
 title: 'Instalação'
 ---
 
+<script setup>
+    import { data } from './install.data'
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+
+        return date.toLocaleDateString('pt-BR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'America/Sao_Paulo',
+        });
+    }
+
+    function formatSize(size) {
+        if (size < 1024) {
+            return size + ' B';
+        }
+
+        const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const index = Math.floor(Math.log(size) / Math.log(1024));
+
+        const formattedSize = (size / Math.pow(1024, index)).toFixed(2);
+        return formattedSize + ' ' + units[index];
+    }
+</script>
+
 # Instalação do Lenz Designer
 
 
@@ -24,32 +53,22 @@ Se você não sabe qual pacote baixar, escolha o pacote .AppImage, ele é portá
 <table>
     <tbody>
     <tr>
-        <th>Sistema Operacional</th>
-        <th>Notas</th>
-        <th>Download</th>
+        <th>Nome do arquivo</th>
+        <th>Tamanho</th>
+        <th>Data de publicação</th>
+        <th></th>
     </tr>
-    <!-- <tr>
-        <td>Debian/Ubuntu e derivados</td>
-        <td>Pacote Debian (.deb)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.deb">Baixar arquivo</a></td>
-    </tr> -->
-    <tr>
-        <td rowspan="4">Todas as distribuições Linux</td>
-        <td>Executável portátil (.AppImage)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.AppImage">Baixar arquivo</a></td>
-    </tr>
-    <tr>
-        <td>Arquivo compactado (.tar.gz)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.tar.gz">Baixar arquivo</a></td>
-    </tr>
-    <tr>
-        <td>Arquivo compactado (.tar.xz)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.tar.xz">Baixar arquivo</a></td>
-    </tr>
-    <tr>
-        <td>Arquivo compactado (.zip)</td>
-        <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.zip">Baixar arquivo</a></td>
-    </tr>
+        <!-- <tr>
+            <td>Debian/Ubuntu e derivados</td>
+            <td>Pacote Debian (.deb)</td>
+            <td><a href="https://github.com/salomaosnff/lenz/releases/download/v0.2.0/lenz-designer.deb">Baixar arquivo</a></td>
+        </tr> -->
+        <tr v-for="asset in data.assets">
+            <td>{{asset.name}}</td>
+            <td>{{formatSize(asset.size)}}</td>
+            <td>{{formatDate(asset.created_at)}}</td>
+            <td><a :href="asset.browser_download_url">Baixar arquivo</a></td>
+        </tr>
     </tbody>
 </table>
 
@@ -104,13 +123,6 @@ sudo tar -xvf lenz-designer.tar.gz -C /opt/lenz
 ```bash
 # extrai o arquivo .tar.xz para a pasta /opt/lenz
 sudo tar -xvf lenz-designer.tar.xz -C /opt/lenz
-```
-
-### Extração do arquivo .zip
-
-```bash
-# extrai o arquivo .zip para a pasta /opt/lenz
-sudo unzip lenz-designer.zip -d /opt/lenz
 ```
 
 ::: tip

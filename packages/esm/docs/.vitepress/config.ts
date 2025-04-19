@@ -6,7 +6,6 @@ export default defineConfig({
   title: "Lenz Designer",
   description: "API de extensões do Lenz",
   base: process.env.NODE_ENV === "production" ? "/lenz/" : "/",
-
   themeConfig: {
     logo: "/logo.png",
     nav: [
