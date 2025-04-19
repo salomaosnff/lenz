@@ -9,7 +9,7 @@
     "make": "pnpm i && pnpm --filter=builder run make --output=../../dist",
     "build:docs": "pnpm --filter=esm run docs:build && mv packages/esm/docs/.vitepress/dist docs",
     "flatpak:build": "flatpak-builder --repo=repo --force-clean build-dir dev.sallon.lenz.flatpak.yaml",
-    "flatpak:bundle": "flatpak build-bundle repo dist/target/dev.sallon.lenz.flatpak dev.sallon.lenz"
+    "flatpak:bundle": "mkdir -p dist/target && flatpak build-bundle repo dist/target/dev.sallon.lenz.flatpak dev.sallon.lenz"
   },
   "keywords": [],
   "author": "",
