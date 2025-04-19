@@ -37,7 +37,15 @@ pub fn open(url: &str) -> tokio::process::Child {
             .expect("Failed to open browser")
     }
 
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "linux")]
+    {
+        tokio::process::Command::new("xdg-open")
+            .arg(url)
+            .spawn()
+            .expect("Failed to open browser")
+    }
+
+    #[cfg(target_os = "macos")]
     {
         tokio::process::Command::new("open")
             .arg(url)
@@ -54,6 +62,7 @@ pub fn open_in_app_mode(url: &str) -> tokio::process::Child {
             .spawn()
             .expect("Failed to open browser in app mode")
     } else {
+        println!("Chromium-based browser not found, opening in default mode...");
         open(url)
     }
 }
