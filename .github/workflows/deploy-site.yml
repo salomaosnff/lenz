@@ -34,6 +34,12 @@ jobs:
     - name: Build docs
       run: pnpm build:docs
 
+    - name: Build Flatpak repo
+      run: |
+        pnpm flatpak:build
+        pnpm flatpak:bundle
+        cp -r repo docs/flatpak
+
     - name: Upload docs to GitHub Pages
       uses: actions/upload-pages-artifact@v3
       with:
