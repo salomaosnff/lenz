@@ -1,0 +1,35 @@
+id: dev.sallon.lenz
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+  - org.freedesktop.Sdk.Extension.node22
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/node22/bin
+  build-args:
+    - --share=network
+  env:
+    CARGO_HOME: /run/build/rust-flatpak/cargo
+command: lenz
+finish-args:
+  - --share=network
+  - --socket=wayland
+  - --socket=x11
+  - --filesystem=home
+
+modules:
+  - name: Lenz Designer
+    buildsystem: simple
+    build-commands:
+      - rm -rf node_modules packages/*/node_modules extensions/*/frontend/node_modules
+      - npx -y pnpm i
+      - npx -y pnpm make build --clean
+      - cp -r dist/plain/extensions /app/extensions/
+      - cp -r dist/plain/resources /app/resources/
+      - mkdir -p /app/share/applications && cp -r dist/plain/launchers/* /app/share/applications
+      - install -Dm644 dist/plain/resources/icon.png /app/share/icons/hicolor/128x128/apps/dev.sallon.lenz.png
+      - install -Dm755 dist/plain/bin/lenz /app/bin/lenz
+    sources:
+      - type: dir
+        path: .

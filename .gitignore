@@ -5,3 +5,5 @@ dist
 node_modules
 /frontend/packages/app/dist
 packages/esm/docs/.vitepress/cache
+.flatpak-builder
+repo
