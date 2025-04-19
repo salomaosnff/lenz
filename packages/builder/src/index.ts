@@ -2,16 +2,17 @@ import { program } from "commander";
 import { join, dirname, relative, resolve } from "path";
 import { fileURLToPath } from "node:url";
 import { Listr } from "listr2";
-import { remove } from "fs-extra";
+import { ensureDir, remove } from "fs-extra";
 
 import { getBuildAgentTasks } from "./build/agent";
 import { getBuildExtensionsTask } from "./build/extensions";
 import { getBuildFrontendTasks } from "./build/frontend";
-import { getPackDebianTasks } from "./pack/deb";
+import { getPackDebianTasks, Launcher } from "./pack/deb";
 import { getPackArquiveTasks } from "./pack/archive";
 import { getPackAppImageTasks } from "./pack/appimage";
 import { getBuildEsmTasks } from "./build/esm";
 import { clearHashs, isChanged } from "./hash";
+import { writeFile } from "node:fs/promises";
 
 
 const ROOT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../');
@@ -137,6 +138,33 @@ program
             })
           ),
       },
+      {
+        title: "Criar lançador",
+        skip: async () => !options.agent,
+        async task() {
+          const launcher = new Launcher()
+            .setName("Lenz Designer")
+            .setIcon("dev.sallon.lenz")
+            .setComment("Editor de páginas web")
+            .setMimeType("text/html")
+            .setTerminal(false)
+            .setType("Application")
+            .setCategories(["Development"])
+            .setExecutable("lenz %f");
+
+          const iconPath = resolve(
+            process.cwd(),
+            options.output,
+            "plain",
+            "launchers",
+            "dev.sallon.lenz.desktop"
+          )
+
+          await ensureDir(dirname(iconPath));
+
+          await writeFile(iconPath, launcher.toDesktopFile(), 'utf-8')
+        }
+      }
     ]).run();
   });
 
