@@ -42,7 +42,15 @@ Para instalar o Lenz Designer, você precisa possuir os seguintes requisitos:
 | Sistema Operacional                | Qualquer distribuição Linux                                                              |
 | Navegador Web moderno e atualizado | É recomendado um navegador baseado em Chromium como Google Chrome, Brave, Microsoft Edge |
 
-## Downloads
+## Flatpak
+Para instalar o Lenz Designer via Flatpak, execute os comandos abaixo no terminal:
+
+```bash
+flatpak remote-add --if-not-exists flathub https://sallon.dev/lenz/lenz.flatpakrepo
+flatpak install flathub com.sallon.lenz
+```
+
+## Outros métodos de instalação
 
 Lenz Designer está disponível para todas as distribuições Linux. Escolha o pacote de instalação de acordo com o seu sistema operacional ou preferência:
 
