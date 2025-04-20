@@ -5,6 +5,7 @@ on:
         workflows: ["Build and Release"]
         types:
             - completed
+    workflow_dispatch: {}
 permissions:
   contents: write
   pages: write
@@ -16,15 +17,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Importar chaves GPG
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --import
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg.conf
-          echo "use-agent" >> ~/.gnupg/gpg.conf
-          echo RELOADAGENT | gpg-connect-agent
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
       - name: Install Flatpak
         run: |
           sudo apt-get update
