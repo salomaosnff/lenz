@@ -55,7 +55,7 @@ jobs:
       - name: Build Flatpak repo
         run: |
           mkdir -p dist/target
-          flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean build-dir dev.sallon.lenz.flatpak.yaml"
+          flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean build-dir dev.sallon.lenz.flatpak.yaml
           flatpak build-bundle --gpg-sign="contato@sallon.dev" repo dist/target/dev.sallon.lenz.flatpak dev.sallon.lenz
           mv repo docs/flatpak
 
