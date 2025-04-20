@@ -1,6 +1,6 @@
 {
   "name": "lenz",
-  "version": "0.2.2",
+  "version": "0.1.1-0",
   "description": "",
   "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b",
   "main": "index.js",
@@ -13,10 +13,10 @@
     "version:major": "pnpm version major --message 'chore(release): Bump version to v%s'",
     "version:minor": "pnpm version minor --message 'chore(release): Bump version to v%s'",
     "version:patch": "pnpm version patch --message 'chore(release): Bump version to v%s'",
-    "version:premajor": "pnpm version premajor --no-git-tag-version --message 'chore(release): Bump version to v%s'",
-    "version:preminor": "pnpm version preminor --no-git-tag-version --message 'chore(release): Bump version to v%s'",
-    "version:prepatch": "pnpm version prepatch --no-git-tag-version --message 'chore(release): Bump version to v%s'",
-    "version:prerelease": "pnpm version prerelease --no-git-tag-version --message 'chore(release): Bump version to v%s'"
+    "version:premajor": "pnpm version premajor --message 'chore(release): Bump version to v%s'",
+    "version:preminor": "pnpm version preminor --message 'chore(release): Bump version to v%s'",
+    "version:prepatch": "pnpm version prepatch --message 'chore(release): Bump version to v%s'",
+    "version:prerelease": "pnpm version prerelease --message 'chore(release): Bump version to v%s'"
   },
   "keywords": [],
   "author": "",
