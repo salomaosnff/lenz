@@ -144,7 +144,7 @@ program
         skip: async () => !options.agent,
         async task() {
           const data = await fetch('https://api.github.com/repos/salomaosnff/lenz/releases').then(res => res.json());
-          const currentTag = (await execaCommand(`git tag -n -l $(git describe --tags --exact-match)`, {
+          const currentTag = (await execaCommand(`git describe --tags --abbrev=0`, {
             cwd: ROOT_PROJECT,
           })).stdout.trim();
 
@@ -152,26 +152,34 @@ program
 
           if (match) {
             if (match[1].trim() !== data[0].tag_name) {
-              await execaCommand(`pnpm changelogithub --output=RELEASE-CHANGELOG.md`, {
+              const changelogTagRegex = /\{\{\s*CHANGELOG\s*\}\}/gi
+              let releaseBody = await readFile(join(ROOT_PROJECT, ".github/RELEASE_BODY.md"), 'utf-8');
+
+              await execaCommand(`pnpm changelogithub --output=.github/RELEASE_CHANGELOG.md`, {
                 cwd: ROOT_PROJECT,
               });
-              const changelog = await readFile(join(ROOT_PROJECT, "RELEASE-CHANGELOG.md"), 'utf-8');
 
-              await unlink(join(ROOT_PROJECT, "RELEASE-CHANGELOG.md"));
+              const changelog = await readFile(join(ROOT_PROJECT, ".github/RELEASE_CHANGELOG.md"), 'utf-8');
 
-              match[2] ||= changelog
+              await unlink(join(ROOT_PROJECT, ".github/RELEASE_CHANGELOG.md"));
+
+              if (changelogTagRegex.test(releaseBody)) {
+                releaseBody = releaseBody.replace(changelogTagRegex, changelog);
+              } else {
+                releaseBody += `\n\n## Changelog\n\n${changelog}`;
+              }
 
               data.unshift({
-                tag_name: match[1],
+                tag_name: currentTag,
                 published_at: new Date().toISOString(),
-                body: match[2],
+                body: releaseBody,
                 html_url: `https://github.com/salomaosnff/lenz/releases/tag/${match[1]}`,
               });
             }
           }
 
           if (data[0].tag_name !== currentTag) { }
-          const releases = data.map((release: any) => `<release version="${release.tag_name.replace(/^v+/)}" date="${release.published_at}">
+          const releases = data.map((release: any) => `<release version="${release.tag_name.replace(/^v+/, '')}" date="${release.published_at}">
   <description>${release.body}</description>
   <url>${release.html_url}</url>
 </release>`).join('\n');
