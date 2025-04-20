@@ -187,7 +187,11 @@ program
 
           if (data[0].tag_name !== currentTag) { }
           const releases = data.map((release: any) => `<release version="${release.tag_name.replace(/^v+/, '')}" date="${release.published_at}">
-  <description>${release.body}</description>
+  <description>
+  <![CDATA[
+    ${release.body}
+  ]]>
+  </description>
   <url>${release.html_url}</url>
 </release>`).join('\n');
 
@@ -196,13 +200,18 @@ program
   <id>dev.sallon.lenz</id>
   <name>Lenz Designer</name>
   <summary>Editor de páginas web</summary>
-  <developer_name>Salomão Neto</developer_name>
   <description>
     <p>
       Um editor de páginas Web para todos
     </p>
   </description>
   <launchable type="desktop-id">dev.sallon.lenz.desktop</launchable>
+
+  <developer id="sallon.dev">
+    <name>Salomão Neto</name>
+    <url>https://sallon.dev</url>
+  </developer>
+  
   <screenshots>
     <screenshot type="default">
       <image>https://i.imgur.com/eN6BMvV.png</image>
