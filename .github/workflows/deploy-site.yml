@@ -54,8 +54,9 @@ jobs:
 
       - name: Build Flatpak repo
         run: |
-          pnpm flatpak:build
-          pnpm flatpak:bundle
+          mkdir -p dist/target
+          flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean build-dir dev.sallon.lenz.flatpak.yaml"
+          flatpak build-bundle --gpg-sign="contato@sallon.dev" repo dist/target/dev.sallon.lenz.flatpak dev.sallon.lenz
           mv repo docs/flatpak
 
       # Assinar o repositório Flatpak
@@ -64,7 +65,24 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --sign
+          flatpak build-update-repo --gpg-sign="contato@sallon.dev" docs/flatpak
           flatpak build-sign docs/flatpak --gpg-sign="contato@sallon.dev"
+
+      - name: "Create FlatpakRepo"
+        env:
+          GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+        run: |
+          cat <<EOF > docs/lenz.flatpakrepo
+          [Flatpak Repo]
+          Title=LenzDesigner
+          Url=https://sallon.dev/lenz/flatpak
+          Homepage=https://sallon.dev/lenz
+          Comment=Repositório de atualizações do Lenz Designer
+          Description=Repositório de atualizações do Lenz Designer
+          Icon=https://sallon.dev/lenz/logo.png
+          GPGKey=$GPG_KEY
+          EOF
+          echo $GPG_KEY | base64 -d > docs/lenz.gpg
 
       - name: "Create FlatpakRef"
         env:
@@ -83,7 +101,6 @@ jobs:
           License=GPL-3.0-or-later
           GPGKey=$GPG_KEY
           EOF
-          echo $GPG_KEY > docs/lenz.gpg
 
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
