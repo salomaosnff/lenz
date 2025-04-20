@@ -1,8 +1,11 @@
 name: Deploy Website
 description: Deploys the website to GitHub Pages when the build is successful.
 on:
-  release: 
-    types: [created, edited, published, unpublished]
+  workflow_run: 
+    workflows: ["Build and Release"]
+    types:
+      - completed
+  workflow_dispatch:
     
 permissions:
   contents: write
