@@ -83,6 +83,7 @@ jobs:
           License=GPL-3.0-or-later
           GPGKey=$GPG_KEY
           EOF
+          echo $GPG_KEY > docs/lenz.gpg
 
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
