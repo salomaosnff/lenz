@@ -14,6 +14,7 @@ import { getBuildEsmTasks } from "./build/esm";
 import { clearHashs, isChanged } from "./hash";
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { execaCommand } from "execa";
+import { execSync } from "node:child_process";
 
 
 const ROOT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../');
@@ -144,18 +145,22 @@ program
         skip: async () => !options.agent,
         async task() {
           const data = await fetch('https://api.github.com/repos/salomaosnff/lenz/releases').then(res => res.json());
-          const currentTag = (await execaCommand(`git describe --tags --abbrev=0`, {
+          const currentTag = execSync(`git describe --tags --abbrev=0`, {
             cwd: ROOT_PROJECT,
-          })).stdout.trim();
+          }).toString().trim();
 
           const match = currentTag.match(/^(v.*?)\s*(.*)$/);
 
           if (match) {
             if (match[1].trim() !== data[0].tag_name) {
+              const fromTag = execSync(`git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1)`, {
+                cwd: ROOT_PROJECT,
+              }).toString().trim();
+
               const changelogTagRegex = /\{\{\s*CHANGELOG\s*\}\}/gi
               let releaseBody = await readFile(join(ROOT_PROJECT, ".github/RELEASE_BODY.md"), 'utf-8');
 
-              await execaCommand(`pnpm changelogithub --output=.github/RELEASE_CHANGELOG.md`, {
+              await execaCommand(`pnpm changelogithub --output=.github/RELEASE_CHANGELOG.md --from=${fromTag} --to=${currentTag}`, {
                 cwd: ROOT_PROJECT,
               });
 
@@ -175,6 +180,8 @@ program
                 body: releaseBody,
                 html_url: `https://github.com/salomaosnff/lenz/releases/tag/${match[1]}`,
               });
+
+              console.log(data[0])
             }
           }
 
