@@ -27,10 +27,14 @@
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@salomaosnff/eslint-config": "^2.0.2",
+    "@types/jsdom": "^21.1.7",
+    "@types/marked": "^6.0.0",
     "changelogithub": "^13.13.0",
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.27.0",
+    "jsdom": "^26.1.0",
+    "marked": "^15.0.8",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "typescript-eslint": "^8.1.0"

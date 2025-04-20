@@ -16,9 +16,59 @@ import { readFile, unlink, writeFile } from "node:fs/promises";
 import { execaCommand } from "execa";
 import { execSync } from "node:child_process";
 
+import { marked } from "marked";
+import { JSDOM } from "jsdom";
+
 
 const ROOT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../');
 const ROOT_PROJECT = dirname(ROOT_DIR);
+
+function convertMarkdownToAppstream(markdownText: string) {
+  // Converte Markdown para HTML
+  const html = marked(markdownText.replaceAll('&nbsp;', ' ')) as string;
+
+  // Usa JSDOM para manipular o HTML
+  const dom = new JSDOM(html);
+  const document = dom.window.document;
+
+  // Remove tags não suportadas
+  const allowedTags = ["p", "ul", "ol", "li", "em", "code"];
+
+  document.body.querySelectorAll("a").forEach((node) => {
+    // Remove links
+    node.remove();
+  });
+
+  document.body.querySelectorAll("*").forEach((node) => {
+    if (allowedTags.includes(node.tagName.toLowerCase())) {
+      if (node.tagName.toLowerCase() === "li") {
+        node.textContent = (node.textContent?.[0]?.toUpperCase() ?? '') + node.textContent?.slice(1);
+      }
+      return;
+    }
+
+    if (node.tagName.toLowerCase().startsWith("h")) {
+      // Converte cabeçalhos em parágrafos
+      const newNode = document.createElement("p");
+      newNode.innerHTML = node.innerHTML;
+      node.replaceWith(newNode);
+      return;
+    }
+
+    // Substitui a tag não suportada pelo conteúdo interno
+    node.replaceWith(...node.childNodes);
+
+  });
+
+  document.body.querySelectorAll("p").forEach((node) => {
+    if (node.textContent?.trim() === "") {
+      node.remove();
+    }
+  });
+
+  // Retorna o HTML processado como string
+  return document.body.innerHTML.trim();
+}
 
 async function clean(options: any) {
   await remove(join(process.cwd(), options.output));
@@ -188,9 +238,7 @@ program
           if (data[0].tag_name !== currentTag) { }
           const releases = data.map((release: any) => `<release version="${release.tag_name.replace(/^v+/, '')}" date="${release.published_at}">
   <description>
-  <![CDATA[
-    ${release.body}
-  ]]>
+    ${convertMarkdownToAppstream(release.body)}
   </description>
   <url>${release.html_url}</url>
 </release>`).join('\n');
