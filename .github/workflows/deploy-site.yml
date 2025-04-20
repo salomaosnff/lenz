@@ -74,7 +74,7 @@ jobs:
         run: |
           cat <<EOF > docs/lenz.flatpakrepo
           [Flatpak Repo]
-          Title=LenzDesigner
+          Title=Lenz Designer
           Url=https://sallon.dev/lenz/flatpak
           Homepage=https://sallon.dev/lenz
           Comment=Repositório de atualizações do Lenz Designer
