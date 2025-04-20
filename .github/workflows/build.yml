@@ -50,6 +50,11 @@ jobs:
       - name: Build project
         run: pnpm make build
 
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          pnpm changelogithub --output RELEASE.md
+
       - name: Pack as AppImage
         run: pnpm make pack --appimage
       
@@ -59,7 +64,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          body_path: RELEASE.md
           files: |
             dist/target/lenz-designer.AppImage
             dist/target/lenz-designer.tar.gz

@@ -12,7 +12,8 @@ import { getPackArquiveTasks } from "./pack/archive";
 import { getPackAppImageTasks } from "./pack/appimage";
 import { getBuildEsmTasks } from "./build/esm";
 import { clearHashs, isChanged } from "./hash";
-import { writeFile } from "node:fs/promises";
+import { readFile, unlink, writeFile } from "node:fs/promises";
+import { execaCommand } from "execa";
 
 
 const ROOT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../');
@@ -142,6 +143,39 @@ program
         title: "Criar AppStream.xml",
         skip: async () => !options.agent,
         async task() {
+          const data = await fetch('https://api.github.com/repos/salomaosnff/lenz/releases').then(res => res.json());
+          const currentTag = (await execaCommand(`git tag -n -l $(git describe --tags --exact-match)`, {
+            cwd: ROOT_PROJECT,
+          })).stdout.trim();
+
+          const match = currentTag.match(/^(v.*?)\s*(.*)$/);
+
+          if (match) {
+            if (match[1].trim() !== data[0].tag_name) {
+              await execaCommand(`pnpm changelogithub --output=RELEASE-CHANGELOG.md`, {
+                cwd: ROOT_PROJECT,
+              });
+              const changelog = await readFile(join(ROOT_PROJECT, "RELEASE-CHANGELOG.md"), 'utf-8');
+
+              await unlink(join(ROOT_PROJECT, "RELEASE-CHANGELOG.md"));
+
+              match[2] ||= changelog
+
+              data.unshift({
+                tag_name: match[1],
+                published_at: new Date().toISOString(),
+                body: match[2],
+                html_url: `https://github.com/salomaosnff/lenz/releases/tag/${match[1]}`,
+              });
+            }
+          }
+
+          if (data[0].tag_name !== currentTag) { }
+          const releases = data.map((release: any) => `<release version="${release.tag_name.replace(/^v+/)}" date="${release.published_at}">
+  <description>${release.body}</description>
+  <url>${release.html_url}</url>
+</release>`).join('\n');
+
           const appStream = `<?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>dev.sallon.lenz</id>
@@ -187,6 +221,7 @@ program
   </supports>
 
   <content_rating type="oars-1.1" />
+  <releases>${releases}</releases>
 </component>`
 
           const appStreamPath = resolve(
