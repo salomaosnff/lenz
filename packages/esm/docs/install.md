@@ -46,8 +46,8 @@ Para instalar o Lenz Designer, você precisa possuir os seguintes requisitos:
 Para instalar o Lenz Designer via Flatpak, execute os comandos abaixo no terminal:
 
 ```bash
-flatpak remote-add --if-not-exists flathub https://sallon.dev/lenz/lenz.flatpakrepo
-flatpak install flathub com.sallon.lenz
+flatpak --user remote-add --if-not-exists flathub https://sallon.dev/lenz/lenz.flatpakrepo
+flatpak --user install flathub dev.sallon.lenz
 ```
 
 ## Outros métodos de instalação
