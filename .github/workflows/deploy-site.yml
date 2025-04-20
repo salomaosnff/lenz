@@ -16,54 +16,75 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install Flatpak
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y flatpak flatpak-builder
-        flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-        flatpak --user install -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08 org.freedesktop.Sdk.Extension.rust-stable//24.08 org.freedesktop.Sdk.Extension.node22//24.08
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Importar chaves GPG
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --import
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg.conf
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo RELOADAGENT | gpg-connect-agent
+      - name: Install Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak --user install -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08 org.freedesktop.Sdk.Extension.rust-stable//24.08 org.freedesktop.Sdk.Extension.node22//24.08
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set up PNPM
-      uses: pnpm/action-setup@v4
+      - name: Set up PNPM
+        uses: pnpm/action-setup@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 22
-        cache: 'pnpm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
 
-    - name: Install dependencies
-      run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
 
-    - name: Build docs
-      run: pnpm build:docs
+      - name: Build docs
+        run: pnpm build:docs
 
-    - name: Build Flatpak repo
-      run: |
-        pnpm flatpak:build
-        pnpm flatpak:bundle
-        cp -r repo docs/flatpak
+      - name: Build Flatpak repo
+        run: |
+          pnpm flatpak:build
+          pnpm flatpak:bundle
+          mv repo docs/flatpak
 
-    - name: "Create FlatpakRef"
-      run: |
-        cat <<EOF > docs/lenz.flatpakref
-        [Flatpak Ref]
-        Title=Lenz Designer
-        Name=dev.sallon.lenz
-        Branch=master
-        Runtime=org.freedesktop.Platform//24.08
-        Url=https://sallon.dev/lenz/flatpak
-        Arch=x86_64
-        Comment=Um editor de páginas HTML para todos
-        Icon=dev.sallon.lenz
-        EOF
+      # Assinar o repositório Flatpak
+      - name: Sign Flatpak repository
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --sign
+          flatpak build-sign docs/flatpak --gpg-sign="contato@sallon.dev"
 
-    - name: Upload docs to GitHub Pages
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./docs
+      - name: "Create FlatpakRef"
+        env:
+          GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+        run: |
+          cat <<EOF > docs/lenz.flatpakref
+          [Flatpak Ref]
+          Title=Lenz Designer
+          Name=dev.sallon.lenz
+          Branch=master
+          Runtime=org.freedesktop.Platform//24.08
+          Url=https://sallon.dev/lenz/flatpak
+          Arch=x86_64
+          Comment=Um editor de páginas HTML para todos
+          Icon=dev.sallon.lenz
+          License=GPL-3.0-or-later
+          GPGKey=$GPG_KEY
+          EOF
+
+      - name: Upload docs to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
 
   # Deployment job
   deploy:
