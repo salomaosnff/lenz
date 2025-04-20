@@ -1,9 +1,10 @@
 name: Build and Release
 
+# Dispatch on new tag
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*.*.*'
 permissions:
   contents: write
 
@@ -58,7 +59,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.vars.outputs.sha_short }}
+          tag_name: v${{ github.event.ref }}
           files: |
             dist/target/lenz-designer.AppImage
             dist/target/lenz-designer.tar.gz

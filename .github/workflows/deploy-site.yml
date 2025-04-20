@@ -5,7 +5,13 @@ on:
         workflows: ["Build and Release"]
         types:
             - completed
-    workflow_dispatch: {}
+    workflow_dispatch:
+        inputs:
+            deploy:
+                description: 'Deploy to GitHub Pages'
+                required: true
+                default: true
+                type: boolean
 permissions:
   contents: write
   pages: write
