@@ -38,13 +38,5 @@ export function FileList(props: FileListProps) {
 
   const viewProps = useMemo(() => ({ entries, ...props }), [entries, props]);
 
-  return (
-    <div>
-      {props.gridView ? (
-        <FileGridView {...viewProps} />
-      ) : (
-        <FileListView {...viewProps} />
-      )}
-    </div>
-  );
+  return props.gridView ? <FileGridView {...viewProps} /> : <FileListView {...viewProps} />;
 }
