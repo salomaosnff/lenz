@@ -57,6 +57,15 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
   }
 
   function handleKeyDown(event: KeyboardEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // if (event.key === "Escape") {
+    //   currentPressedKeys.clear();
+    //   showHotKeys.value = false;
+    //   return;
+    // }
+
     if (isInEditableField(activeElement.value)) {
       return;
     }
@@ -103,13 +112,14 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
         continue;
       }
 
-      event.preventDefault();
-
       commandStore.executeCommand(command);
     }
   }
 
   function handleKeyUp(event: KeyboardEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+
     const key = getKeyName(event);
 
     if (currentPressedKeys.has(key)) {

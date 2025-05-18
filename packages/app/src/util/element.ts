@@ -1,39 +1,35 @@
 export function getSpecificElementSelector(element: HTMLElement): string {
-  if (element.tagName === "BODY" || element.tagName === "HTML") {
-    return element.tagName.toLowerCase();
-  }
-
-  let current: HTMLElement | null = element;
-
   const path: string[] = [];
 
-  while (current) {
-    if (current.tagName === "BODY" || current.tagName === "HTML") {
-        break;
-    }
+  let currentElement: HTMLElement | null = element;
 
-    if (current.id) {
-      path.push(`#${current.id}`);
+  while (currentElement) {
+    if (currentElement.id) {
+      path.unshift(`#${currentElement.id}`);
       break;
     }
 
-    let selector = current.tagName.toLowerCase();
+    let selector = currentElement.tagName.toLowerCase();
 
-    if (current.classList.length) {
-      selector += "." + Array.from(current.classList).join(".");
+    if (currentElement.classList.length) {
+      selector += `.${Array.from(currentElement.classList)
+        .map((className) => className.trim())
+        .join(".")}`;
     }
 
-    if (current.parentElement) {
-      const siblings = Array.from(current.parentElement.children);
-      const index = siblings.indexOf(current);
+    const siblings = Array.from(
+      currentElement.parentElement?.children ?? []
+    ).filter((el) => el.tagName === currentElement?.tagName);
 
-      selector += `:nth-child(${index + 1})`;
+    if (siblings.length > 1) {
+      const index = siblings.indexOf(currentElement);
+      selector += `:nth-of-type(${index + 1})`;
     }
 
-    path.push(selector);
-    
-    current = current.parentElement;
+    path.unshift(selector);
+
+    currentElement = currentElement.parentElement;
   }
 
-  return path.reverse().join(" > ");
+  return path.join(" > ");
 }
