@@ -1,5 +1,6 @@
 import "@unocss/reset/tailwind-compat.css";
 import "uno.css";
+import './components/AppCodeEditor/worker'
 
 import "./style.css";
 
@@ -24,7 +25,7 @@ Object.defineProperty(window, "__LENZ_VUE_COMPONENTS__", {
   value: Object.fromEntries(
     Object.entries(import.meta.glob<{
       default: Component & { __name: string };
-    }>("../../ui/src/components/**/*.vue", {eager: true})).map(([path, component]) => {
+    }>("../../ui/src/components/**/*.vue", { eager: true })).map(([path, component]) => {
       return [
         component.default.__name ?? /([^/]+)\.vue$/.exec(path)?.[1] ?? "Unknown",
         component.default
@@ -32,3 +33,7 @@ Object.defineProperty(window, "__LENZ_VUE_COMPONENTS__", {
     })
   ),
 });
+
+document.addEventListener("keydown", (e) => {
+  e.preventDefault();
+}, { capture: true });

@@ -1,11 +1,13 @@
-import vue from "@vitejs/plugin-vue";
-import path, { join } from "path";
+import path, { join } from "node:path";
+import url from "node:url";
+
+import { defineConfig } from "vite";
 import Uno from "unocss/vite";
+import vue from "@vitejs/plugin-vue";
+
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import VueRouter from "unplugin-vue-router/vite";
-import url from "url";
-import { defineConfig } from "vite";
 
 import Lenz from "@lenz-design/vite-plugin";
 
@@ -19,11 +21,6 @@ export default defineConfig({
     Uno({
       configFile: "../ui/uno.config.ts",
     }),
-    // monaco({
-    //   features: "all",
-    //   languages: ["typescript", "javascript", "json", "css", "html"],
-    //   globalAPI: true,
-    // }),
     Lenz({
       lenzExecutable: join(PROJECT_ROOT, "../../dist/plain/bin/lenz"),
     }),

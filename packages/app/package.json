@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bithero/monaco-editor-vite-plugin": "^1.0.2",
+    "@emmetio/expand-abbreviation": "^0.7.3",
     "@lenz-design/types": "link:../esm-types",
     "@lenz-design/vite-plugin": "link:../vite-lenz",
     "@mdi/js": "^7.4.47",

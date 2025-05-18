@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppCodeEditor from "../components/AppCodeEditor.vue";
+import AppCodeEditor from "../components/AppCodeEditor/AppCodeEditor.vue";
 
 const code = ref(`
 <h1>Hello, World!</h1>

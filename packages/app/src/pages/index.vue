@@ -68,7 +68,7 @@ const recents = computed<
 
   return fileStore.recents.map((filename: string) => {
     const name =
-      filename.substring(commonPrefix.length) || filename.split("/").pop();
+      filename.substring(commonPrefix.length) || filename.split("/").pop()!;
     return {
       filename,
       name: name !== filename && name?.includes("/") ? `.../${name}` : name,
@@ -77,12 +77,9 @@ const recents = computed<
 });
 </script>
 <template>
-  <div
-    class="w-full h-full flex flex-col"
-    :class="{
-      'pointer-events-none': lockIframe,
-    }"
-  >
+  <div class="w-full h-full flex flex-col" :class="{
+    'pointer-events-none': lockIframe,
+  }">
     <div class="app-titlebar">
       <div class="flex gap-2 items-center">
         <div class="inline-flex gap-2 font-bold ml-2 items-center">
@@ -92,64 +89,39 @@ const recents = computed<
         <p>
           {{ fileStore.currentFile?.filepath }}
         </p>
-        <span
-          v-if="fileStore.currentFile?.dirty"
-          class="w-3 h-3 bg--warning rounded-full"
-          title="O arquivo foi modificado"
-        ></span>
+        <span v-if="fileStore.currentFile?.dirty" class="w-3 h-3 bg--warning rounded-full"
+          title="O arquivo foi modificado"></span>
         <div class="flex-1"></div>
-        <UiBtn
-          class="ma-2"
-          v-if="fileStore.currentFile"
-          @click="codeMode = !codeMode"
-        >
+        <UiBtn class="ma-2" v-if="fileStore.currentFile" @click="codeMode = !codeMode">
           <span v-if="codeMode">Modo Visual</span>
           <span v-else>Modo Código</span>
         </UiBtn>
       </div>
       <AppMenubar v-if="fileStore.currentFile" />
     </div>
-    <AppCommandPalette
-      class="fixed top-12 left-50% w-120 translate-x--50% z-9999"
-    />
-    <div
-      class="app-editor-view w-full h-full relative justify-center items-center"
-    >
-      <div
-        v-if="!fileStore.currentFile"
-        class="w-full h-full flex-center bg--surface"
-      >
+    <AppCommandPalette class="fixed top-12 left-50% w-120 translate-x--50% z-9999" />
+    <div class="app-editor-view overflow-hidden w-full h-full relative justify-center items-center">
+      <div v-if="!fileStore.currentFile" class="w-full h-full flex-center bg--surface">
         <div>
           <h1 class="text-8 mb-4">Bem-vindo ao Lenz Designer</h1>
           <h2 class="text-6 mb-4">Comece a Editar</h2>
           <ul class="mb-4 flex flex-col">
-            <li
-              class="inline-flex items-center gap-2 py-1 cursor-pointer hover:underline py-1 fg--primary"
-            >
+            <li class="inline-flex items-center gap-2 py-1 cursor-pointer hover:underline py-1 fg--primary">
               <UiIcon :path="newFileIcon" class="text-6 w-6" />
               <a href="#" @click="commandStore.executeCommand('file.new.html')">
-                Criar um novo arquivo</a
-              >
+                Criar um novo arquivo</a>
             </li>
-            <li
-              class="inline-flex items-center gap-2 cursor-pointer hover:underline py-1 fg--primary"
-              @click="commandStore.executeCommand('file.open.html')"
-            >
+            <li class="inline-flex items-center gap-2 cursor-pointer hover:underline py-1 fg--primary"
+              @click="commandStore.executeCommand('file.open.html')">
               <UiIcon :path="openFileIcon" class="text-6 w-6" />
               <span>Abrir um arquivo existente</span>
             </li>
           </ul>
           <h2 class="text-6 mb-2">Recentes</h2>
           <ul>
-            <li
-              v-for="recent in recents"
-              :key="recent.filename"
-              :title="recent.filename"
-            >
-              <router-link
-                :to="{ query: { file: recent.filename } }"
-                class="inline-flex items-center gap-2 cursor-pointer hover:underline py-1"
-              >
+            <li v-for="recent in recents" :key="recent.filename" :title="recent.filename">
+              <router-link :to="{ query: { file: recent.filename } }"
+                class="inline-flex items-center gap-2 cursor-pointer hover:underline py-1">
                 <UiIcon :path="fileIcon" class="text-6" />
                 <span>{{ recent.name }}</span>
               </router-link>
@@ -157,33 +129,18 @@ const recents = computed<
           </ul>
         </div>
       </div>
-      <AppCodeEditor
-        v-if="codeMode"
-        :modelValue="html"
-        class="w-full h-full"
-        language="html"
+      <AppCodeEditor v-if="codeMode" :modelValue="html" class="w-full h-full" language="html"
         @save="fileStore.currentFile?.save($event)"
-        @update:modelValue="
-          fileStore.writeFile(fileStore.currentFile?.filepath, $event)
-        "
-      />
+        @update:modelValue=" fileStore.currentFile && fileStore.writeFile(fileStore.currentFile?.filepath, $event)" />
       <div v-show="html" class="pa-4 h-full flex-1">
-        <AppCanvas
-          v-model="editor.currentDocument"
-          v-model:active="editor.selectedElements"
-          v-model:hover="editor.hoveredElement"
-          :html="html"
-          :is-mobile
-          :hidden="codeMode"
-          class="mx-auto h-full bg-white"
-          :style="{
+        <AppCanvas v-if="!codeMode" v-model="editor.currentDocument" v-model:active="editor.selectedElements"
+          v-model:hover="editor.hoveredElement" :html="html" :is-mobile :hidden="codeMode"
+          class="mx-auto h-full bg-white" :style="{
             maxWidth: `${settingsStore.settings.frame.width}px`,
-          }"
-          @dom-update="
+          }" @dom-update="
             fileStore.currentFile &&
-              fileStore.writeFile(fileStore.currentFile?.filepath, $event)
-          "
-        />
+            fileStore.writeFile(fileStore.currentFile?.filepath, $event)
+            " />
       </div>
     </div>
     <AppWindowManager />
@@ -198,7 +155,8 @@ const recents = computed<
 }
 
 .app-editor-view {
-  --s: 64px; /* control the size*/
+  --s: 64px;
+  /* control the size*/
   --c1: var(--color-surface-muted);
   --c2: var(--color-surface);
 
