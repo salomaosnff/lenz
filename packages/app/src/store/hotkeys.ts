@@ -57,9 +57,6 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
   }
 
   function handleKeyDown(event: KeyboardEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-
     // if (event.key === "Escape") {
     //   currentPressedKeys.clear();
     //   showHotKeys.value = false;
@@ -69,6 +66,9 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
     if (isInEditableField(activeElement.value)) {
       return;
     }
+
+    event.preventDefault();
+    event.stopPropagation();
 
     const key = getKeyName(event);
 
@@ -117,6 +117,10 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
   }
 
   function handleKeyUp(event: KeyboardEvent) {
+    if (isInEditableField(activeElement.value)) {
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 

@@ -33,7 +33,3 @@ Object.defineProperty(window, "__LENZ_VUE_COMPONENTS__", {
     })
   ),
 });
-
-document.addEventListener("keydown", (e) => {
-  e.preventDefault();
-}, { capture: true });
