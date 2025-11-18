@@ -34,7 +34,7 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
 
   const hotKeyToCommand = new Map<Hotkey, string>();
   const commandToHotKey = new Map<string, Hotkey>();
-  const currentPressedKeys = new Set<AnyKey>();
+  const currentPressedKeys = reactive(new Set<AnyKey>());
   const activeElement = useActiveElement();
   const showHotKeys = ref(false);
 
@@ -117,10 +117,6 @@ export const useHotKeysStore = defineStore("hotkeys", () => {
   }
 
   function handleKeyUp(event: KeyboardEvent) {
-    if (isInEditableField(activeElement.value)) {
-      return;
-    }
-
     event.preventDefault();
     event.stopPropagation();
 

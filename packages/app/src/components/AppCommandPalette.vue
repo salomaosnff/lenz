@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import gsap from "gsap";
+import { AnyKey } from "lenz:hotkeys";
 
 const commandStore = useCommandsStore();
 const hotkeyStore = useHotKeysStore();
@@ -118,60 +119,55 @@ function onLeave(el: any, done: any) {
     onComplete: done,
   });
 }
+const suggestedHotKeys = computed(() => {
+  const pressedKeys = Array.from(hotkeyStore.pressedKeys);
+
+  if (pressedKeys.length === 0) {
+    return [];
+  }
+
+  return allCommands.value.filter((entry) => {
+    const hotkey = new Set(hotkeyStore.commandToHotKey.get(entry.command.id)?.split("+") as AnyKey[]);
+
+    if (!hotkey) {
+      return false;
+    }
+
+    return pressedKeys.every((part) => hotkey.has(part));
+  });
+})
+
+const attrs = useAttrs()
+defineOptions({
+  inheritAttrs: false,
+});
 </script>
 <template>
   <Transition>
-    <div
-      v-if="commandStore.showCommands"
+    <div v-if="commandStore.showCommands" v-bind="attrs"
       class="app-hotkeys-pallete w-full max-w-768px translate-x--50% left-50% pa-4"
-      @keydown.esc="commandStore.showCommands = false"
-      @keydown.arrow-down="selectedIndex++"
-      @keydown.arrow-up="selectedIndex--"
-      @keydown.enter="
+      @keydown.esc="commandStore.showCommands = false" @keydown.arrow-down="selectedIndex++"
+      @keydown.arrow-up="selectedIndex--" @keydown.enter="
         selectedIndex > 0 &&
-          ((commandStore.showCommands = false),
+        ((commandStore.showCommands = false),
           commandStore.executeCommand(
             filteredCommands[selectedIndex].command.id
           ))
-      "
-    >
+        ">
       <AppPanel ref="element" class="flex flex-col overflow-clip">
         <h1 class="text-6">Paleta de comandos</h1>
-        <UiTextField
-          v-model="query"
-          type="search"
-          autofocus
-          class="w-full mt-4"
-          placeholder="Pesquisar comandos..."
-          @focus="selectedIndex = -1"
-        />
-        <TransitionGroup
-          tag="ul"
-          :css="false"
-          class="overflow-y-auto flex-1 max-h-100 pr-2"
-          @before-enter="onBeforeEnter"
-          @enter="onEnter"
-          @leave="onLeave"
-        >
-          <li
-            v-for="({ key, command }, index) of filteredCommands"
-            :key="command.id"
-            ref="results"
-            :data-index="index"
-            class="overflow-hidden mb-1"
-            @click="
+        <UiTextField v-model="query" type="search" autofocus class="w-full mt-4" placeholder="Pesquisar comandos..."
+          @focus="selectedIndex = -1" />
+        <TransitionGroup tag="ul" :css="false" class="overflow-y-auto flex-1 max-h-100 pr-2"
+          @before-enter="onBeforeEnter" @enter="onEnter" @leave="onLeave">
+          <li v-for="({ key, command }, index) of filteredCommands" :key="command.id" ref="results" :data-index="index"
+            class="overflow-hidden mb-1" @click="
               commandStore.executeCommand(command.id),
-                (commandStore.showCommands = false)
-            "
-          >
-            <div
-              class="flex gap-2 rounded-md pa-2 cursor-pointer hover:bg--surface-muted items-center w-full"
-              :class="{ 'bg--surface-muted': selectedIndex === index }"
-            >
-              <UiIcon
-                :path="command.icon ?? ''"
-                class="block !w-8 !h-8 self-start mt-0.5"
-              />
+              (commandStore.showCommands = false)
+              ">
+            <div class="flex gap-2 rounded-md pa-2 cursor-pointer hover:bg--surface-muted items-center w-full"
+              :class="{ 'bg--surface-muted': selectedIndex === index }">
+              <UiIcon :path="command.icon ?? ''" class="block !w-8 !h-8 self-start mt-0.5" />
               <div class="flex-1">
                 <p>
                   {{ command.name }}
@@ -185,10 +181,25 @@ function onLeave(el: any, done: any) {
       </AppPanel>
     </div>
   </Transition>
+
+  <Transition>
+    <div v-if="suggestedHotKeys.length"
+      class="app-command-hint fixed top-24 right-2 z-10 bg--surface pa-3 rounded-md shadow-md max-w-100 pointer-events-none overflow-hidden">
+      <h1 class="text-5 mb">Tente estas combinações</h1>
+      <TransitionGroup tag="ul" @before-enter="onBeforeEnter" @enter="onEnter" @leave="onLeave">
+        <li v-for="({ key, command }, index) in suggestedHotKeys.slice(0, 20)" :key="command.id">
+          <UiKbd class="text-3 py-1 mr-1">
+            {{ key }}
+          </UiKbd>
+          <span class="text-3">{{ command.name }}</span>
+        </li>
+      </TransitionGroup>
+    </div>
+  </Transition>
 </template>
 <style lang="scss">
 .app-hotkeys-pallete {
-  & > .app-panel {
+  &>.app-panel {
     box-shadow: 0 0 0 150vmax rgba(0, 0, 0, 0.5);
   }
 
@@ -201,6 +212,20 @@ function onLeave(el: any, done: any) {
   &.v-leave-to {
     opacity: 0;
     transform: translate(-50%, -100%);
+  }
+}
+
+.app-command-hint {
+
+  &.v-enter-active,
+  &.v-leave-active {
+    transition: all 0.3s;
+  }
+
+  &.v-enter-from,
+  &.v-leave-to {
+    opacity: 0;
+    transform: translate(100%, 0);
   }
 }
 </style>
