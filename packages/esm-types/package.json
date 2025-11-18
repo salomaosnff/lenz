@@ -1,6 +1,6 @@
 {
     "name": "@lenz-design/types",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "author": "Salomão Neto <contato@sallon.dev>",
     "description": "Tipagens do Lenz Designer",
     "types": "index.d.ts",
