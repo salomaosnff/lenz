@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const schema = ref<JSONSchema7>();
-const attrs = ref<Record<string, string>>({});
+const lazyAttrs = ref<Record<string, string>>({});
 const tagName = ref<string[]>();
 
 const { selection } = props.getData();
@@ -23,7 +23,7 @@ const { selection } = props.getData();
 function updateSelection() {
   tagName.value = selection.value.map(({ element }) => element.tagName.toLowerCase());
 
-  attrs.value = Object.fromEntries(
+  lazyAttrs.value = Object.fromEntries(
     selection.value.flatMap(({ element }) =>
       Array.from(element.attributes).map((attr) => [attr.name, attr.value])
     )
@@ -51,14 +51,14 @@ LenzReactivity.watch(selection, updateSelection, { immediate: true });
 
 let timer: number | undefined;
 
-function debouncedSend() {
+function send() {
   clearTimeout(timer);
   timer = setTimeout(() => {
     const element = selection.value[0]?.element;
 
     if (!element) return;
 
-    for (const [key, value] of Object.entries(attrs.value)) {
+    for (const [key, value] of Object.entries(lazyAttrs.value)) {
       if (value === undefined || value === "" || value === null) {
         element.removeAttribute(key);
       } else {
@@ -68,14 +68,12 @@ function debouncedSend() {
   }, 1000 / 30);
 }
 
-watch(attrs, debouncedSend, { deep: true });
-
 const html = computed(() => {
 
   return selection.value.map(({ element }) => {
     let str = "<" + element.tagName.toLowerCase();
 
-    for (const [key, value] of Object.entries(attrs.value)) {
+    for (const [key, value] of Object.entries(lazyAttrs.value)) {
       str += `\n  ${key}`;
 
       if (value === undefined || value === "" || value === null) {
@@ -94,8 +92,8 @@ const html = computed(() => {
 
 <template>
   <div class="pa-4">
-    <div class="flex gap-2">
-      <JsonForm v-if="schema" :schema v-model="attrs" class="flex-1" />
+    <div class="flex gap-2" @blur.capture="send">
+      <JsonForm v-if="schema" :schema v-model="lazyAttrs" class="flex-1" />
       <div v-else class="flex-1">Selecione um elemento</div>
       <pre class="overflow-auto w-70 pa-2 bg-[var(--color-surface2)]">{{
         html
