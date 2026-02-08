@@ -46,7 +46,7 @@ Para instalar o Lenz Designer, você precisa possuir os seguintes requisitos:
 Para instalar o Lenz Designer utilizando o script automatizado, execute os comandos abaixo no terminal:
 
 ```bash
-sh <(curl -sL https://sallon.dev/lenz/install.sh)
+curl -sL https://sallon.dev/lenz/install.sh | sudo sh
 ```
 
 ## Flatpak

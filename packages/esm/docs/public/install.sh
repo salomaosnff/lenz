@@ -1,5 +1,13 @@
 #!/bin/env sh
 VERSION="v0.1.8"
+CURRENT_VERSION="none"
+
+if [ -f /usr/share/metainfo/dev.sallon.lenz.metainfo.xml ]; then
+  CURRENT_VERSION=$(xmllint --xpath "string(//releases/release[1]/@version)" /usr/share/metainfo/dev.sallon.lenz.metainfo.xml 2>/dev/null || echo "")
+  if [ -n "$CURRENT_VERSION" ]; then
+    CURRENT_VERSION="v$CURRENT_VERSION"
+  fi
+fi
 
 # Check if the script is run as root
 if [ "$EUID" -ne 0 ]; then
@@ -8,11 +16,6 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 TARBALL_URL="https://github.com/salomaosnff/lenz/releases/download/${VERSION}/lenz-designer.tar.xz"
-
-get_latest_version() {
-  local LATEST_VERSION=$(curl -sL https://api.github.com/repos/salomaosnff/lenz/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-  echo "$LATEST_VERSION"
-}
 
 command_install() {
   TMP_DIR=$(mktemp -d)
@@ -37,8 +40,6 @@ command_install() {
 }
 
 command_uninstall() {
-  CURRENT_VERSION=$(get_installed_version)
-
   if [ "$CURRENT_VERSION" = "none" ]; then
     echo "Lenz Designer não está instalado."
     exit 1
@@ -50,10 +51,6 @@ command_uninstall() {
 }
 
 command_update() {
-  CURRENT_VERSION=$(get_installed_version)
-
-  echo "Versão atual instalada: $CURRENT_VERSION"
-  
   if [ "$CURRENT_VERSION" = "none" ]; then
     echo "Lenz Designer não está instalado. Use 'install' para instalar."
     exit 1
@@ -68,11 +65,17 @@ command_update() {
   fi
 }
 
-# check if command is a defined function
-if declare -f "command_$1" > /dev/null; then
+# Check if $1 is empty
+if [ -z "$1" ]; then
+  if [ "$CURRENT_VERSION" = "none" ]; then
+    command_install
+  else
+    command_update
+  fi
+elif declare -f "command_$1" > /dev/null; then
   "command_$1"
 else
   echo "Comando desconhecido: $1"
-  echo "Uso: <install|uninstall>"
+  echo "Uso: [install|uninstall|update]"
   exit 1
 fi
