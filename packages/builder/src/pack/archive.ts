@@ -23,7 +23,7 @@ export async function getPackArquiveTasks(options: PackArchiveOptions): Promise<
       async task(_, task) {
         const archiveFilename = join(options.output, `${prefix}.tar.gz`);
 
-        const execute = command(`tar -czvf ${archiveFilename} ${options.input}`);
+        const execute = command(`tar -czvf ${archiveFilename} -C ${options.input} .`);
 
         execute.stdout.pipe(task.stdout());
         execute.stderr.pipe(task.stdout());
@@ -51,7 +51,7 @@ export async function getPackArquiveTasks(options: PackArchiveOptions): Promise<
       async task(_, task) {
         const archiveFilename = join(options.output, `${prefix}.tar.xz`);
 
-        const execute = command(`tar -cJvf ${archiveFilename} ${options.input}`);
+        const execute = command(`tar -cJvf ${archiveFilename} -C ${options.input} .`);
 
         execute.stdout.pipe(task.stdout());
         execute.stderr.pipe(task.stdout());
