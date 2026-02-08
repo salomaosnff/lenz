@@ -1,5 +1,4 @@
 name: Deploy Website
-description: Deploys the website to GitHub Pages when the build is successful.
 on:
   workflow_run:
     workflows: ["Build and Release"]
