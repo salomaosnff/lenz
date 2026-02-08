@@ -101,8 +101,7 @@ jobs:
 
       - name: "Update VERSION in install script"
         run: |
-          # set VERSION variable in install.sh
-          sed -i "0,/VERSION=.*/{s//VERSION=\"${GITHUB_REF#refs/tags/}\"/;b};" install.sh
+          sed -i "0,/VERSION=.*/{s//VERSION=\"${{github.ref_name}}\"/;b};" install.sh
 
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
