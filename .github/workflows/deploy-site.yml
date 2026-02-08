@@ -1,12 +1,12 @@
 name: Deploy Website
 description: Deploys the website to GitHub Pages when the build is successful.
 on:
-  workflow_run: 
+  workflow_run:
     workflows: ["Build and Release"]
     types:
       - completed
   workflow_dispatch:
-    
+
 permissions:
   contents: write
   pages: write
@@ -41,7 +41,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -90,7 +90,7 @@ jobs:
           Title=Lenz Designer
           Name=dev.sallon.lenz
           Branch=master
-          Runtime=org.freedesktop.Platform//24.08
+          Runtime=org.freedesktop.Platform//25.08
           Url=https://sallon.dev/lenz/flatpak
           Arch=x86_64
           Comment=Um editor de páginas HTML para todos
@@ -98,6 +98,11 @@ jobs:
           License=GPL-3.0-or-later
           GPGKey=$GPG_KEY
           EOF
+
+      - name: "Update VERSION in install script"
+        run: |
+          # set VERSION variable in install.sh
+          sed -i "0,/VERSION=.*/{s//VERSION=\"${GITHUB_REF#refs/tags/}\"/;b};" install.sh
 
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
