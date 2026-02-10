@@ -225,7 +225,7 @@ jobs:
           mv flatpak/lenz.flatpakrepo docs/lenz.flatpakrepo
           mv flatpak/lenz.flatpakref docs/lenz.flatpakref
           mv flatpak/lenz.gpg docs/lenz.gpg
-          mv flatpak docs/flatpak
+          mv flatpak/repo docs/flatpak
 
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
