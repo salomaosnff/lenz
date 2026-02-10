@@ -43,10 +43,16 @@ Para instalar o Lenz Designer, você precisa possuir os seguintes requisitos:
 | Navegador Web moderno e atualizado | É recomendado um navegador baseado em Chromium como Google Chrome, Brave, Microsoft Edge |
 
 ## Script automatizado de instalação
-Para instalar o Lenz Designer utilizando o script automatizado, execute os comandos abaixo no terminal:
+Para instalar o Lenz Designer utilizando o script automatizado, execute o comando abaixo no terminal:
 
 ```bash
 curl -sL https://sallon.dev/lenz/install.sh | sudo sh
+```
+
+Para desinstalar o Lenz Designer utilizando o script automatizado, execute o comando abaixo no terminal:
+
+```bash
+curl -sL https://sallon.dev/lenz/install.sh | sudo sh -s -- uninstall
 ```
 
 ## Flatpak
