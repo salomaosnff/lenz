@@ -113,7 +113,7 @@ jobs:
           mkdir -p dist/target
           mkdir -p flatpak
           sudo dbus-uuidgen --ensure=/etc/machine-id
-          flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean --ccache build-dir dev.sallon.lenz.flatpak.yaml
+          flatpak-builder --disable-rofiles-fuse --gpg-sign="contato@sallon.dev" --repo=repo --force-clean --ccache build-dir dev.sallon.lenz.flatpak.yaml
           flatpak build-bundle --gpg-sign="contato@sallon.dev" repo flatpak/dev.sallon.lenz.flatpak dev.sallon.lenz
           mv repo flatpak/repo
 
