@@ -222,13 +222,12 @@ jobs:
 
       - name: Move flatpak repo to github_pages
         run: |
-          mv docs github_pages
-          mv flatpak github_pages/flatpak
+          mv flatpak docs/flatpak
 
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./github_pages
+          path: ./docs
 
   create_release:
     needs: [organize_artifacts, build_binaries]
@@ -264,9 +263,9 @@ jobs:
           tag_name: ${{ github.ref_name }}
           body_path: RELEASE.md
           files: |
-            dist/target/lenz-designer.AppImage
-            dist/target/lenz-designer.tar.gz
-            dist/target/lenz-designer.tar.xz
+            lenz-designer.AppImage
+            lenz-designer.tar.gz
+            lenz-designer.tar.xz
 
   deploy_pages:
     needs: [organize_artifacts, create_release]
