@@ -222,6 +222,9 @@ jobs:
 
       - name: Move flatpak repo to github_pages
         run: |
+          mv flatpak/lenz.flatpakrepo docs/lenz.flatpakrepo
+          mv flatpak/lenz.flatpakref docs/lenz.flatpakref
+          mv flatpak/lenz.gpg docs/lenz.gpg
           mv flatpak docs/flatpak
 
       - name: Upload docs to GitHub Pages
