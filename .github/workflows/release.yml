@@ -218,7 +218,7 @@ jobs:
 
       - name: Update VERSION in install script
         run: |
-          sed -i "0,/VERSION=.*/{s//VERSION=\"${{github.ref_name}}\"/;b};" github_pages/install.sh
+          sed -i "0,/VERSION=.*/{s//VERSION=\"${{github.ref_name}}\"/;b};" docs/install.sh
 
       - name: Move flatpak repo to github_pages
         run: |
