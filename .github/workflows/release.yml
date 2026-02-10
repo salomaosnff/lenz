@@ -1,0 +1,233 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build_binaries:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install FUSE
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fuse
+
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: ⚡ Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            agent/target
+            extensions/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js with Corepack
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+
+      - name: Build project
+        run: pnpm make build
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          pnpm changelogithub --output RELEASE.md
+
+      - name: Pack as AppImage
+        run: pnpm make pack --appimage
+      
+      - name: Pack as tar.gz and tar.xz
+        run: pnpm make pack --archive
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: dist/target/
+
+  build_flatpak_repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Install Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak --user install -y flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08 org.freedesktop.Sdk.Extension.rust-stable//25.08 org.freedesktop.Sdk.Extension.node22//25.08
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up PNPM
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Flatpak repo
+        run: |
+          mkdir -p dist/target
+          flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean build-dir dev.sallon.lenz.flatpak.yaml
+          flatpak build-bundle --gpg-sign="contato@sallon.dev" repo dist/target/dev.sallon.lenz.flatpak dev.sallon.lenz
+          mv repo flatpak_repo
+
+      # Assinar o repositório Flatpak
+      - name: Sign Flatpak repository
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --sign
+          flatpak build-update-repo --gpg-sign="contato@sallon.dev" flatpak_repo
+          flatpak build-sign flatpak_repo --gpg-sign="contato@sallon.dev"
+
+      - name: "Create FlatpakRepo"
+        env:
+          GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+        run: |
+          cat <<EOF > docs/lenz.flatpakrepo
+          [Flatpak Repo]
+          Title=Lenz Designer
+          Url=https://sallon.dev/lenz/flatpak
+          Homepage=https://sallon.dev/lenz
+          Comment=Repositório de atualizações do Lenz Designer
+          Description=Repositório de atualizações do Lenz Designer
+          Icon=https://sallon.dev/lenz/logo.png
+          GPGKey=$GPG_KEY
+          EOF
+          echo $GPG_KEY | base64 -d > docs/lenz.gpg
+
+      - name: "Create FlatpakRef"
+        env:
+          GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+        run: |
+          cat <<EOF > docs/lenz.flatpakref
+          [Flatpak Ref]
+          Title=Lenz Designer
+          Name=dev.sallon.lenz
+          Branch=master
+          Runtime=org.freedesktop.Platform//24.08
+          Url=https://sallon.dev/lenz/flatpak
+          Arch=x86_64
+          Comment=Um editor de páginas HTML para todos
+          Icon=dev.sallon.lenz
+          License=GPL-3.0-or-later
+          GPGKey=$GPG_KEY
+          EOF
+
+      - name: Save Flatpak repo
+        uses: actions/upload-artifact@v4
+        with:
+          name: flatpak-repo
+          path: flatpak_repo
+
+  build_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up PNPM
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build docs
+        run: pnpm build:docs
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: docs
+  
+  organize_artifacts:
+    needs: [build_binaries, build_flatpak_repo, build_docs]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download binaries artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries
+          path: dist/target
+
+      - name: Download flatpak repo artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: flatpak-repo
+          path: flatpak_repo
+
+      - name: Download docs artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docs
+          path: docs
+
+      - name: Organize files
+        run: |
+          mkdir -p github_pages
+          mv -r docs/* github_pages/
+          mv -r flatpak_repo/ github_pages/flatpak/
+
+      - name: Upload docs to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./github_pages
+  deploy_pages:
+    needs: [organize_artifacts]
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+    
+    
+    
