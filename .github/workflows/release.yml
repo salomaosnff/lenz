@@ -12,7 +12,6 @@ permissions:
 jobs:
   build_binaries:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -72,16 +71,24 @@ jobs:
 
   build_flatpak_repo:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
+      options: --privileged
     steps:
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: ⚡ Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-flatpak-${{ hashFiles('**/dev.sallon.lenz.flatpak.yaml') }}
+          path: |
+            ~/.flatpak-builder
+            ~/.ccache
       - name: Install Flatpak
         run: |
-          sudo apt-get update
-          sudo apt-get install -y flatpak flatpak-builder
           flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
           flatpak --user install -y flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08 org.freedesktop.Sdk.Extension.rust-stable//25.08 org.freedesktop.Sdk.Extension.node22//25.08
       - name: Checkout
@@ -101,14 +108,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build app
-        run: pnpm make build
-
       - name: Build Flatpak repo
         run: |
           mkdir -p dist/target
           mkdir -p flatpak
-          flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean build-dir dev.sallon.lenz.flatpak.yaml
+          flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean --ccache build-dir dev.sallon.lenz.flatpak.yaml
           flatpak build-bundle --gpg-sign="contato@sallon.dev" repo flatpak/dev.sallon.lenz.flatpak dev.sallon.lenz
           mv repo flatpak/repo
 
@@ -125,7 +129,6 @@ jobs:
         env:
           GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
         run: |
-          ls -la
           cat <<EOF > flatpak/lenz.flatpakrepo
           [Flatpak Repo]
           Title=Lenz Designer
@@ -136,7 +139,7 @@ jobs:
           Icon=https://sallon.dev/lenz/logo.png
           GPGKey=$GPG_KEY
           EOF
-          echo $GPG_KEY | base64 -d > github_pages/lenz.gpg
+          echo $GPG_KEY | base64 -d > flatpak/lenz.gpg
 
       - name: "Create FlatpakRef"
         env:
@@ -226,6 +229,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./github_pages
+
   create_release:
     needs: [organize_artifacts, build_binaries]
     runs-on: ubuntu-latest
@@ -263,6 +267,7 @@ jobs:
             dist/target/lenz-designer.AppImage
             dist/target/lenz-designer.tar.gz
             dist/target/lenz-designer.tar.xz
+
   deploy_pages:
     needs: [organize_artifacts, create_release]
     environment:
