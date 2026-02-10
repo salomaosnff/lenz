@@ -27,6 +27,7 @@ command_install() {
 
   cp -r "$TMP_DIR/bin" /usr/share/lenz/bin
   cp -r "$TMP_DIR/extensions" /usr/share/lenz/extensions
+  cp -r "$TMP_DIR/launchers/dev.sallon.lenz.desktop" /usr/share/applications/dev.sallon.lenz.desktop
   cp -r "$TMP_DIR/resources" /usr/share/lenz/resources
 
   # Copy Metainfo
@@ -37,6 +38,8 @@ command_install() {
 
   # Clean up
   rm -rf "$TMP_DIR"
+
+  echo "Lenz Designer ${VERSION} instalado com sucesso!"
 }
 
 command_uninstall() {
@@ -48,6 +51,8 @@ command_uninstall() {
   echo "Desinstalando Lenz Designer versão $CURRENT_VERSION..."
 
   rm -rf /usr/bin/lenz /usr/share/lenz /usr/share/metainfo/dev.sallon.lenz.metainfo.xml
+
+  echo "Lenz Designer desinstalado com sucesso!"
 }
 
 command_update() {
