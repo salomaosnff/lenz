@@ -37,15 +37,15 @@ jobs:
             agent/target
             extensions/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
       - name: Set up Node.js with Corepack
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'pnpm'
+          node-version: "22"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: |
@@ -61,7 +61,7 @@ jobs:
 
       - name: Pack as AppImage
         run: pnpm make pack --appimage
-      
+
       - name: Pack as tar.gz and tar.xz
         run: pnpm make pack --archive
 
@@ -96,17 +96,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build app
+        run: pnpm make build
+
       - name: Build Flatpak repo
         run: |
           mkdir -p dist/target
+          mkdir -p flatpak
           flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean build-dir dev.sallon.lenz.flatpak.yaml
-          flatpak build-bundle --gpg-sign="contato@sallon.dev" repo dist/target/dev.sallon.lenz.flatpak dev.sallon.lenz
-          mv repo flatpak
+          flatpak build-bundle --gpg-sign="contato@sallon.dev" repo flatpak/dev.sallon.lenz.flatpak dev.sallon.lenz
+          mv repo flatpak/repo
 
       # Assinar o repositório Flatpak
       - name: Sign Flatpak repository
@@ -114,14 +118,15 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --sign
-          flatpak build-update-repo --gpg-sign="contato@sallon.dev" flatpak
-          flatpak build-sign flatpak --gpg-sign="contato@sallon.dev"
+          flatpak build-update-repo --gpg-sign="contato@sallon.dev" flatpak/repo
+          flatpak build-sign flatpak/repo --gpg-sign="contato@sallon.dev"
 
       - name: "Create FlatpakRepo"
         env:
           GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
         run: |
-          cat <<EOF > github_pages/lenz.flatpakrepo
+          ls -la
+          cat <<EOF > flatpak/lenz.flatpakrepo
           [Flatpak Repo]
           Title=Lenz Designer
           Url=https://sallon.dev/lenz/flatpak
@@ -137,7 +142,7 @@ jobs:
         env:
           GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
         run: |
-          cat <<EOF > github_pages/lenz.flatpakref
+          cat <<EOF > flatpak/lenz.flatpakref
           [Flatpak Ref]
           Title=Lenz Designer
           Name=dev.sallon.lenz
@@ -151,7 +156,7 @@ jobs:
           GPGKey=$GPG_KEY
           EOF
 
-      - name: Save Flatpak repo
+      - name: Upload flatpak artifacts
         uses: actions/upload-artifact@v4
         with:
           name: flatpak
@@ -172,7 +177,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -185,7 +190,7 @@ jobs:
         with:
           name: docs
           path: docs
-  
+
   organize_artifacts:
     needs: [build_binaries, build_flatpak_repo, build_docs]
     runs-on: ubuntu-latest
@@ -221,8 +226,45 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./github_pages
+  create_release:
+    needs: [organize_artifacts, build_binaries]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js with Corepack
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          pnpm changelogithub --output RELEASE.md
+      - name: Download binaries artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          body_path: RELEASE.md
+          files: |
+            dist/target/lenz-designer.AppImage
+            dist/target/lenz-designer.tar.gz
+            dist/target/lenz-designer.tar.xz
   deploy_pages:
-    needs: [organize_artifacts]
+    needs: [organize_artifacts, create_release]
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -231,6 +273,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-    
-    
-    
