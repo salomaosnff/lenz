@@ -106,7 +106,7 @@ jobs:
           mkdir -p dist/target
           flatpak-builder --gpg-sign="contato@sallon.dev" --repo=repo --force-clean build-dir dev.sallon.lenz.flatpak.yaml
           flatpak build-bundle --gpg-sign="contato@sallon.dev" repo dist/target/dev.sallon.lenz.flatpak dev.sallon.lenz
-          mv repo flatpak_repo
+          mv repo flatpak
 
       # Assinar o repositório Flatpak
       - name: Sign Flatpak repository
@@ -114,14 +114,14 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --sign
-          flatpak build-update-repo --gpg-sign="contato@sallon.dev" flatpak_repo
-          flatpak build-sign flatpak_repo --gpg-sign="contato@sallon.dev"
+          flatpak build-update-repo --gpg-sign="contato@sallon.dev" flatpak
+          flatpak build-sign flatpak --gpg-sign="contato@sallon.dev"
 
       - name: "Create FlatpakRepo"
         env:
           GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
         run: |
-          cat <<EOF > docs/lenz.flatpakrepo
+          cat <<EOF > github_pages/lenz.flatpakrepo
           [Flatpak Repo]
           Title=Lenz Designer
           Url=https://sallon.dev/lenz/flatpak
@@ -131,13 +131,13 @@ jobs:
           Icon=https://sallon.dev/lenz/logo.png
           GPGKey=$GPG_KEY
           EOF
-          echo $GPG_KEY | base64 -d > docs/lenz.gpg
+          echo $GPG_KEY | base64 -d > github_pages/lenz.gpg
 
       - name: "Create FlatpakRef"
         env:
           GPG_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
         run: |
-          cat <<EOF > docs/lenz.flatpakref
+          cat <<EOF > github_pages/lenz.flatpakref
           [Flatpak Ref]
           Title=Lenz Designer
           Name=dev.sallon.lenz
@@ -154,8 +154,8 @@ jobs:
       - name: Save Flatpak repo
         uses: actions/upload-artifact@v4
         with:
-          name: flatpak-repo
-          path: flatpak_repo
+          name: flatpak
+          path: flatpak
 
   build_docs:
     runs-on: ubuntu-latest
@@ -199,8 +199,8 @@ jobs:
       - name: Download flatpak repo artifacts
         uses: actions/download-artifact@v4
         with:
-          name: flatpak-repo
-          path: flatpak_repo
+          name: flatpak
+          path: flatpak
 
       - name: Download docs artifacts
         uses: actions/download-artifact@v4
@@ -208,11 +208,14 @@ jobs:
           name: docs
           path: docs
 
-      - name: Organize files
+      - name: Update VERSION in install script
         run: |
-          mkdir -p github_pages
-          mv -r docs/* github_pages/
-          mv -r flatpak_repo/ github_pages/flatpak/
+          sed -i "0,/VERSION=.*/{s//VERSION=\"${{github.ref_name}}\"/;b};" github_pages/install.sh
+
+      - name: Move flatpak repo to github_pages
+        run: |
+          mv docs github_pages
+          mv flatpak github_pages/flatpak
 
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
