@@ -80,6 +80,13 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Cache Flatpak
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/flatpak
+          key: flatpak-${{ runner.os }}-gnome48-25.08
+          restore-keys: |
+            flatpak-${{ runner.os }}-gnome48-
       - name: ⚡ Cache
         uses: actions/cache@v4
         with:
