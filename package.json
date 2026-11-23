@@ -6,7 +6,7 @@
   "scripts": {
     "ready": "vp check && vp run -r test && vp run -r build",
     "dev": "vp run lenz-app#dev",
-    "deploy": "vp run lenz-app#deploy",
+    "deploy": "vp run --filter ./extensions/* build && vp run lenz-app#deploy",
     "prepare": "vp config"
   },
   "devDependencies": {

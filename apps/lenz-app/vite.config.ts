@@ -9,7 +9,6 @@ import UnoCSS from "unocss/vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { lazyPlugins } from "vite-plus";
 import { hostVueBridge } from "./vite/host-vue-bridge";
-import { buildExtensions } from "./vite/build-extensions";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -19,7 +18,6 @@ export default defineConfig({
   },
   plugins: lazyPlugins(() => [
     hostVueBridge(),
-    buildExtensions(),
     VueRouter({ dts: "./src/typed-router.d.ts" }),
     vue(),
     vueDevTools(),
