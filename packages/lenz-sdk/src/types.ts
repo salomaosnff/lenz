@@ -262,7 +262,7 @@ export interface WindowOptions {
   id: string;
   title: string;
   content: ViewContent;
-  /** Initial position and size, in px. */
+  /** Initial position and size, in px. Without `x`/`y` the window opens centered. */
   x?: number;
   y?: number;
   width?: number;

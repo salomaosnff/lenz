@@ -7,8 +7,11 @@ const props = withDefaults(
   defineProps<{
     title: string;
     open?: boolean;
+    /** Position in px. Omitted, the window opens centered in the viewport. */
     x?: number;
     y?: number;
+    /** Shifts a centered window down and right, so stacked windows don't overlap exactly. */
+    offset?: number;
     width?: number;
     height?: number;
     minWidth?: number;
@@ -18,8 +21,9 @@ const props = withDefaults(
   }>(),
   {
     open: undefined,
-    x: 96,
-    y: 96,
+    x: undefined,
+    y: undefined,
+    offset: 0,
     width: 420,
     height: 280,
     minWidth: 220,
@@ -34,14 +38,20 @@ const emit = defineEmits<{
 const windowRef = ref<HTMLElement>();
 const titlebarRef = ref<HTMLElement>();
 
-const { style: dragStyle } = useDraggable(windowRef, {
-  handle: titlebarRef,
-  initialValue: { x: props.x, y: props.y },
-  preventDefault: true,
-});
-
 const width = ref(props.width);
 const height = ref(props.height);
+
+const centered = (viewport: number, size: number, offset: number) =>
+  Math.max(0, Math.round((viewport - size) / 2) + offset);
+
+const { style: dragStyle } = useDraggable(windowRef, {
+  handle: titlebarRef,
+  initialValue: {
+    x: props.x ?? centered(window.innerWidth, width.value, props.offset),
+    y: props.y ?? centered(window.innerHeight, height.value, props.offset),
+  },
+  preventDefault: true,
+});
 const sizeStyle = computed(() => ({
   width: `${width.value}px`,
   height: `${height.value}px`,

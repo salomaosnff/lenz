@@ -61,8 +61,6 @@ export default defineExtension({
       id: "player",
       title: "Reprodutor de histórico",
       content: { type: "vue-component", component: Player, props: { player } },
-      x: 360,
-      y: 90,
       width: 680,
       height: 580,
       open: false,

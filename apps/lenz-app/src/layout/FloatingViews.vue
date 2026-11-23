@@ -13,8 +13,7 @@ const layout = useLayoutStore();
     :key="view.id"
     :title="view.title"
     :open="true"
-    :x="240 + index * 32"
-    :y="120 + index * 32"
+    :offset="index * 32"
     :width="320"
     :height="260"
     flush
