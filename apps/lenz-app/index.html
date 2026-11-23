@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- The .ico has 16, 32 and 48 px for old browsers and tabs; the PNG is for the rest. -->
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" href="/icon.png" sizes="200x200" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lenz Design</title>
+    <!-- Extensions externalize `vue`; this makes their import resolve to the host's copy. -->
+    <script type="importmap">
+      { "imports": { "vue": "/host/vue.js" } }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

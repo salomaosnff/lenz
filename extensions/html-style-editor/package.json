@@ -1,0 +1,64 @@
+{
+  "name": "html-style-editor",
+  "displayName": "Editor de estilos",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Painel de propriedades de estilo do editor visual: layout, espaçamento, tipografia, fundo, borda e efeitos.",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "vp build",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "html-visual-editor": "workspace:*",
+    "lenz-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "~6.0.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
+  },
+  "contributes": {
+    "views": {
+      "secondary": [
+        {
+          "id": "html-style-editor.layout",
+          "name": "Layout",
+          "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+        },
+        {
+          "id": "html-style-editor.spacing",
+          "name": "Espaçamento",
+          "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+        },
+        {
+          "id": "html-style-editor.typography",
+          "name": "Tipografia",
+          "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+        },
+        {
+          "id": "html-style-editor.background",
+          "name": "Fundo",
+          "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+        },
+        {
+          "id": "html-style-editor.border",
+          "name": "Borda",
+          "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+        },
+        {
+          "id": "html-style-editor.effects",
+          "name": "Efeitos",
+          "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+        }
+      ]
+    }
+  },
+  "extensionDependencies": [
+    "html-visual-editor"
+  ]
+}

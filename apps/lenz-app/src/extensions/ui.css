@@ -1,0 +1,15 @@
+.ext-badge {
+  @apply shrink-0 rounded px-1.5 py-px text-[11px] leading-4 bg-[var(--ide-hover)] text-[var(--ide-fg-muted)];
+}
+.ext-badge-builtin {
+  @apply bg-[var(--ide-accent)]/20 text-[var(--ide-accent)];
+}
+.ext-badge-error {
+  @apply bg-red-500/20 text-red-400;
+}
+.ext-btn {
+  @apply inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-md border border-[var(--ide-border)] bg-transparent px-3 text-[13px] text-[var(--ide-fg)] outline-none hover:bg-[var(--ide-hover)] focus-visible:border-[var(--ide-accent)] disabled:cursor-default disabled:opacity-50;
+}
+.ext-btn-primary {
+  @apply border-transparent bg-[var(--ide-accent)] text-white hover:bg-[var(--ide-accent)] hover:brightness-110;
+}

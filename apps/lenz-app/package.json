@@ -1,0 +1,48 @@
+{
+  "name": "lenz-app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vp preview",
+    "deploy": "vp build && wrangler deploy",
+    "build-only": "vp build",
+    "type-check": "vue-tsc --build",
+    "format": "vp fmt src/"
+  },
+  "dependencies": {
+    "@iconify/vue": "catalog:",
+    "@vueuse/core": "catalog:",
+    "dompurify": "catalog:",
+    "lenz-sdk": "workspace:*",
+    "marked": "catalog:",
+    "pinia": "^4.0.3",
+    "reka-ui": "catalog:",
+    "vue": "^3.5.42",
+    "vue-draggable-plus": "catalog:",
+    "vue-router": "^5.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:",
+    "@cloudflare/workers-types": "catalog:",
+    "@iconify-json/lucide": "catalog:",
+    "@tsconfig/node24": "^24.0.5",
+    "@types/node": "^24.13.4",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/tsconfig": "^0.9.1",
+    "npm-run-all2": "^9.0.3",
+    "typescript": "~6.0.0",
+    "unocss": "catalog:",
+    "unplugin-vue-components": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-vue-devtools": "^8.2.1",
+    "vite-plus": "catalog:",
+    "vue-tsc": "^3.3.11",
+    "wrangler": "catalog:"
+  },
+  "engines": {
+    "node": "^22.18.0 || >=24.12.0"
+  }
+}

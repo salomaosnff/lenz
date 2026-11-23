@@ -1,0 +1,2 @@
+overrides:
+  "typescript": "npm:typescript-native-bridge@latest"

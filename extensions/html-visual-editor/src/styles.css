@@ -1,0 +1,807 @@
+.hve {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  font-size: 12px;
+  color: var(--ide-fg);
+}
+.hve-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.hve-icon:hover:not(:disabled) {
+  background: var(--ide-hover);
+}
+.hve-icon:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.hve-icon.danger:hover:not(:disabled) {
+  background: var(--color-danger);
+  color: var(--color-danger-foreground);
+}
+.hve-main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.hve-canvas {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  background: #fff;
+}
+.hve-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+.hve-box {
+  pointer-events: none;
+  box-sizing: border-box;
+}
+.hve-box.hover {
+  outline: 1px dashed var(--color-primary);
+}
+.hve-box.selected {
+  outline: 2px solid var(--color-primary);
+}
+.hve-box.drop.line {
+  background: var(--ide-accent, #8b5cf6);
+  border-radius: 1px;
+}
+.hve-box.drop.inside {
+  border: 2px dashed var(--ide-accent, #8b5cf6);
+}
+.hve-box-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.hve-box-action:hover {
+  background: rgb(255 255 255 / 0.25);
+}
+.hve-box-action.first {
+  margin-left: 2px;
+}
+.hve-box-action[data-state="open"] {
+  background: rgb(255 255 255 / 0.25);
+}
+/* The menu is portaled to the body, so it is styled on its own and not through the editor. */
+.hve-menu {
+  z-index: 60;
+  min-width: 180px;
+  padding: 4px;
+  border: 1px solid var(--ide-menu-border, var(--ide-border));
+  border-radius: 6px;
+  background: var(--ide-menu-bg, var(--ide-bg));
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  color: var(--ide-fg);
+  font-size: 12px;
+}
+.hve-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+}
+.hve-menu-item[data-highlighted] {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+.hve-menu-item.danger:not([data-highlighted]) {
+  color: #e5484d;
+}
+.hve-box-handle {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  pointer-events: auto;
+  cursor: grab;
+}
+.hve-box-handle:active {
+  cursor: grabbing;
+}
+.hve-box-tag {
+  display: inline-flex;
+  align-items: center;
+  position: absolute;
+  top: -20px;
+  left: -2px;
+  padding: 1px 6px;
+  border-radius: 4px 4px 0 0;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.hve-layers {
+  /* No scroll area of its own: the view scrolls, so the panel has one scrollbar and not two. */
+  padding: 2px 0 6px;
+  font-size: 12px;
+}
+.hve-layer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding-right: 8px;
+  white-space: nowrap;
+}
+.hve-layer:hover {
+  background: var(--ide-hover);
+}
+.hve-layer.selected {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+.hve-guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--ide-border);
+}
+.hve-layer.selected .hve-guide {
+  background: color-mix(in srgb, var(--color-primary-foreground) 35%, transparent);
+}
+.hve-layer-toggle {
+  display: inline-flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ide-fg-muted);
+  cursor: pointer;
+}
+.hve-layer.selected .hve-layer-toggle {
+  color: inherit;
+}
+.hve-layer-chevron {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.12s;
+}
+.hve-layer-chevron.open {
+  transform: rotate(90deg);
+}
+.hve-layer-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 2px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+.hve-layer-main:focus-visible {
+  outline: 1px solid var(--color-primary);
+  outline-offset: -1px;
+}
+.hve-layer-icon {
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  color: var(--ide-fg-muted);
+}
+.hve-layer.selected .hve-layer-icon {
+  color: inherit;
+}
+.hve-layer-tag {
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.hve-layer-id {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+.hve-layer-class {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ide-fg-muted);
+}
+.hve-layer-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ide-fg-muted);
+  font-style: italic;
+}
+/* On the highlight, the colors of the parts would not be seen: they follow the text. */
+.hve-layer.selected .hve-layer-id,
+.hve-layer.selected .hve-layer-class,
+.hve-layer.selected .hve-layer-text {
+  color: inherit;
+  opacity: 0.8;
+}
+.hve-field {
+  display: grid;
+  grid-template-columns: minmax(96px, 40%) 1fr;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.hve-field span {
+  color: var(--ide-fg-muted);
+  min-width: 0;
+  overflow-wrap: anywhere; /* a label wraps; it is never cut */
+}
+.hve-field input,
+.hve-field select,
+.hve-field textarea {
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.hve-field input:focus,
+.hve-field select:focus,
+.hve-field textarea:focus {
+  border-color: var(--color-primary);
+}
+
+.hve-prop {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hve-prop .hve-field {
+  flex: 1;
+  min-width: 0;
+}
+.hve-prop .hve-icon {
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+.hve-classes {
+  margin-bottom: 4px;
+}
+.hve-classes-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ide-fg-muted);
+}
+.hve-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 3px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+}
+.hve-tags:focus-within {
+  border-color: var(--color-primary);
+}
+.hve-tag {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 3px 1px 6px;
+  border-radius: 3px;
+  background: var(--ide-border);
+  font-family: monospace;
+}
+.hve-tag[data-state="active"] {
+  outline: 1px solid var(--color-primary);
+}
+.hve-tag-delete {
+  display: inline-flex;
+  padding: 1px;
+  border-radius: 2px;
+  color: var(--ide-fg-muted);
+  cursor: pointer;
+}
+.hve-tag-delete:hover {
+  color: inherit;
+}
+.hve-tags-input {
+  flex: 1;
+  min-width: 60px;
+  padding: 1px 3px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.hve-check {
+  justify-self: start;
+}
+.hve-add {
+  width: 100%;
+  margin: 4px 0 8px;
+  padding: 3px 6px;
+  border: 1px dashed var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: var(--ide-fg-muted);
+  font: inherit;
+  outline: none;
+}
+.hve-add:focus {
+  border-color: var(--color-primary);
+}
+
+/* Obsolete or deprecated attributes: struck through; the tooltip explains why. */
+.hve-field.obsolete > span {
+  text-decoration: line-through;
+}
+
+/* ---- Color input ---------------------------------------------------------------------- */
+.hve-color {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.hve-color-swatch,
+.hve-color-preview,
+.hve-color-var {
+  --checker: repeating-conic-gradient(#8884 0% 25%, transparent 0% 50%) 50% / 8px 8px;
+  background:
+    linear-gradient(var(--hve-swatch, transparent), var(--hve-swatch, transparent)), var(--checker);
+}
+.hve-color-swatch {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.hve-color-swatch:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+.hve-color .hve-color-text {
+  flex: 1;
+  min-width: 0;
+}
+.hve-color.invalid .hve-color-text {
+  border-color: #e5484d;
+}
+.hve-color-popup {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid var(--ide-menu-border);
+  border-radius: 8px;
+  background: var(--ide-menu-bg);
+  color: var(--ide-fg);
+  box-shadow: 0 8px 24px #0008;
+  font-size: 12px;
+  user-select: none;
+}
+.hve-color-area {
+  position: relative;
+  height: 130px;
+  border-radius: 4px;
+  background:
+    linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, var(--hue, red));
+  cursor: crosshair;
+  touch-action: none;
+  outline: none;
+}
+.hve-color-area:focus-visible,
+.hve-color-hue:focus-visible,
+.hve-color-alpha:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+.hve-color-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #0007;
+  pointer-events: none;
+}
+.hve-color-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hve-color-preview {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--ide-border);
+  border-radius: 50%;
+}
+.hve-color-sliders {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.hve-color-hue,
+.hve-color-alpha {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  touch-action: none;
+  outline: none;
+}
+.hve-color-hue {
+  background: linear-gradient(
+    to right,
+    #f00,
+    #ff0 16.66%,
+    #0f0 33.33%,
+    #0ff 50%,
+    #00f 66.66%,
+    #f0f 83.33%,
+    #f00
+  );
+}
+.hve-color-alpha {
+  background:
+    linear-gradient(to right, transparent, var(--color)),
+    repeating-conic-gradient(#8884 0% 25%, transparent 0% 50%) 50% / 8px 8px;
+}
+.hve-color-thumb {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #0007;
+  pointer-events: none;
+}
+.hve-color-fields {
+  display: flex;
+  gap: 4px;
+}
+.hve-color-field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.hve-color-field.wide {
+  flex: 3;
+}
+.hve-color-field input,
+.hve-color-field select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 3px 2px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  outline: none;
+}
+.hve-color-field input:focus,
+.hve-color-field select:focus,
+.hve-color-format:focus {
+  border-color: var(--color-primary);
+}
+.hve-color-field span {
+  font-size: 10px;
+  color: var(--ide-fg-muted);
+}
+.hve-color-format {
+  padding: 3px 6px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.hve-color-vars h6 {
+  margin: 0 0 4px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ide-fg-muted);
+}
+.hve-color-varnote {
+  margin: 0 0 6px;
+  color: var(--ide-fg-muted);
+}
+.hve-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 72px;
+  overflow: auto;
+}
+.hve-color-var {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.hve-color-var.selected,
+.hve-color-var:hover {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.hve-attributes {
+  container-type: inline-size;
+  padding: 4px 12px 8px;
+  font-size: 12px;
+}
+
+/* The elements view: the palette of the catalog, to insert from. */
+.hve-elements {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 8px 8px;
+  font-size: 12px;
+}
+.hve-el-bar {
+  /* Stays at the top while the view scrolls under it. */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 6px 0;
+  background: var(--ide-sidebar-bg);
+}
+.hve-el-search {
+  width: 100%;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--ide-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ide-fg);
+  font: inherit;
+  outline: none;
+}
+.hve-el-search:focus {
+  border-color: var(--ide-accent);
+}
+.hve-el-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hve-el-list > li + li {
+  border-top: 1px solid var(--ide-border);
+}
+.hve-el {
+  display: flex;
+  /* Every item has the height of the tallest (name and two lines of description), and its content
+     sits in the middle of it. */
+  align-items: center;
+  box-sizing: border-box;
+  height: 72px;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.hve-el:hover:not(:disabled),
+.hve-el:focus-visible {
+  background: var(--ide-hover);
+  outline: none;
+}
+.hve-el:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.hve-el-icon {
+  flex-shrink: 0;
+  /* Only the icon sits at the top: the text stays in the middle. */
+  align-self: flex-start;
+  width: 24px;
+  height: 24px;
+  color: var(--ide-fg-muted);
+}
+.hve-el-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+.hve-el-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.hve-el-label {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hve-el-tag {
+  flex-shrink: 0;
+  color: var(--ide-fg-muted);
+  font-size: 11px;
+}
+.hve-el-description {
+  /* At most two lines: the rest is cut with an ellipsis. */
+  display: -webkit-box;
+  max-height: 32px;
+  line-height: 16px;
+  overflow: hidden;
+  color: var(--ide-fg-muted);
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.hve-el-group summary {
+  padding: 4px 8px;
+  color: var(--ide-fg-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.hve-el-empty {
+  margin: 0;
+  padding: 8px;
+  color: var(--ide-fg-muted);
+}
+
+/* The breadcrumb of elements: from the page down to the selected one. */
+.hve-crumbs {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--ide-border);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.hve-crumb {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 160px;
+  height: 22px;
+  padding: 0 6px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ide-fg-muted);
+  font: inherit;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.hve-crumb:hover {
+  background: var(--ide-hover);
+  color: var(--ide-fg);
+}
+.hve-crumb.current {
+  color: var(--ide-fg);
+  font-weight: 600;
+}
+.hve-crumb-more {
+  flex-shrink: 0;
+}
+.hve-crumb-sep-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 22px;
+  padding: 0 1px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ide-fg-muted);
+  cursor: pointer;
+}
+.hve-crumb-sep-button:hover {
+  background: var(--ide-hover);
+  color: var(--ide-fg);
+}
+.hve-crumb-sep {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--ide-fg-muted);
+}
+.hve-crumb-menu {
+  z-index: 60;
+  min-width: 160px;
+  max-height: 300px;
+  padding: 4px;
+  overflow-y: auto;
+  border: 1px solid var(--ide-menu-border);
+  border-radius: 8px;
+  background: var(--ide-menu-bg);
+  color: var(--ide-fg);
+  font-size: 12px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.45);
+}
+.hve-crumb-item {
+  padding: 4px 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+.hve-crumb-item[data-highlighted] {
+  background: var(--ide-accent);
+  color: var(--color-primary-foreground);
+}
+
+.hve-el-open {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--ide-fg-muted);
+}

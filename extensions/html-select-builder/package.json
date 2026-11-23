@@ -1,0 +1,39 @@
+{
+  "name": "html-select-builder",
+  "displayName": "Construtor de select",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Monta listas de seleção (select) numa janela: opções, grupos, múltipla escolha e estilo, e edita as opções de um select da página.",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "vp build",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "html-visual-editor": "workspace:*",
+    "lenz-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "~6.0.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "html-select-builder.open",
+        "title": "Abrir o construtor de select",
+        "category": "Editor visual",
+        "icon": "lucide:square-chevron-down",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      }
+    ]
+  },
+  "extensionDependencies": [
+    "html-visual-editor"
+  ]
+}

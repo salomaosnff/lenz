@@ -1,0 +1,273 @@
+{
+  "name": "html-visual-editor",
+  "displayName": "Editor visual de HTML",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Edita páginas HTML clicando nos elementos: árvore, atributos, comandos e atalhos.",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    "./api": "./src/api.ts"
+  },
+  "scripts": {
+    "build": "vp build",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "lenz-sdk": "workspace:*",
+    "reka-ui": "catalog:"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "~6.0.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
+  },
+  "contributes": {
+    "editors": [
+      {
+        "id": "html-visual-editor.visual",
+        "label": "Visual",
+        "icon": "lucide:layout-template",
+        "selector": [
+          "*.html",
+          "*.htm"
+        ],
+        "priority": "default"
+      }
+    ],
+    "commands": [
+      {
+        "command": "html-visual-editor.selectAll",
+        "title": "Selecionar tudo",
+        "category": "Editor visual",
+        "icon": "lucide:box-select",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-visual-editor.createDiv",
+        "title": "Criar uma div",
+        "category": "Editor visual",
+        "icon": "lucide:square",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-visual-editor.toggleFlex",
+        "title": "Alternar o flex",
+        "category": "Editor visual",
+        "icon": "lucide:columns-3",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "command": "html-visual-editor.cycleJustify",
+        "title": "Alternar a justificação (justify-content)",
+        "category": "Editor visual",
+        "icon": "lucide:align-horizontal-space-between",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "command": "html-visual-editor.cycleTextAlign",
+        "title": "Alternar o alinhamento do texto",
+        "category": "Editor visual",
+        "icon": "lucide:align-center",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "command": "html-visual-editor.setGrid",
+        "title": "Definir como grid",
+        "category": "Editor visual",
+        "icon": "lucide:layout-grid",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "command": "html-visual-editor.stretch",
+        "title": "Esticar (flex: 1)",
+        "category": "Editor visual",
+        "icon": "lucide:move-horizontal",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "command": "html-visual-editor.selectParent",
+        "title": "Selecionar o elemento pai",
+        "category": "Editor visual",
+        "icon": "lucide:corner-left-up",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "command": "html-visual-editor.moveUp",
+        "title": "Mover o elemento para cima",
+        "category": "Editor visual",
+        "icon": "lucide:arrow-up",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "command": "html-visual-editor.moveDown",
+        "title": "Mover o elemento para baixo",
+        "category": "Editor visual",
+        "icon": "lucide:arrow-down",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "command": "html-visual-editor.duplicate",
+        "title": "Duplicar o elemento",
+        "category": "Editor visual",
+        "icon": "lucide:copy",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "command": "html-visual-editor.remove",
+        "title": "Excluir o elemento",
+        "category": "Editor visual",
+        "icon": "lucide:trash-2",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "command": "html-visual-editor.insert.heading",
+        "title": "Inserir título",
+        "category": "Editor visual",
+        "icon": "lucide:heading-1",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-visual-editor.insert.text",
+        "title": "Inserir texto",
+        "category": "Editor visual",
+        "icon": "lucide:pilcrow",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-visual-editor.insert.button",
+        "title": "Inserir botão",
+        "category": "Editor visual",
+        "icon": "lucide:mouse-pointer-click",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-visual-editor.insert.link",
+        "title": "Inserir link",
+        "category": "Editor visual",
+        "icon": "lucide:link",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-visual-editor.insert.image",
+        "title": "Inserir imagem",
+        "category": "Editor visual",
+        "icon": "lucide:image",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-visual-editor.insert.container",
+        "title": "Inserir container",
+        "category": "Editor visual",
+        "icon": "lucide:square",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-visual-editor.insert.list",
+        "title": "Inserir lista",
+        "category": "Editor visual",
+        "icon": "lucide:list",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "Mod+A",
+        "command": "html-visual-editor.selectAll",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "key": "Mod+D",
+        "command": "html-visual-editor.duplicate",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "key": "Alt+Up",
+        "command": "html-visual-editor.moveUp",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "key": "Alt+Down",
+        "command": "html-visual-editor.moveDown",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "key": "Alt+Shift+Up",
+        "command": "html-visual-editor.selectParent",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditElements"
+      },
+      {
+        "key": "D",
+        "command": "html-visual-editor.createDiv",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "key": "F",
+        "command": "html-visual-editor.toggleFlex",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "key": "J",
+        "command": "html-visual-editor.cycleJustify",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "key": "A",
+        "command": "html-visual-editor.cycleTextAlign",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "key": "G",
+        "command": "html-visual-editor.setGrid",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      },
+      {
+        "key": "1",
+        "command": "html-visual-editor.stretch",
+        "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.hasSelection"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "html-visual-editor.layers",
+          "name": "Árvore de elementos",
+          "when": "activeEditor == 'html-visual-editor.visual'"
+        }
+      ],
+      "secondary": [
+        {
+          "id": "html-visual-editor.attributes",
+          "name": "Atributos",
+          "when": "activeEditor == 'html-visual-editor.visual' && html-visual-editor.canEditAttributes"
+        }
+      ],
+      "html-visual-editor": [
+        {
+          "id": "html-visual-editor.builders",
+          "name": "Construtores de elementos",
+          "when": "activeEditor == 'html-visual-editor.visual'",
+          "autoHeight": true
+        },
+        {
+          "id": "html-visual-editor.elements",
+          "name": "Elementos",
+          "when": "activeEditor == 'html-visual-editor.visual'"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "html-visual-editor",
+          "title": "Editor HTML",
+          "icon": "lucide:shapes",
+          "order": 10
+        }
+      ]
+    }
+  }
+}

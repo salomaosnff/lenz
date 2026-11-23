@@ -1,0 +1,93 @@
+{
+  "name": "history-player",
+  "displayName": "Reprodutor de histórico",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Grava as alterações dos arquivos e as reproduz como um vídeo; guarda, baixa e carrega gravações.",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "vp build",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "lenz-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "~6.0.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "history-player.start",
+        "title": "Iniciar a gravação",
+        "category": "Histórico",
+        "icon": "lucide:circle-dot",
+        "when": "!history-player.recording"
+      },
+      {
+        "command": "history-player.stop",
+        "title": "Parar a gravação",
+        "category": "Histórico",
+        "icon": "lucide:square",
+        "when": "history-player.recording"
+      },
+      {
+        "command": "history-player.open",
+        "title": "Abrir o reprodutor de histórico",
+        "category": "Histórico",
+        "icon": "lucide:clapperboard"
+      },
+      {
+        "command": "history-player.toggle",
+        "title": "Reproduzir ou pausar a gravação",
+        "category": "Histórico",
+        "icon": "lucide:play"
+      },
+      {
+        "command": "history-player.load",
+        "title": "Carregar uma gravação de um arquivo",
+        "category": "Histórico",
+        "icon": "lucide:upload"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "Mod+Alt+R",
+        "command": "history-player.start",
+        "when": "!history-player.recording"
+      },
+      {
+        "key": "Mod+Alt+R",
+        "command": "history-player.stop",
+        "when": "history-player.recording"
+      },
+      {
+        "key": "Mod+Alt+H",
+        "command": "history-player.open"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "history-player",
+          "title": "Gravações",
+          "icon": "lucide:clapperboard"
+        }
+      ]
+    },
+    "views": {
+      "history-player": [
+        {
+          "id": "history-player.recordings",
+          "name": "Gravações"
+        }
+      ]
+    }
+  }
+}

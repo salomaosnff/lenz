@@ -1,0 +1,46 @@
+{
+  "name": "html-table-builder",
+  "displayName": "Construtor de tabelas",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Monta tabelas HTML numa janela: tamanho, cabeçalho, rodapé, legenda e estilo, e edita as linhas e colunas de uma tabela da página.",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "vp build",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "html-visual-editor": "workspace:*",
+    "lenz-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "~6.0.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "html-table-builder.open",
+        "title": "Abrir o construtor de tabelas",
+        "category": "Editor visual",
+        "icon": "lucide:table",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      },
+      {
+        "command": "html-table-builder.insertDefault",
+        "title": "Inserir uma tabela 3×3",
+        "category": "Editor visual",
+        "icon": "lucide:table-2",
+        "when": "activeEditor == 'html-visual-editor.visual'"
+      }
+    ]
+  },
+  "extensionDependencies": [
+    "html-visual-editor"
+  ]
+}

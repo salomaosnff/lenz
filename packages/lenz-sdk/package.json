@@ -1,0 +1,32 @@
+{
+  "name": "lenz-sdk",
+  "version": "0.0.0",
+  "description": "Types and helpers for writing Lenz extensions.",
+  "license": "MIT",
+  "files": [
+    "src",
+    "globals.d.ts"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./globals": {
+      "types": "./globals.d.ts"
+    },
+    "./package.json": "./package.json",
+    "./vite": "./src/vite.ts",
+    "./manifest": "./src/manifest.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.0",
+    "vite-plus": "catalog:",
+    "vue": "^3.5.42"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  }
+}

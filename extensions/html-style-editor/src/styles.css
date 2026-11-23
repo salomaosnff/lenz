@@ -1,0 +1,557 @@
+.hse-group {
+  /* One label column for every row, as wide as the longest label up to 40% of the view. */
+  display: grid;
+  grid-template-columns: fit-content(40%) 1fr;
+  column-gap: 6px;
+  container-type: inline-size;
+  padding: 4px 12px 8px 18px;
+  font-size: 12px;
+}
+.hse-field {
+  position: relative;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  column-gap: 6px;
+  margin-bottom: 4px;
+}
+.hse-field span {
+  color: var(--ide-fg-muted);
+}
+.hse-field input,
+.hse-field select {
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.hse-field input:focus,
+.hse-field select:focus {
+  border-color: var(--color-primary);
+}
+
+.hse-auto {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 12px 10px;
+  font-size: 12px;
+}
+.hse-segmented {
+  display: inline-flex;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.hse-segmented button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 24px;
+  border: 0;
+  background: var(--ide-bg);
+  color: var(--ide-fg-muted);
+  cursor: pointer;
+}
+.hse-segmented button + button {
+  border-left: 1px solid var(--ide-border);
+}
+.hse-segmented button.active {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+.hse-align {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 84px;
+  height: 84px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+}
+.hse-align button {
+  position: relative;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.hse-align button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ide-fg-muted);
+  opacity: 0.5;
+}
+.hse-align button:hover::after {
+  opacity: 1;
+}
+.hse-align button.active::after {
+  width: 10px;
+  height: 10px;
+  background: var(--color-primary);
+  opacity: 1;
+}
+.hse-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ide-fg-muted);
+}
+.hse-hint {
+  margin: 0;
+  padding: 4px 12px 10px;
+  font-size: 12px;
+  color: var(--ide-fg-muted);
+}
+
+.hse-subhead {
+  margin: 6px 0 2px;
+  padding: 0 12px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ide-fg-muted);
+}
+
+.hse-label {
+  min-width: 96px; /* the label column is never narrower than this */
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ide-fg-muted);
+}
+.hse-field.child {
+  padding-left: 14px;
+}
+.hse-toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-left: -14px;
+  padding: 1px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.hse-toggle:hover {
+  color: var(--ide-fg);
+}
+.hse-toggle.open svg {
+  transform: rotate(90deg);
+}
+.hse-label.expandable {
+  cursor: pointer;
+  user-select: none;
+}
+.hse-label.expandable:hover {
+  color: var(--ide-fg);
+}
+.hse-label-text {
+  min-width: 0;
+  overflow-wrap: anywhere; /* a label wraps; it is never cut */
+}
+.hse-help {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 1px;
+  border-radius: 50%;
+  color: var(--ide-fg);
+  opacity: 0.75;
+}
+.hse-help:hover,
+.hse-help:focus-visible {
+  opacity: 1;
+  color: var(--color-primary);
+}
+.hse-field input.invalid {
+  border-color: #e5484d;
+}
+
+/* ---- Shadow widget --------------------------------------------------------------------- */
+.hse-shadow-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.hse-shadow-summary:hover,
+.hse-shadow-summary:focus-visible {
+  border-color: var(--color-primary);
+  outline: none;
+}
+.hse-shadow-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: monospace;
+}
+.hse-shadow-chip {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin: 0 2px;
+  border-radius: 3px;
+  background: #fff;
+  color: #000;
+}
+.hse-shadow-chevron {
+  flex-shrink: 0;
+  color: var(--ide-fg-muted);
+  transition: transform 0.15s;
+}
+.hse-shadow-chevron.open {
+  transform: rotate(180deg);
+}
+.hse-shadow-layer .hse-shadow-chevron.open {
+  transform: rotate(90deg);
+}
+.hse-shadow-editor {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0 6px;
+  padding: 8px;
+  border: 1px solid var(--ide-border);
+  border-radius: 6px;
+}
+.hse-shadow-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96px;
+  border-radius: 4px;
+  /* Light, so a dark shadow shows; checkerboard hints that the page behind may be any color. */
+  background: #f4f4f5;
+}
+.hse-shadow-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  background: #fff;
+}
+.hse-shadow-sample {
+  font-size: 32px;
+  font-weight: 700;
+  color: #18181b;
+}
+.hse-shadow-toolbar {
+  display: flex;
+  gap: 6px;
+}
+.hse-shadow-toolbar select {
+  flex: 1;
+  min-width: 0;
+}
+.hse-shadow-toolbar select,
+.hse-shadow-add,
+.hse-shadow-raw input,
+.hse-shadow-slider input[type="number"] {
+  padding: 3px 6px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.hse-shadow-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.hse-shadow-add:hover,
+.hse-shadow-toolbar select:focus,
+.hse-shadow-raw input:focus,
+.hse-shadow-slider input[type="number"]:focus {
+  border-color: var(--color-primary);
+}
+.hse-shadow-layer {
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+}
+.hse-shadow-layer.active {
+  border-color: color-mix(in srgb, var(--color-primary) 60%, var(--ide-border));
+}
+.hse-shadow-layer-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px 2px 2px;
+}
+.hse-shadow-layer-title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 3px 4px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.hse-icon-button {
+  display: inline-flex;
+  padding: 3px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ide-fg-muted);
+  cursor: pointer;
+}
+.hse-icon-button:hover:not(:disabled) {
+  background: var(--ide-hover);
+  color: var(--ide-fg);
+}
+.hse-icon-button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.hse-shadow-layer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 8px 8px;
+  border-top: 1px solid var(--ide-border);
+}
+.hse-shadow-slider {
+  display: grid;
+  grid-template-columns: 64px 1fr 56px;
+  align-items: center;
+  gap: 6px;
+}
+.hse-shadow-slider input[type="range"] {
+  min-width: 0;
+  accent-color: var(--color-primary);
+}
+.hse-shadow-color {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+.hse-shadow-empty {
+  padding: 0;
+}
+/* The generic field style (.hse-field input) must not frame the sliders and checkboxes. */
+.hse-field .hse-shadow-editor input[type="range"],
+.hse-field .hse-shadow-editor input[type="checkbox"] {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.hse-field .hse-shadow-editor input[type="checkbox"] {
+  width: auto;
+}
+
+/* ---- Gradient widget ------------------------------------------------------------------- */
+.hse-grad-chip {
+  background-color: #fff;
+}
+.hse-grad-box {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+.hse-grad-sample {
+  font-size: 36px;
+  font-weight: 800;
+}
+.hse-grad-directions {
+  display: grid;
+  gap: 2px;
+}
+.hse-grad-directions {
+  grid-template-columns: repeat(3, 28px);
+  justify-content: start;
+}
+.hse-grad-directions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: var(--ide-fg-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.hse-grad-directions button.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+.hse-grad-bar {
+  position: relative;
+  height: 32px;
+  margin: 2px 7px 0;
+  cursor: copy;
+}
+.hse-grad-track {
+  position: absolute;
+  inset: 4px 0 14px;
+  border: 1px solid var(--ide-border);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.hse-grad-stop {
+  position: absolute;
+  bottom: 0;
+  width: 14px;
+  height: 22px;
+  margin-left: -7px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 3px 3px 7px 7px;
+  background: var(--stop);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.6);
+  cursor: grab;
+  touch-action: none;
+}
+.hse-grad-stop.active {
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.6),
+    0 0 0 3px var(--color-primary);
+  z-index: 1;
+}
+.hse-grad-stopfields {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 4px;
+}
+.hse-grad-pos {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ide-fg-muted);
+}
+.hse-grad-pos input,
+.hse-grad-center input,
+.hse-shadow-color select {
+  padding: 3px 6px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.hse-grad-pos input {
+  width: 52px;
+}
+.hse-grad-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ide-fg-muted);
+}
+.hse-grad-center label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.hse-grad-center input {
+  width: 52px;
+}
+
+/* The advanced editors open in a window, so they need no frame of their own. */
+.hse-window .hse-shadow-editor {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.hse-window {
+  font-size: 12px;
+}
+.hse-widget-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.hse-widget-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.hse-code {
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+}
+.hse-code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 2px 8px;
+  border-bottom: 1px solid var(--ide-border);
+  color: var(--ide-fg-muted);
+  font-size: 11px;
+}
+.hse-code pre {
+  margin: 0;
+  padding: 8px;
+  overflow-x: hidden;
+  user-select: text;
+}
+.hse-code code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  /* Long values wrap instead of scrolling sideways; the indentation is kept. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.hse-img-source {
+  display: flex;
+  gap: 6px;
+}
+.hse-img-source input:not([hidden]) {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: var(--ide-bg);
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.hse-error {
+  margin: 0;
+  color: #e5484d;
+}
+.hse-shadow-sub {
+  margin: 4px 0 0;
+  padding: 0;
+}
+/* The options reuse the field list of the panel, without its own indentation. */
+.hse-shadow-editor .hse-group {
+  padding: 0;
+}

@@ -1,0 +1,33 @@
+import "uno.css";
+import "./scrollbar.css";
+
+import * as Vue from "vue";
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+
+import App from "./App.vue";
+import router from "./router";
+import { loadInstalledExtensions } from "./extensions";
+import Icon from "./components/Icon.vue";
+import { registerBuiltinEditors } from "./editor/builtin";
+import { registerIcons } from "./icons";
+import { installKeybindings, loadUserKeybindings } from "./keybindings";
+
+// Extensions import `vue` through the import map in index.html, which points at
+// /host/vue.js. That module re-exports this instance, so both sides share one Vue.
+(window as unknown as { __lenz_vue: typeof Vue }).__lenz_vue = Vue;
+
+const app = createApp(App);
+
+// Global, so extension components can use <Icon /> without importing it.
+app.component("Icon", Icon);
+void registerIcons();
+registerBuiltinEditors();
+
+app.use(createPinia());
+app.use(router);
+
+loadUserKeybindings();
+installKeybindings();
+app.mount("#app");
+await loadInstalledExtensions();
