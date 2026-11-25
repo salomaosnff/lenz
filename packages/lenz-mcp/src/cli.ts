@@ -4,6 +4,9 @@ import { Bridge } from "./bridge";
 import { McpSession, type ToolHost } from "./mcp";
 import { DEFAULT_HOST, DEFAULT_PORT } from "./protocol";
 
+/** The hosted Lenz app: allowed without a flag, besides the pages on this machine. */
+const DEFAULT_ORIGINS = ["https://lenz.sallon.dev"];
+
 const HELP = `lenz-mcp: gives MCP clients (Claude Code, Claude Desktop...) the tools of a Lenz tab.
 
 Usage: lenz-mcp [--port ${DEFAULT_PORT}] [--allow-origin https://your.lenz.app]...
@@ -12,8 +15,9 @@ Usage: lenz-mcp [--port ${DEFAULT_PORT}] [--allow-origin https://your.lenz.app].
   to it by WebSocket at ws://${DEFAULT_HOST}:<port>, once the MCP server is turned on in its settings.
 
   --port <n>             Port of the WebSocket (default ${DEFAULT_PORT}, or LENZ_MCP_PORT).
-  --allow-origin <url>   A page origin that may connect, besides the ones on this machine
-                         (repeat it, or set LENZ_MCP_ORIGINS separated by commas).
+  --allow-origin <url>   A page origin that may connect, besides the ones on this machine and
+                         ${DEFAULT_ORIGINS.join(", ")} (repeat it, or set LENZ_MCP_ORIGINS
+                         separated by commas).
   --help                 This text.
 `;
 
@@ -21,7 +25,10 @@ Usage: lenz-mcp [--port ${DEFAULT_PORT}] [--allow-origin https://your.lenz.app].
 const log = (message: string) => process.stderr.write(`[lenz-mcp] ${message}\n`);
 
 function readArguments(argv: string[]) {
-  const origins = (process.env.LENZ_MCP_ORIGINS ?? "").split(",").filter(Boolean);
+  const origins = [
+    ...DEFAULT_ORIGINS,
+    ...(process.env.LENZ_MCP_ORIGINS ?? "").split(",").filter(Boolean),
+  ];
   let port = Number(process.env.LENZ_MCP_PORT ?? DEFAULT_PORT);
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];

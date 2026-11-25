@@ -35,7 +35,7 @@ package, or `vp run -r build` at the root) and point the client at `node package
 
 The server listens on `127.0.0.1` only. Any web page can try to open a WebSocket there, so it
 checks the `Origin` of every connection: pages served from this machine (`localhost`,
-`127.0.0.1`) are accepted, any other origin has to be listed with `--allow-origin`, and a request
+`127.0.0.1`) and the hosted app (`https://lenz.sallon.dev`) are accepted, any other origin has to be listed with `--allow-origin`, and a request
 without an origin is refused. With several Lenz tabs open, the newest to connect answers.
 
 A second `lenz-mcp` cannot take the port while another one is running; it keeps answering the
