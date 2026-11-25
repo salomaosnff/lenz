@@ -192,6 +192,7 @@ export const builtinIds = [
   "html-style-editor",
   "html-table-builder",
   "html-select-builder",
+  "html-icon-library",
   "history-player",
   "css-games",
 ];
