@@ -193,6 +193,7 @@ export const builtinIds = [
   "html-table-builder",
   "html-select-builder",
   "history-player",
+  "css-games",
 ];
 
 const folderOfBuiltin = (id: string) => new URL(`/extensions/${id}/`, location.href).href;

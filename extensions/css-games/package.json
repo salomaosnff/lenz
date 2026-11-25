@@ -1,0 +1,175 @@
+{
+  "name": "css-games",
+  "displayName": "Jogos de CSS",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Jogos para aprender CSS: Fábrica de Tintas (cores), Tiro ao Alvo (seletores), Construtor de Caixas (box model), Cabo de Guerra (especificidade), Dança das Caixas (flexbox e grid), Caça-Bugs (consertar CSS), Pixel Perfeito (recriar imagens) e Prova de Fogo (quiz com nota).",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "vp build",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "lenz-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "~6.0.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "css-games.openColors",
+        "title": "Abrir a Fábrica de Tintas (cores)",
+        "category": "Jogo",
+        "icon": "lucide:palette"
+      },
+      {
+        "command": "css-games.openBlocks",
+        "title": "Abrir a Dança das Caixas (flexbox e grid)",
+        "category": "Jogo",
+        "icon": "lucide:layout-grid"
+      },
+      {
+        "command": "css-games.openHouse",
+        "title": "Abrir o Construtor de Caixas (box model)",
+        "category": "Jogo",
+        "icon": "lucide:box"
+      },
+      {
+        "command": "css-games.openCable",
+        "title": "Abrir o Cabo de Guerra (especificidade)",
+        "category": "Jogo",
+        "icon": "lucide:scale"
+      },
+      {
+        "command": "css-games.openHunt",
+        "title": "Abrir o Tiro ao Alvo (seletores)",
+        "category": "Jogo",
+        "icon": "lucide:crosshair"
+      },
+      {
+        "command": "css-games.openBugs",
+        "title": "Abrir o Caça-Bugs (CSS com defeito)",
+        "category": "Jogo",
+        "icon": "lucide:bug"
+      },
+      {
+        "command": "css-games.reset",
+        "title": "Reiniciar o progresso dos jogos de CSS",
+        "category": "Jogo",
+        "icon": "lucide:rotate-ccw"
+      },
+      {
+        "command": "css-games.openArena",
+        "title": "Abrir o Pixel Perfeito (recriar imagens)",
+        "category": "Jogo",
+        "icon": "lucide:swords"
+      },
+      {
+        "command": "css-games.openQuiz",
+        "title": "Abrir a Prova de Fogo (quiz de CSS)",
+        "category": "Jogo",
+        "icon": "lucide:graduation-cap"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "Mod+Alt+G",
+        "command": "css-games.openBlocks"
+      },
+      {
+        "key": "Mod+Alt+K",
+        "command": "css-games.openHunt"
+      },
+      {
+        "key": "Mod+Alt+B",
+        "command": "css-games.openHouse"
+      },
+      {
+        "key": "Mod+Alt+D",
+        "command": "css-games.openBugs"
+      },
+      {
+        "key": "Mod+Alt+C",
+        "command": "css-games.openCable"
+      },
+      {
+        "key": "Mod+Alt+P",
+        "command": "css-games.openColors"
+      },
+      {
+        "key": "Mod+Alt+A",
+        "command": "css-games.openArena"
+      },
+      {
+        "key": "Mod+Alt+Q",
+        "command": "css-games.openQuiz"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "css-games",
+          "title": "Jogos",
+          "icon": "lucide:gamepad-2"
+        }
+      ]
+    },
+    "views": {
+      "css-games": [
+        {
+          "id": "css-games.games",
+          "name": "Jogos"
+        }
+      ]
+    },
+    "pages": [
+      {
+        "id": "css-games.colors",
+        "title": "Fábrica de Tintas",
+        "icon": "lucide:palette"
+      },
+      {
+        "id": "css-games.blocks",
+        "title": "Dança das Caixas",
+        "icon": "lucide:layout-grid"
+      },
+      {
+        "id": "css-games.house",
+        "title": "Construtor de Caixas",
+        "icon": "lucide:box"
+      },
+      {
+        "id": "css-games.cable",
+        "title": "Cabo de Guerra",
+        "icon": "lucide:scale"
+      },
+      {
+        "id": "css-games.hunt",
+        "title": "Tiro ao Alvo",
+        "icon": "lucide:crosshair"
+      },
+      {
+        "id": "css-games.bugs",
+        "title": "Caça-Bugs",
+        "icon": "lucide:bug"
+      },
+      {
+        "id": "css-games.arena",
+        "title": "Pixel Perfeito",
+        "icon": "lucide:swords"
+      },
+      {
+        "id": "css-games.quiz",
+        "title": "Prova de Fogo",
+        "icon": "lucide:graduation-cap"
+      }
+    ]
+  }
+}

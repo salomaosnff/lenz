@@ -1,0 +1,942 @@
+.fgg {
+  padding: 12px;
+  --fgg-flex: #e8a33d;
+  --fgg-grid: #5b8def;
+  --fgg-ok: #3fb27f;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  font-size: 12px;
+  color: var(--ide-fg);
+}
+.fgg code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--ide-bg-subtle, rgb(128 128 128 / 0.18));
+  font-family: ui-monospace, monospace;
+}
+.fgg-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fgg-levels {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.fgg-dot {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--ide-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ide-fg-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.fgg-dot.solved {
+  border-color: var(--fgg-ok);
+  background: var(--fgg-ok);
+  color: #fff;
+}
+.fgg-dot.active {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+.fgg-count {
+  color: var(--ide-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.fgg-lesson h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+.fgg-lesson p {
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+.fgg-badge {
+  padding: 1px 7px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.fgg-badge.flex {
+  background: var(--fgg-flex);
+}
+.fgg-badge.bug {
+  background: #d9534f;
+}
+.fgg-badge.box {
+  background: #3fb27f;
+}
+.fgg-badge.grid {
+  background: var(--fgg-grid);
+}
+.fgg-boards {
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.fgg-boards figure {
+  margin: 0;
+}
+.fgg-boards figcaption {
+  margin-bottom: 4px;
+  color: var(--ide-fg-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.fgg-board {
+  box-sizing: border-box;
+  width: 280px;
+  height: 200px;
+  overflow: hidden;
+  border: 2px solid var(--ide-border);
+  border-radius: 6px;
+  background: var(--ide-bg-subtle, rgb(128 128 128 / 0.1));
+  transition: border-color 0.2s;
+}
+.fgg-board.ok {
+  border-color: var(--fgg-ok);
+}
+.fgg-board.goal {
+  border-style: dashed;
+}
+.fgg-item {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  border-radius: 4px;
+  background: var(--fgg-flex);
+  color: #fff;
+  font-weight: 700;
+  transition: all 0.25s;
+}
+.fgg-item.target {
+  background: var(--color-primary);
+}
+.fgg-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fgg-selector code {
+  background: transparent;
+  color: var(--ide-fg-muted);
+}
+.fgg-fixed {
+  margin-left: 8px;
+  color: var(--ide-fg-muted);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  opacity: 0.7;
+}
+.fgg-editor textarea {
+  box-sizing: border-box;
+  width: 100%;
+  margin-left: 14px;
+  padding: 6px 8px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ide-fg);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  resize: vertical;
+}
+.fgg-editor textarea:focus {
+  outline: 1px solid var(--color-primary);
+}
+.fgg-problems {
+  margin: 4px 0 0 14px;
+  padding-left: 16px;
+  color: #d9534f;
+}
+.fgg-status {
+  min-height: 20px;
+}
+.fgg-status p {
+  margin: 0;
+}
+.fgg-win {
+  color: var(--fgg-ok);
+  font-weight: 600;
+}
+.fgg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.fgg-actions button {
+  padding: 5px 12px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ide-fg);
+  font: inherit;
+  cursor: pointer;
+}
+.fgg-actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.fgg-actions button.primary {
+  margin-left: auto;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+.fgg-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--ide-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ide-fg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.fgg-card:hover {
+  border-color: var(--color-primary);
+}
+.fgg-card-title {
+  font-weight: 600;
+}
+.fgg-card-text {
+  color: var(--ide-fg-muted);
+  font-size: 12px;
+}
+.fgg-card-play {
+  align-self: flex-end;
+  color: var(--color-primary);
+  font-size: 12px;
+}
+
+/* ---- Tiro ao Alvo -------------------------------------------------------------------------- */
+.sel-badge {
+  background: #9b6bdc;
+}
+.sel-stage {
+  box-sizing: border-box;
+  width: 280px;
+  height: 200px;
+  overflow: auto;
+  padding: 8px 10px;
+  border: 2px solid var(--ide-border);
+  border-radius: 6px;
+  background: var(--ide-bg-subtle, rgb(128 128 128 / 0.1));
+  font-size: 12px;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+.sel-stage.ok {
+  border-color: var(--fgg-ok);
+}
+.sel-stage.goal {
+  border-style: dashed;
+}
+.sel-stage * {
+  margin: 2px 0;
+  padding: 0;
+  font-size: inherit;
+}
+.sel-stage h2,
+.sel-stage h3 {
+  font-size: 14px;
+}
+.sel-stage ul {
+  padding-left: 18px;
+  list-style: disc;
+}
+.sel-stage .bau,
+.sel-stage .cartao,
+.sel-stage nav {
+  padding: 4px 6px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+}
+.sel-stage [data-hit] {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+  background: rgb(80 140 240 / 0.22);
+}
+.sel-stage.ok [data-hit] {
+  outline-color: var(--fgg-ok);
+  background: rgb(63 178 127 / 0.25);
+}
+.sel-stage [data-goal] {
+  outline: 2px dashed var(--fgg-ok);
+  outline-offset: 1px;
+  background: rgb(63 178 127 / 0.2);
+}
+.sel-source {
+  color: var(--ide-fg-muted);
+}
+.sel-source h4 {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.sel-source pre {
+  margin: 6px 0 0;
+  padding: 8px;
+  overflow-x: auto;
+  border-radius: 4px;
+  background: var(--ide-bg-subtle, rgb(128 128 128 / 0.18));
+  color: var(--ide-fg);
+  font-size: 12px;
+}
+.sel-editor input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ide-fg);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.sel-editor input:focus {
+  outline: 1px solid var(--color-primary);
+}
+.sel-feedback {
+  min-height: 16px;
+  margin: 4px 0 0;
+  color: var(--ide-fg-muted);
+}
+.sel-feedback.bad {
+  color: #d9534f;
+}
+.fgg-games {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+
+/* ---- Construtor de Caixas ------------------------------------------------------------------------ */
+.fgg-card-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.fgg-card-level {
+  color: var(--ide-fg-muted);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+/* The content is orange and the padding is the pale band around it, so each layer can be seen. */
+.fgg-board.box .fgg-item {
+  display: block;
+  background:
+    linear-gradient(var(--fgg-flex), var(--fgg-flex)) content-box,
+    #f6d9a8 padding-box;
+  color: #3a2a08;
+  text-align: center;
+}
+.fgg-board.box .fgg-item.target {
+  background:
+    linear-gradient(var(--color-primary), var(--color-primary)) content-box,
+    #bcd0f7 padding-box;
+  color: #0c2350;
+}
+
+/* ---- Cabo de Guerra -------------------------------------------------------------------------- */
+.cab-badge {
+  background: #c2576b;
+}
+.cab-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cab-color,
+.cab-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--ide-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ide-fg);
+  font: inherit;
+  cursor: pointer;
+}
+.cab-color:hover:not(:disabled),
+.cab-selector:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+.cab-color:disabled,
+.cab-selector:disabled {
+  cursor: default;
+}
+.cab-color.wrong {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+.cab-color.right,
+.cab-selector.right {
+  border-color: var(--fgg-ok);
+}
+.cab-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+.cab-rank {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 11px;
+}
+.cab-weights,
+.cab-explain {
+  margin: 4px 0 0;
+  line-height: 1.6;
+}
+.cab-weight {
+  color: var(--ide-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.cab-wrong {
+  color: #d9534f;
+}
+.cab-proof h4 {
+  margin: 8px 0 4px;
+  color: var(--ide-fg-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cab-preview {
+  padding: 8px 10px;
+  border: 1px dashed var(--ide-border);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* ---- Fábrica de Tintas ----------------------------------------------------------------------------- */
+.pal-probe {
+  display: none;
+}
+.pal-badge {
+  background: #e0568a;
+}
+/* A checkerboard behind the colour, so transparency can be seen. */
+.pal-checker {
+  box-sizing: border-box;
+  width: 280px;
+  height: 140px;
+  border: 2px solid var(--ide-border);
+  border-radius: 6px;
+  background: conic-gradient(#bbb 25%, #fff 0 50%, #bbb 0 75%, #fff 0) 0 0 / 20px 20px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.pal-checker.ok {
+  border-color: var(--fgg-ok);
+}
+.pal-checker.goal {
+  border-style: dashed;
+}
+.pal-swatch {
+  width: 100%;
+  height: 100%;
+}
+.pal-contrast {
+  padding: 16px;
+  border: 2px solid var(--ide-border);
+  border-radius: 6px;
+}
+.pal-sample {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+.pal-sample.small {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 400;
+}
+.pal-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pal-hints li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
+  border: 1px solid var(--ide-border);
+  border-radius: 12px;
+}
+.pal-hints li.ok {
+  border-color: var(--fgg-ok);
+  color: var(--fgg-ok);
+}
+.pal-hints li.up,
+.pal-hints li.down {
+  border-color: var(--fgg-flex);
+}
+
+/* ---- Pixel Perfeito ------------------------------------------------------------------------- */
+.arena-badge {
+  background: #6a4fd8;
+}
+.arena-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.arena-colors li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.arena-chip {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--ide-border);
+  border-radius: 3px;
+}
+.arena-pictures figure {
+  width: 400px;
+  max-width: 100%;
+}
+.arena-frame {
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 2px solid var(--ide-border);
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+.arena-frame.ok {
+  border-color: var(--fgg-ok);
+}
+.arena-frame.goal {
+  border-style: dashed;
+}
+.arena-frame img,
+.arena-frame canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.arena-tabs {
+  display: flex;
+  gap: 4px;
+}
+.arena-tabs button {
+  padding: 0 6px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--ide-fg-muted);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+.arena-tabs button.active {
+  border-bottom-color: var(--color-primary);
+  color: var(--ide-fg);
+}
+.arena-score p {
+  margin: 4px 0 0;
+}
+.arena-bar {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--ide-bg-subtle, rgb(128 128 128 / 0.2));
+}
+.arena-fill {
+  height: 100%;
+  background: var(--fgg-flex);
+  transition: width 0.25s;
+}
+.arena-bar.ok .arena-fill {
+  background: var(--fgg-ok);
+}
+.arena-goal-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--ide-fg);
+  opacity: 0.6;
+}
+.arena-editors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+.arena-editors label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.arena-editors code {
+  background: transparent;
+  color: var(--ide-fg-muted);
+}
+.arena-editors textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--ide-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ide-fg);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  resize: vertical;
+}
+.arena-editors textarea:focus {
+  outline: 1px solid var(--color-primary);
+}
+.arena-rules {
+  margin: 0;
+  color: var(--ide-fg-muted);
+}
+
+/* The comparer: the target is laid over the result and cut at the pointer. */
+.arena-compare {
+  position: relative;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+.arena-compare:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.arena-over {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.arena-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  margin-left: -0.5px;
+  /* One pixel wide, and it inverts what is under it, so it shows on light and dark pictures alike. */
+  background: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+.arena-tag {
+  position: absolute;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.arena-tag {
+  top: 6px;
+}
+.arena-tag.left {
+  left: 6px;
+}
+.arena-tag.right {
+  right: 6px;
+}
+
+/* ---- Prova de Fogo --------------------------------------------------------------------------- */
+.quiz {
+  --quiz-good: var(--fgg-ok);
+  --quiz-mid: var(--fgg-flex);
+  --quiz-low: #d9534f;
+  max-width: 720px;
+}
+.quiz h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+.quiz-facts {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  color: var(--ide-fg-muted);
+}
+.quiz-last {
+  margin: 4px 0 8px;
+  color: var(--ide-fg-muted);
+}
+.quiz-go {
+  margin-left: 0 !important;
+  padding: 8px 18px !important;
+}
+.quiz-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.quiz-level {
+  padding: 1px 8px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.quiz-level.l1 {
+  background: var(--fgg-ok);
+}
+.quiz-level.l2 {
+  background: var(--fgg-flex);
+}
+.quiz-level.l3 {
+  background: #d9534f;
+}
+.quiz-progress {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--ide-bg-subtle, rgb(128 128 128 / 0.2));
+}
+.quiz-progress > div {
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 0.25s;
+}
+.quiz-question h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.quiz-code {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  overflow-x: auto;
+  border-radius: 4px;
+  background: var(--ide-bg-subtle, rgb(128 128 128 / 0.18));
+  font-size: 12px;
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--ide-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ide-fg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.quiz-option:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+.quiz-option:disabled {
+  cursor: default;
+}
+.quiz-option.right {
+  border-color: var(--fgg-ok);
+  background: rgb(63 178 127 / 0.15);
+}
+.quiz-option.wrong {
+  border-color: #d9534f;
+  background: rgb(217 83 79 / 0.15);
+}
+.quiz-option.dim {
+  opacity: 0.55;
+}
+.quiz-letter {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--ide-border);
+  border-radius: 50%;
+  color: var(--ide-fg-muted);
+  font-size: 11px;
+}
+.quiz-score {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.quiz-score p {
+  margin: 0 0 4px;
+}
+.quiz-grade {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border: 4px solid var(--quiz-good);
+  border-radius: 50%;
+}
+.quiz-grade.mid {
+  border-color: var(--quiz-mid);
+}
+.quiz-grade.low {
+  border-color: var(--quiz-low);
+}
+.quiz-grade strong {
+  font-size: 30px;
+  line-height: 1;
+}
+.quiz-grade span {
+  color: var(--ide-fg-muted);
+  font-size: 11px;
+}
+.quiz-heading {
+  margin: 0 0 6px;
+  color: var(--ide-fg-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.quiz-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.quiz-bars li {
+  display: grid;
+  grid-template-columns: 170px 1fr 44px;
+  align-items: center;
+  gap: 8px;
+}
+.quiz-bar {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--ide-bg-subtle, rgb(128 128 128 / 0.2));
+}
+.quiz-bar > span {
+  display: block;
+  height: 100%;
+}
+.quiz-bar > .good,
+.quiz-study li.good {
+  --tone: var(--quiz-good);
+}
+.quiz-bar > .mid,
+.quiz-study li.mid {
+  --tone: var(--quiz-mid);
+}
+.quiz-bar > .low,
+.quiz-study li.low {
+  --tone: var(--quiz-low);
+}
+.quiz-bar > span {
+  background: var(--tone);
+}
+.quiz-bar-value {
+  color: var(--ide-fg-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.quiz-study {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.quiz-study li {
+  padding: 8px 12px;
+  border: 1px solid var(--ide-border);
+  border-left: 4px solid var(--tone);
+  border-radius: 6px;
+}
+.quiz-study-score {
+  margin-left: 8px;
+  color: var(--ide-fg-muted);
+}
+.quiz-study p {
+  margin: 4px 0 6px;
+  line-height: 1.5;
+}
+.quiz-study button {
+  padding: 4px 10px;
+  border: 1px solid var(--color-primary);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-primary);
+  font: inherit;
+  cursor: pointer;
+}
+.quiz-study-ok {
+  margin: 0;
+}
+.quiz-review summary {
+  color: var(--ide-fg-muted);
+  cursor: pointer;
+}
+.quiz-review ul {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.quiz-review p {
+  margin: 0 0 4px;
+}
