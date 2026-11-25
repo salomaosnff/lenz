@@ -268,6 +268,469 @@
           "order": 10
         }
       ]
-    }
+    },
+    "tools": [
+      {
+        "name": "get_element_tree",
+        "description": "Lists the elements of the page open in the visual editor as a tree, each with an id (\"e12\") that the other tools take as target, its tag, id attribute, classes, own text and the attributes that matter (href, src, alt...). Start here to know what exists. Which elements are selected is in \"selected\".",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element to start from: an id or a CSS selector. Defaults to the whole page."
+            },
+            "depth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 12,
+              "description": "How many levels down. Defaults to 4."
+            },
+            "maxNodes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "description": "At most this many elements. Defaults to 200."
+            }
+          }
+        },
+        "readOnly": true
+      },
+      {
+        "name": "get_element",
+        "description": "Describes one element of the page in detail: all its attributes, its inline style, how it looks now (computed), its size and position, its text and HTML, and its parent and children.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            }
+          }
+        },
+        "readOnly": true
+      },
+      {
+        "name": "select_element",
+        "description": "Selects an element of the page, as a click would, so the panels show it and the commands (run_command) act on it.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree, or a CSS selector that matches exactly one element."
+            },
+            "additive": {
+              "type": "boolean",
+              "description": "Add it to the selection (or take it out if it is there), as Ctrl+click does. Defaults to false."
+            }
+          },
+          "required": [
+            "target"
+          ]
+        }
+      },
+      {
+        "name": "insert_element",
+        "description": "Inserts an element into the page, or a fragment of HTML, and returns the id of what it made. Say where with target and position; without a target it goes into the selected element, or the page. Use real tags (header, section, nav, footer, h2, a, img...). Scripts and event handlers (onclick...) are refused.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tag": {
+              "type": "string",
+              "description": "The tag of one new element, e.g. \"section\". Use this or html."
+            },
+            "html": {
+              "type": "string",
+              "description": "A fragment of HTML with the elements to insert (it may have several levels). Use this or tag."
+            },
+            "text": {
+              "type": "string",
+              "description": "The text of the new element (with tag)."
+            },
+            "attributes": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "description": "Attributes of the new element (with tag), e.g. {\"href\": \"#about\", \"class\": \"card\"}."
+            },
+            "styles": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "number",
+                  "null"
+                ]
+              },
+              "description": "Inline CSS of the new element (with tag), e.g. {\"display\": \"flex\", \"gap\": \"16px\"}."
+            },
+            "target": {
+              "type": "string",
+              "description": "The element to put it in or beside: an id or a CSS selector. Defaults to the selected element, or the page."
+            },
+            "position": {
+              "type": "string",
+              "enum": [
+                "append",
+                "prepend",
+                "before",
+                "after"
+              ],
+              "description": "Where, in relation to the reference: append (inside, at the end), prepend (inside, at the start), before or after (beside it). Defaults to append."
+            },
+            "select": {
+              "type": "boolean",
+              "description": "Select what was inserted. Defaults to true."
+            }
+          }
+        }
+      },
+      {
+        "name": "set_text",
+        "description": "Sets the text of an element. It refuses an element that has other elements inside (setting the text would remove them) unless replaceChildren is set: set the text of the inner element instead.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            },
+            "text": {
+              "type": "string",
+              "description": "The new text."
+            },
+            "replaceChildren": {
+              "type": "boolean",
+              "description": "Allow removing the elements inside. Defaults to false."
+            }
+          },
+          "required": [
+            "text"
+          ]
+        }
+      },
+      {
+        "name": "set_attributes",
+        "description": "Sets attributes of an element: href, src, alt, class, id, title, aria-*, data-*, type... A null (or false) value removes the attribute; true makes a boolean attribute (disabled, hidden). Event handlers (onclick...) and javascript: addresses are refused.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            },
+            "attributes": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "description": "Attribute names and their values, e.g. {\"href\": \"#contact\", \"title\": null}."
+            }
+          },
+          "required": [
+            "attributes"
+          ]
+        }
+      },
+      {
+        "name": "set_styles",
+        "description": "Sets inline CSS properties of an element (colors, fonts, spacing, borders, flex...). This is how every style must be written: inline, on each element, not in classes or stylesheets. Names can be written as in CSS (\"background-color\") or in camelCase. A null or empty value removes the property; \"!important\" is accepted. A value the browser would ignore is an error, and nothing is changed. Only for what inline styles cannot do (:hover, ::before, media queries) is there set_style_rule.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            },
+            "styles": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "number",
+                  "null"
+                ]
+              },
+              "description": "Properties and values, e.g. {\"color\": \"#333\", \"padding\": \"16px 24px\", \"margin\": null}."
+            }
+          },
+          "required": [
+            "styles"
+          ]
+        }
+      },
+      {
+        "name": "move_element",
+        "description": "Moves an element to another place in the page: inside another element or beside it, not only up or down among its siblings.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            },
+            "to": {
+              "type": "string",
+              "description": "The element it is moved to, in relation to position: an id or a CSS selector."
+            },
+            "position": {
+              "type": "string",
+              "enum": [
+                "append",
+                "prepend",
+                "before",
+                "after"
+              ],
+              "description": "Where, in relation to the reference: append (inside, at the end), prepend (inside, at the start), before or after (beside it). Defaults to append. Relative to `to`."
+            }
+          },
+          "required": [
+            "to"
+          ]
+        }
+      },
+      {
+        "name": "remove_element",
+        "description": "Removes an element from the page. The user can undo it.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            }
+          }
+        }
+      },
+      {
+        "name": "duplicate_element",
+        "description": "Duplicates an element, right after it, and selects the copy. Returns the id of the copy.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            }
+          }
+        }
+      },
+      {
+        "name": "get_style_rules",
+        "description": "Lists the rules of the page's own stylesheets (<style> blocks), with their media queries and declarations: what exists besides the inline styles.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "selector": {
+              "type": "string",
+              "description": "Only the rules whose selector has this text."
+            }
+          }
+        },
+        "readOnly": true
+      },
+      {
+        "name": "set_style_rule",
+        "description": "AVOID THIS TOOL: style every element inline with set_styles, which is the rule of this editor. Use set_style_rule only for what inline styles cannot express: pseudo-classes and pseudo-elements (:hover, :focus, :active, ::before, ::after) and media queries for small screens (e.g. media \"(max-width: 600px)\"). Never use it for colors, fonts, spacing, borders, layout or anything else that set_styles can do, and do not make classes just to share styles between elements. The rules go in a block of their own at the end of the page's stylesheets, so they win over equal rules there; the page's own stylesheets are never rewritten (get_style_rules lists both). Calling it again for the same selector and media query changes that rule. A null or empty value removes a property, and a rule left empty is removed.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "selector": {
+              "type": "string",
+              "description": "One selector, e.g. \".card:hover\" or \"nav a\"."
+            },
+            "styles": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "number",
+                  "null"
+                ]
+              },
+              "description": "Properties and values, e.g. {\"background\": \"#eee\", \"transform\": \"translateY(-2px)\"}."
+            },
+            "media": {
+              "type": "string",
+              "description": "A media query the rule is inside, e.g. \"(max-width: 600px)\"."
+            },
+            "remove": {
+              "type": "boolean",
+              "description": "Delete the rule instead of changing it. Defaults to false."
+            }
+          },
+          "required": [
+            "selector"
+          ]
+        }
+      },
+      {
+        "name": "screenshot",
+        "description": "Takes pictures of the page as it is rendered, one for each width, so the layout can be checked at desktop, tablet and phone sizes (the page is laid out at that width, so its media queries apply). Pictures and fonts from other addresses are included when the browser can read them; the result says which it could not. Defaults to 1280, 768 and 375.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "widths": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 200,
+                "maximum": 3000
+              },
+              "maxItems": 4,
+              "description": "Widths in pixels, up to four. Defaults to [1280, 768, 375]."
+            },
+            "maxHeight": {
+              "type": "integer",
+              "minimum": 200,
+              "maximum": 8000,
+              "description": "The picture is cut at this height. Defaults to 4000."
+            },
+            "scale": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 2,
+              "description": "Pixels per pixel: lower for a smaller picture. Defaults to 1."
+            }
+          }
+        },
+        "readOnly": true
+      },
+      {
+        "name": "select_parent",
+        "description": "Selects the parent of an element, as Alt+Shift+Up does, so the panels and commands act on it.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            }
+          }
+        }
+      },
+      {
+        "name": "select_children",
+        "description": "Selects everything directly inside an element (the page, if nothing is selected and no target is given), as Select all does, so one command acts on all of them.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            }
+          }
+        }
+      },
+      {
+        "name": "reorder_element",
+        "description": "Steps an element up or down among its siblings, as Alt+Up and Alt+Down do. To move it to another parent use move_element.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            },
+            "direction": {
+              "type": "string",
+              "enum": [
+                "up",
+                "down"
+              ],
+              "description": "up is toward the start of the parent. Defaults to up."
+            }
+          }
+        }
+      },
+      {
+        "name": "set_html",
+        "description": "Replaces what is inside an element with a fragment of HTML: formatted text (<b>, <em>, <a>), or a small structure. Like insert_element, it refuses scripts and event handlers. For plain text use set_text.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            },
+            "html": {
+              "type": "string",
+              "description": "The new content of the element."
+            }
+          },
+          "required": [
+            "html"
+          ]
+        }
+      },
+      {
+        "name": "get_tag_reference",
+        "description": "What the HTML spec says about a tag: its description, where it may go, what it may hold, and the attributes it takes (with their descriptions and allowed values). Look here before setting attributes of an element you are not sure about.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tag": {
+              "type": "string",
+              "description": "The tag, e.g. \"a\", \"input\", \"video\"."
+            }
+          },
+          "required": [
+            "tag"
+          ]
+        },
+        "readOnly": true
+      },
+      {
+        "name": "get_css_variables",
+        "description": "Lists the CSS custom properties (--brand...) an element can see, with their values there: what the color picker offers.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "description": "The element: an id from get_element_tree (e.g. \"e12\"), or a CSS selector that matches exactly one element. Left out, the selected element."
+            }
+          }
+        },
+        "readOnly": true
+      },
+      {
+        "name": "list_builders",
+        "description": "Lists the element builders (table, select...) other extensions add to the editor, which build an element step by step in a window.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "readOnly": true
+      },
+      {
+        "name": "open_builder",
+        "description": "Opens a builder's window for the user, who finishes it there; the agent cannot fill it in. To build the same element yourself, use insert_element with html.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "An id from list_builders."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      }
+    ]
   }
 }

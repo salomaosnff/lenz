@@ -207,6 +207,25 @@ describe("parseManifest refuses a manifest that is wrong, saying where", () => {
     rejects({ ...minimal, extensionDependencies: "x" }, /"extensionDependencies" must be a list/);
   });
 
+  test("reads pages", () => {
+    const manifest = parseManifest({
+      ...minimal,
+      contributes: {
+        pages: [
+          { id: "my-extension.game", title: "Jogo", icon: "lucide:gamepad-2" },
+          { id: "my-extension.other", title: "Outra" },
+        ],
+      },
+    });
+    expect(manifest.contributes?.pages).toEqual([
+      { id: "my-extension.game", title: "Jogo", icon: "lucide:gamepad-2" },
+      { id: "my-extension.other", title: "Outra" },
+    ]);
+    rejects({ ...minimal, contributes: { pages: [{ title: "Jogo" }] } }, /pages\[0\].*"id"/);
+    rejects({ ...minimal, contributes: { pages: [{ id: "p" }] } }, /pages\[0\].*"title"/);
+    rejects({ ...minimal, contributes: { pages: "p" } }, /"pages" must be a list/);
+  });
+
   test("the same command, container or view declared twice", () => {
     rejects(
       {
@@ -238,6 +257,32 @@ describe("parseManifest refuses a manifest that is wrong, saying where", () => {
         contributes: { views: { x: [{ id: "v", name: "A" }], y: [{ id: "v", name: "B" }] } },
       },
       /view "v" is declared twice/,
+    );
+  });
+  test("reads the tools for agents, and refuses the ones that cannot work", () => {
+    const tool = {
+      name: "my-extension.list",
+      title: "Listar",
+      description: "Lists things.",
+      inputSchema: { type: "object", properties: { n: { type: "number" } } },
+      readOnly: true,
+    };
+    expect(
+      parseManifest({ ...minimal, contributes: { tools: [tool] } }).contributes?.tools,
+    ).toEqual([tool]);
+
+    const rejects = (tools: unknown[], message: RegExp) =>
+      expect(() => parseManifest({ ...minimal, contributes: { tools } })).toThrow(message);
+    rejects([{ name: "has space", description: "x" }], /"name" must start with a letter/);
+    rejects([{ name: "a" }], /"description" must be a text/);
+    rejects([{ name: "a", description: "x", inputSchema: { type: "string" } }], /type "object"/);
+    rejects([{ name: "a", description: "x", readOnly: "yes" }], /"readOnly" must be true or false/);
+    rejects(
+      [
+        { name: "a", description: "x" },
+        { name: "a", description: "y" },
+      ],
+      /tool "a" is declared twice/,
     );
   });
 });

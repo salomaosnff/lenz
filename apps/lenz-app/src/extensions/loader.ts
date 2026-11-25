@@ -5,6 +5,7 @@ import {
   type ExtensionContext,
   type ExtensionManifest,
 } from "lenz-sdk";
+import { setExtensionWaiter as setToolWaiter } from "../agent-tools/extension-tools";
 import { setExtensionWaiter } from "../commands";
 import { createExtensionContext } from "./context";
 import { registerContributions } from "./contributions";
@@ -181,8 +182,9 @@ export async function unloadExtension(id: string): Promise<string[]> {
 
 export const isActive = (id: string) => active.has(id);
 
-// A command declared by a manifest waits here for its extension to be active.
+// A command or a tool declared by a manifest waits here for its extension to be active.
 setExtensionWaiter((id) => activationOf(id).promise);
+setToolWaiter((id) => activationOf(id).promise);
 
 /** Extensions shipped with the app: the folders the build puts in /extensions/. */
 export const builtinIds = [

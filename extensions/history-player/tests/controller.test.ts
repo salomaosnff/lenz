@@ -10,7 +10,6 @@ function fakeHistory(initial: Record<string, string> = {}) {
   const listeners = {
     open: new Set<(h: DocumentHistory) => void>(),
     change: new Set<(c: HistoryChange) => void>(),
-    close: new Set<(p: string) => void>(),
   };
   const on =
     <T>(set: Set<(v: T) => void>) =>
@@ -27,7 +26,6 @@ function fakeHistory(initial: Record<string, string> = {}) {
     list: () => [...open.keys()].map(asHistory),
     onDidOpen: on(listeners.open),
     onDidChange: on(listeners.change),
-    onDidClose: on(listeners.close),
   };
   return {
     source,
@@ -43,7 +41,6 @@ function fakeHistory(initial: Record<string, string> = {}) {
     },
     closeFile(path: string) {
       open.delete(path);
-      listeners.close.forEach((l) => l(path));
     },
   };
 }
@@ -77,14 +74,14 @@ describe("recording", () => {
     clock = 3000;
     history.openFile("c.html", "new"); // created while recording
     history.edit("a.html", "three", "Desfazer", "undo");
-    history.closeFile("b.html");
+    history.edit("a.html", "three", "Limpar", "clear"); // not a write
+    history.closeFile("b.html"); // not a write either
     expect(recorder.frames.value.map((f) => [f.path, f.kind, f.content])).toEqual([
       ["a.html", "open", "one"],
       ["b.html", "open", "bee"],
       ["a.html", "record", "two"],
       ["c.html", "open", "new"],
       ["a.html", "undo", "three"],
-      ["b.html", "close", "bee"], // a closed file keeps its last content
     ]);
   });
 

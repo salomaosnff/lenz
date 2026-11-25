@@ -53,12 +53,30 @@ export class Recorder {
     return recorder;
   }
 
-  /** Adds a frame at the end. A `close` takes the content the file had last, if none is given. */
+  /**
+   * Adds a frame at the end. A `close` takes the content the file had last, if none is given.
+   * A `merge` is the file's history joining quick edits (typing) into one entry: it updates the
+   * frame of that entry instead of adding one for every key.
+   */
   add(frame: { path: string; kind: FrameKind; label: string; content?: string }): Frame {
     const content = frame.content ?? this.last.get(frame.path) ?? "";
+    const list = this.frames.value;
+    const previous = list[list.length - 1];
+    if (
+      frame.kind === "merge" &&
+      previous &&
+      previous.path === frame.path &&
+      previous.label === frame.label &&
+      (previous.kind === "record" || previous.kind === "merge")
+    ) {
+      const merged: Frame = { ...previous, time: this.now(), content };
+      list[list.length - 1] = merged;
+      this.last.set(frame.path, content);
+      triggerRef(this.frames);
+      return merged;
+    }
     const added: Frame = { id: this.nextId++, time: this.now(), ...frame, content };
     this.last.set(frame.path, content);
-    const list = this.frames.value;
     list.push(added);
     if (list.length > this.limit) list.splice(0, list.length - this.limit);
     triggerRef(this.frames);

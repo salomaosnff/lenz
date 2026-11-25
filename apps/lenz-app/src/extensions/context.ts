@@ -7,6 +7,7 @@ import type {
   ExtensionWindow,
   WindowOptions,
 } from "lenz-sdk";
+import { implementTool } from "../agent-tools/extension-tools";
 import { executeCommand, registerCommand } from "../commands";
 import { setContextKey } from "../context";
 import { useEditorStore } from "../editor/store";
@@ -19,6 +20,7 @@ import {
 import { registerEditorProvider, registerViewProvider } from "../providers";
 import { createNotificationsApi } from "../notifications";
 import { createPromptsApi } from "../prompts";
+import { openPageTab, PAGE_EDITOR_PREFIX } from "./page";
 import { declaredBy } from "./declared";
 import { extensionWindows, type ExtensionWindowEntry } from "./windows";
 
@@ -99,6 +101,12 @@ export function createExtensionContext(
       },
       executeCommand,
     },
+    tools: {
+      registerTool({ name, execute }) {
+        declared.tool(name);
+        return implementTool(name, execute);
+      },
+    },
     history: {
       get: (path) => {
         const tab = useEditorStore().tabs.find((t) => t.id === path);
@@ -139,6 +147,22 @@ export function createExtensionContext(
       registerEditorProvider({ id, resolveEditor }) {
         // Label, icon, selector and priority come from the manifest.
         return registerEditorProvider({ ...declared.editor(id), resolveEditor });
+      },
+    },
+    pages: {
+      registerPageProvider({ id, resolvePage }) {
+        const page = declared.page(id);
+        // A page is an editor that applies to no file name, so only its own tab shows it.
+        return registerEditorProvider({
+          id: `${PAGE_EDITOR_PREFIX}${id}`,
+          label: page.title,
+          icon: page.icon,
+          selector: [],
+          resolveEditor: () => resolvePage(),
+        });
+      },
+      open(id) {
+        openPageTab(id, declared.page(id));
       },
     },
     windows: { createWindow: (options) => createWindow(extensionId, options) },

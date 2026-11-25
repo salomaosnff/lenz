@@ -57,8 +57,15 @@ export const palette: PaletteItem[] = [
 /** Wraps a fragment into a document for the canvas. Full documents are used as they are. */
 export function buildDocument(content: string) {
   if (/<html[\s>]/i.test(content)) return content;
-  return `<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;padding:16px;font-family:system-ui,sans-serif;color:#18181b}</style></head><body>${content}</body></html>`;
+  return `<!doctype html><html data-lenz-fragment><head><meta charset="utf-8"><style>body{margin:0;padding:16px;font-family:system-ui,sans-serif;color:#18181b}</style></head><body>${content}</body></html>`;
 }
+
+/**
+ * Whether the canvas is a fragment the editor wrapped (see `buildDocument`): only its `body` is
+ * written back to the file, so anything in its `head` is lost.
+ */
+export const isFragmentCanvas = (doc: Document) =>
+  doc.documentElement.hasAttribute("data-lenz-fragment");
 
 export const isFullDocument = (content: string) => /<html[\s>]/i.test(content);
 

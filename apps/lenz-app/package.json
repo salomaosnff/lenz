@@ -16,6 +16,7 @@
     "@iconify/vue": "catalog:",
     "@vueuse/core": "catalog:",
     "dompurify": "catalog:",
+    "lenz-mcp": "workspace:*",
     "lenz-sdk": "workspace:*",
     "marked": "catalog:",
     "pinia": "^4.0.3",

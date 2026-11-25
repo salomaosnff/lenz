@@ -164,6 +164,27 @@ describe("keybindings", () => {
     expect(press("F2").handled).toBe(true);
   });
 
+  it("sees a field inside a shadow root, where the event's target is only the host", () => {
+    command("sh.run");
+    disposables.push(registerKeybinding({ key: "D", command: "sh.run" }));
+    const host = { tagName: "DIV", isContentEditable: false };
+    const field = { tagName: "INPUT", isContentEditable: false };
+    const event = {
+      key: "d",
+      code: "KeyD",
+      ctrlKey: false,
+      altKey: false,
+      shiftKey: false,
+      metaKey: false,
+      target: host,
+      composedPath: () => [field, host],
+      preventDefault: vi.fn(),
+      stopPropagation() {},
+    };
+    expect(handleKeydown(event as unknown as KeyboardEvent)).toBe(false);
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
   it("leaves select all, copy and paste to a field, but not to the rest of the page", () => {
     command("sa.run");
     disposables.push(registerKeybinding({ key: "Ctrl+A", command: "sa.run" }));

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch as watchValue } from "vue";
 import { SPEEDS, type Player } from "./player";
 
 const props = defineProps<{ player: Player }>();
@@ -43,6 +43,37 @@ const page = computed(() => {
   return `<!doctype html><meta charset="utf-8"><body style="margin:16px;font-family:system-ui,sans-serif;color:#18181b">${content}`;
 });
 
+const frameEl = ref<HTMLIFrameElement>();
+/** Where each file was scrolled to the last time it was on screen. */
+const scrolls = new Map<string, { x: number; y: number }>();
+let drawn: { el: HTMLIFrameElement; path: string } | undefined;
+
+/**
+ * Puts the frame on the page, keeping the scroll: the new content is written into the same
+ * document instead of loading another one, and the position the page was at goes back at once.
+ * (Setting `srcdoc` would reload it from the top on every frame.) The iframe is same-origin but
+ * runs no scripts, so what was recorded cannot act on the app.
+ */
+function draw() {
+  const el = frameEl.value;
+  const path = shown.value?.path;
+  const doc = el?.contentDocument;
+  const win = el?.contentWindow;
+  if (!el || !path || !doc || !win) {
+    drawn = undefined;
+    return;
+  }
+  // Where the page on screen is now, including what the user scrolled while it was paused.
+  if (drawn?.el === el) scrolls.set(drawn.path, { x: win.scrollX, y: win.scrollY });
+  doc.open();
+  doc.write(page.value);
+  doc.close();
+  const at = scrolls.get(path);
+  if (at) win.scrollTo(at.x, at.y);
+  drawn = { el, path };
+}
+watchValue([frameEl, page, () => shown.value?.path], draw, { flush: "post" });
+
 const seek = (event: Event) => props.player.seek((event.target as HTMLInputElement).valueAsNumber);
 const speed = (event: Event) =>
   props.player.setSpeed(Number((event.target as HTMLSelectElement).value));
@@ -82,9 +113,9 @@ const watch = (event: Event) =>
         </div>
         <iframe
           v-if="shown?.frame && isHtml(shown.path)"
+          ref="frameEl"
           class="hp-frame"
-          sandbox=""
-          :srcdoc="page"
+          sandbox="allow-same-origin"
           title="Arquivo no momento da gravação"
         />
         <pre v-else-if="shown?.frame" class="hp-code"><code>{{ shown.frame.content }}</code></pre>

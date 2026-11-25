@@ -254,6 +254,31 @@ export interface EditorsApi {
 }
 
 // ---------------------------------------------------------------------------
+// Pages
+// ---------------------------------------------------------------------------
+
+/** What an extension registers for a page: how it is shown. Its title and icon come from `package.json`. */
+export interface PageRegistration {
+  /** Id declared in `contributes.pages`. */
+  readonly id: string;
+  /** Called each time the page is shown. */
+  resolvePage(): ViewContent | Promise<ViewContent>;
+}
+
+export interface PagesApi {
+  /**
+   * Gives a page its content. The page must be declared in `package.json` (`contributes.pages`) by
+   * this extension: this throws for a page that is not declared. Dispose to unregister.
+   */
+  registerPageProvider(provider: PageRegistration): Disposable;
+  /**
+   * Opens the page in a tab of the editor area, or goes to it if it is already open. It needs no
+   * file. Only pages of this extension can be opened.
+   */
+  open(id: string): void;
+}
+
+// ---------------------------------------------------------------------------
 // Windows
 // ---------------------------------------------------------------------------
 
@@ -489,6 +514,33 @@ export interface CommandsApi {
 }
 
 // ---------------------------------------------------------------------------
+// Tools for AI agents
+// ---------------------------------------------------------------------------
+
+/**
+ * What an extension registers for a tool: what it does. The tool must be declared in `package.json`
+ * (`contributes.tools`), which is where its name, description, schema and hints come from.
+ */
+export interface ToolRegistration {
+  /** The name it was declared with. */
+  readonly name: string;
+  /**
+   * Runs the tool with what the agent passed, shaped by the declared `inputSchema`: validate it, as
+   * an agent can pass anything. What it returns (or resolves to) is sent to the agent: as is when
+   * it is a string, as JSON otherwise. Throwing tells the agent what went wrong.
+   */
+  execute(input: Record<string, unknown>): unknown;
+}
+
+export interface ToolsApi {
+  /**
+   * Gives a declared tool its implementation, which makes it work for agents. Dispose to take it
+   * back. Throws when this extension does not declare the tool, or when it already has one.
+   */
+  registerTool(tool: ToolRegistration): Disposable;
+}
+
+// ---------------------------------------------------------------------------
 // Keybindings
 // ---------------------------------------------------------------------------
 
@@ -541,11 +593,13 @@ export interface ExtensionContext {
   readonly subscriptions: Disposable[];
   readonly views: ViewsApi;
   readonly editors: EditorsApi;
+  readonly pages: PagesApi;
   readonly windows: WindowsApi;
   readonly notifications: NotificationsApi;
   readonly prompts: PromptsApi;
   readonly contextKeys: ContextKeysApi;
   readonly commands: CommandsApi;
+  readonly tools: ToolsApi;
   readonly history: HistoryApi;
   readonly extensions: ExtensionsApi;
 }

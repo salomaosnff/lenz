@@ -22,6 +22,7 @@ import {
 import { palette } from "./model";
 import { JUSTIFY, NEW_DIV, TEXT_ALIGN, nextInCycle, toggleFlex } from "./shortcuts";
 import { session } from "./session";
+import { registerAgentTools } from "./agent/tools";
 
 export default defineExtension<HtmlEditorApi>({
   activate(context) {
@@ -110,6 +111,10 @@ export default defineExtension<HtmlEditorApi>({
         context.commands.registerCommand({ id: `${context.extensionId}.${name}`, run }),
       );
     }
+
+    // The tools for AI agents are declared in package.json (`contributes.tools`); these give them
+    // what they do.
+    context.subscriptions.push(...registerAgentTools(context));
 
     // Lets other extensions' views use `when: "html-visual-editor.hasSelection"`.
     const stop = watchEffect(() => {

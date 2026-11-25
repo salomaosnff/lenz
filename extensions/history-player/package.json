@@ -88,6 +88,76 @@
           "name": "Gravações"
         }
       ]
-    }
+    },
+    "tools": [
+      {
+        "name": "start_recording",
+        "description": "Starts recording the history of the files: the files that are open now, and every edit from here on, so it can be played back later. Does nothing if a recording is already going.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      {
+        "name": "stop_recording",
+        "description": "Stops the recording in progress and saves it, without asking the user anything. It already has a name (the date); pass name to give it another. Unlike the command history-player.stop, which opens dialogs.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name to save it with. Defaults to the one it has (the date and time)."
+            }
+          }
+        }
+      },
+      {
+        "name": "list_recordings",
+        "description": "Lists the saved recordings, newest first, and the one in progress, if any.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "readOnly": true
+      },
+      {
+        "name": "rename_recording",
+        "description": "Gives a saved recording another name.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id of a recording, from list_recordings."
+            },
+            "name": {
+              "type": "string",
+              "description": "The new name."
+            }
+          },
+          "required": [
+            "id",
+            "name"
+          ]
+        }
+      },
+      {
+        "name": "delete_recording",
+        "description": "Deletes a saved recording, without asking: it cannot be undone. One in progress is refused: stop it first.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id of a recording, from list_recordings."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "consequential": true
+      }
+    ]
   }
 }

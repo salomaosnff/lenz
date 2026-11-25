@@ -23,6 +23,38 @@ describe("Recorder", () => {
     expect(recorder.frames.value.map((f) => f.id)).toEqual([0, 1, 2]);
   });
 
+  test("typing is one frame, not one per key", () => {
+    const { recorder, clock } = make();
+    recorder.add({ path: "a.html", kind: "open", label: "Aberto", content: "<p></p>" });
+    recorder.add({ path: "a.html", kind: "record", label: "Editar texto", content: "<p>a</p>" });
+    for (const [i, text] of ["as", "asd", "asdf"].entries()) {
+      clock.now = 1100 + i * 100;
+      recorder.add({
+        path: "a.html",
+        kind: "merge",
+        label: "Editar texto",
+        content: `<p>${text}</p>`,
+      });
+    }
+    expect(recorder.frames.value.map((f) => [f.kind, f.time, f.content])).toEqual([
+      ["open", 1000, "<p></p>"],
+      ["record", 1300, "<p>asdf</p>"],
+    ]);
+    // What a file closed now would hold is the last of the typing.
+    expect(recorder.add({ path: "a.html", kind: "close", label: "Fechado" }).content).toBe(
+      "<p>asdf</p>",
+    );
+  });
+
+  test("a merge after another file's frame, or another label, is a frame of its own", () => {
+    const { recorder } = make();
+    recorder.add({ path: "a.html", kind: "record", label: "Editar texto", content: "1" });
+    recorder.add({ path: "b.html", kind: "open", label: "Aberto", content: "x" });
+    recorder.add({ path: "a.html", kind: "merge", label: "Editar texto", content: "12" });
+    recorder.add({ path: "a.html", kind: "merge", label: "Outro", content: "123" });
+    expect(recorder.frames.value.map((f) => f.content)).toEqual(["1", "x", "12", "123"]);
+  });
+
   test("a closed file keeps the content it had last", () => {
     const { recorder } = make();
     recorder.add({ path: "a.html", kind: "open", label: "Aberto", content: "one" });

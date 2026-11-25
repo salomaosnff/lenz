@@ -1,5 +1,7 @@
 import { historyOf } from "../editor/history";
 import { useEditorStore } from "../editor/store";
+import { htmlTemplate } from "../fs/sample";
+import { useWorkspaceStore } from "../fs/workspace";
 import { useLayoutStore } from "../layout/store";
 import type { Command, Disposable } from "lenz-sdk";
 import { registerKeybinding } from "../keybindings";
@@ -32,6 +34,7 @@ export function registerBuiltinCommands() {
   registered = [];
   const layout = useLayoutStore();
   const editor = useEditorStore();
+  const workspace = useWorkspaceStore();
 
   const file = "Arquivo";
   const view = "Visualizar";
@@ -44,7 +47,8 @@ export function registerBuiltinCommands() {
       // The first name nobody has taken yet.
       let n = 1;
       while (editor.tabs.some((t) => t.id === `sem-titulo-${n}.html`)) n++;
-      editor.open(`sem-titulo-${n}.html`, "");
+      const name = `sem-titulo-${n}.html`;
+      editor.open(name, htmlTemplate(name));
     },
   });
   add({
@@ -53,6 +57,13 @@ export function registerBuiltinCommands() {
     category: file,
     icon: "lucide:folder-open",
     run: () => pickFiles(),
+  });
+  add({
+    id: "file.downloadProject",
+    title: "Baixar o projeto",
+    category: file,
+    icon: "lucide:download",
+    run: () => workspace.download(),
   });
   add({
     id: "file.save",

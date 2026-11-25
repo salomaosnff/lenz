@@ -41,6 +41,11 @@
   flex: 1;
   min-width: 0;
   background: #fff;
+  /* The boxes drawn over the page are placed where their elements are, which can be far below
+     what is visible. Overflowing the canvas, they gave the editor a scrollbar of its own next to
+     the page's. `clip` cuts them without making a scroll area (`hidden` is for old browsers). */
+  overflow: hidden;
+  overflow: clip;
 }
 .hve-frame {
   position: absolute;
@@ -141,6 +146,11 @@
   color: var(--color-primary-foreground);
   font-size: 11px;
   white-space: nowrap;
+}
+/* A box at the very top has no room above it, where the canvas ends: the tag goes inside. */
+.hve-box-tag.inside {
+  top: 0;
+  border-radius: 0 0 4px 0;
 }
 .hve-layers {
   /* No scroll area of its own: the view scrolls, so the panel has one scrollbar and not two. */

@@ -1,14 +1,7 @@
 import SettingsView from "./SettingsView.vue";
-import PlaceholderView from "./PlaceholderView.vue";
+import WorkspaceView from "../fs/WorkspaceView.vue";
 import ExtensionsView from "../extensions/ExtensionsView.vue";
 import { useLayoutStore } from "./store";
-
-const samplePage = `<h1 style="color:#8b5cf6">Minha página</h1>
-<p>Clique em um elemento para editá-lo.</p>
-<div style="padding:16px;background:#f4f4f5;border-radius:8px">
-  <a href="#">Um link</a>
-</div>
-`;
 
 export function registerDefaultViews() {
   const layout = useLayoutStore();
@@ -31,10 +24,8 @@ export function registerDefaultViews() {
     views: [
       {
         id: "files",
-        title: "Páginas",
-        component: PlaceholderView,
-        // Only pages the app can edit: HTML.
-        props: { items: [{ label: "page.html", content: samplePage }] },
+        title: "Arquivos",
+        component: WorkspaceView,
       },
     ],
   });

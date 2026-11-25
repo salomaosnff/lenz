@@ -15,6 +15,24 @@ export interface CommandContribution {
   when?: string;
 }
 
+/**
+ * A tool for AI agents (through WebMCP). Its `execute` is registered by the extension, with
+ * `registerTool`; until it is, an agent that calls it waits for the extension to start.
+ */
+export interface ToolContribution {
+  /** Unique across the app, letters, digits, `_`, `.` and `-`; prefix it with the extension name. */
+  name: string;
+  title?: string;
+  /** Said to the agent: what the tool does and when to use it. */
+  description: string;
+  /** A JSON Schema (`type: "object"`) for what the tool takes. Without one it takes no input. */
+  inputSchema?: Record<string, unknown>;
+  /** The tool changes nothing. */
+  readOnly?: boolean;
+  /** The tool does something that is hard to undo, so the agent should be careful with it. */
+  consequential?: boolean;
+}
+
 /** A keyboard shortcut for a command; see `Keybinding`. */
 export interface KeybindingContribution {
   key: string;
@@ -64,6 +82,16 @@ export interface EditorContribution {
   priority?: "default" | "option";
 }
 
+/** A page: a tab of the editor area that is not a file. Its content is supplied by `registerPageProvider`. */
+export interface PageContribution {
+  /** Unique across the app, e.g. `my-game.board`. Pass it to `pages.open`. */
+  id: string;
+  /** Shown on the tab. */
+  title: string;
+  /** Icon name, e.g. `lucide:gamepad-2`. */
+  icon?: string;
+}
+
 /**
  * Everything an extension adds to the app. It is also everything it is allowed to add: the app
  * refuses to register a command, a view provider or an editor that is not declared here.
@@ -71,7 +99,9 @@ export interface EditorContribution {
 export interface Contributes {
   commands?: CommandContribution[];
   editors?: EditorContribution[];
+  pages?: PageContribution[];
   keybindings?: KeybindingContribution[];
+  tools?: ToolContribution[];
   viewsContainers?: { activitybar?: ViewContainerContribution[] };
   /** Views by the id of the container they go into: one of `viewsContainers`, or one of the app. */
   views?: Record<string, ViewContribution[]>;
@@ -197,6 +227,19 @@ export function parseManifest(data: unknown): ExtensionManifest {
     });
   }
 
+  if (contributes.pages !== undefined) {
+    result.pages = list(where, contributes.pages, "pages", (raw, at) => {
+      const item = object(at, raw);
+      const page: PageContribution = {
+        id: text(at, item.id, "id")!,
+        title: text(at, item.title, "title")!,
+      };
+      const icon = text(at, item.icon, "icon", false);
+      if (icon !== undefined) page.icon = icon;
+      return page;
+    });
+  }
+
   if (contributes.keybindings !== undefined) {
     result.keybindings = list(where, contributes.keybindings, "keybindings", (raw, at) => {
       const item = object(at, raw);
@@ -211,6 +254,34 @@ export function parseManifest(data: unknown): ExtensionManifest {
         binding.args = item.args as unknown[];
       }
       return binding;
+    });
+  }
+
+  if (contributes.tools !== undefined) {
+    result.tools = list(where, contributes.tools, "tools", (raw, at) => {
+      const item = object(at, raw);
+      const tool: ToolContribution = {
+        name: text(at, item.name, "name")!,
+        description: text(at, item.description, "description")!,
+      };
+      if (!/^[a-z][a-z0-9_.-]{0,127}$/i.test(tool.name))
+        fail(
+          at,
+          '"name" must start with a letter and have only letters, digits, "_", "." and "-".',
+        );
+      const title = text(at, item.title, "title", false);
+      if (title !== undefined) tool.title = title;
+      if (item.inputSchema !== undefined) {
+        const schema = object(at, item.inputSchema);
+        if (schema.type !== "object") fail(at, '"inputSchema" must have type "object".');
+        tool.inputSchema = schema;
+      }
+      for (const key of ["readOnly", "consequential"] as const) {
+        if (item[key] === undefined) continue;
+        if (typeof item[key] !== "boolean") fail(at, `"${key}" must be true or false.`);
+        tool[key] = item[key] as boolean;
+      }
+      return tool;
     });
   }
 
@@ -272,6 +343,10 @@ export function parseManifest(data: unknown): ExtensionManifest {
   seen(
     "command",
     (result.commands ?? []).map((c) => c.command),
+  );
+  seen(
+    "tool",
+    (result.tools ?? []).map((t) => t.name),
   );
   seen(
     "editor",

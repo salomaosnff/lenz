@@ -5,7 +5,7 @@ import { fileNameOf, parseFile, toFile, type RecordingMeta, type SavedFrame } fr
 import type { RecordingStore } from "./storage";
 
 /** The part of the history API that recording needs. */
-export type HistorySource = Pick<HistoryApi, "list" | "onDidOpen" | "onDidChange" | "onDidClose">;
+export type HistorySource = Pick<HistoryApi, "list" | "onDidOpen" | "onDidChange">;
 
 export interface ControllerOptions {
   /** Wait (ms) after a frame before the recording in progress is saved again. */
@@ -110,15 +110,17 @@ export class Controller {
       this.history.onDidOpen((file) =>
         capture({ path: file.path, kind: "open", label: "Aberto", content: file.current.content }),
       ),
-      this.history.onDidChange((change) =>
+      // Only what writes to a file: an edit, an undo, a redo, a jump. Clearing the history leaves
+      // the file as it is, and closing a file does not write to it, so neither is recorded.
+      this.history.onDidChange((change) => {
+        if (change.kind === "clear") return;
         capture({
           path: change.path,
           kind: change.kind,
           label: change.entry.label,
           content: change.entry.content,
-        }),
-      ),
-      this.history.onDidClose((path) => capture({ path, kind: "close", label: "Fechado" })),
+        });
+      }),
     ];
     this.active.value = { meta, recorder };
     this.scheduleSave(0); // appears in the list at once

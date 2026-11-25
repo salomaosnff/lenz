@@ -7,6 +7,7 @@ import { Player as PlayerState } from "./player";
 import { Recorder } from "./recorder";
 import { InvalidRecordingError } from "./recording";
 import { defaultStore } from "./storage";
+import { createTools } from "./tools";
 import styles from "./styles.css?inline";
 
 /** Context key that is true while a recording is in progress. */
@@ -170,6 +171,17 @@ export default defineExtension({
         }
       },
     };
+
+    // ---- Tools for agents ----------------------------------------------------------------------
+    // Declared in package.json (`contributes.tools`). They do not open the dialogs the commands do:
+    // an agent would be left waiting for an answer nobody sees.
+    const tools = createTools(controller, {
+      start: () => actions.start(),
+      stopped: () => instruction?.abort(),
+    });
+    for (const [name, execute] of Object.entries(tools)) {
+      context.subscriptions.push(context.tools.registerTool({ name, execute }));
+    }
 
     // ---- The panel in the activity bar ---------------------------------------------------------
     // The panel and its view are declared in package.json; this gives the view its content.

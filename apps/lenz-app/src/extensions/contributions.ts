@@ -1,11 +1,12 @@
 import type { Disposable, ExtensionManifest } from "lenz-sdk";
+import { declareTool } from "../agent-tools/extension-tools";
 import { declareCommand } from "../commands";
 import { registerKeybinding } from "../keybindings";
 import { useLayoutStore } from "../layout/store";
 
 /**
  * Registers what a manifest declares (`contributes`), before the extension runs: its activity bar
- * panels, its views, its commands and its shortcuts. The extension supplies the behavior later, by
+ * panels, its views, its commands, its tools for agents and its shortcuts. The extension supplies the behavior later, by
  * registering the view providers and the commands. Dispose to take all of it away; if anything
  * cannot be registered, what was already is taken away and the error is thrown.
  */
@@ -39,6 +40,9 @@ export function registerContributions(manifest: ExtensionManifest): Disposable[]
     }
     for (const command of contributes.commands ?? []) {
       registered.push(declareCommand(manifest.name, command));
+    }
+    for (const tool of contributes.tools ?? []) {
+      registered.push(declareTool(manifest.name, tool));
     }
     for (const binding of contributes.keybindings ?? []) {
       registered.push(registerKeybinding(binding));

@@ -130,17 +130,35 @@ function load(content: string) {
   if (frame.value) frame.value.srcdoc = buildDocument(content);
 }
 
+/** Ends the text edit in progress and puts the text back as it was; nothing while not editing. */
+let cancelEditing: (() => void) | undefined;
+
 function startEditing(el: HTMLElement) {
+  const original = el.innerHTML;
+  let typed = false;
+  let cancelled = false;
   el.contentEditable = "true";
   el.focus();
-  const onInput = () => commit("Editar texto");
+  const onInput = () => {
+    typed = true;
+    commit("Editar texto");
+  };
   const onBlur = () => {
     el.removeEventListener("input", onInput);
     el.removeAttribute("contenteditable");
+    cancelEditing = undefined;
+    if (!cancelled) return commit("Editar texto");
+    // Cancelled: back to the text it had, in the file too if it was already written there.
+    if (!typed) return updateBoxes();
+    el.innerHTML = original;
     commit("Editar texto");
   };
   el.addEventListener("input", onInput);
   el.addEventListener("blur", onBlur, { once: true });
+  cancelEditing = () => {
+    cancelled = true;
+    el.blur();
+  };
 }
 
 function onFrameLoad() {
@@ -173,8 +191,11 @@ function onFrameLoad() {
     // The canvas is another window, so the app would never see its keys. Shortcuts (they carry a
     // modifier) are handed over; so is a plain key, unless it is text going into a field of the
     // page or into an element being edited. While text is edited only Ctrl/Cmd shortcuts pass.
+    // A text edit in progress counts whatever element got the key: it is the user's typing.
     const typing =
-      target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+      !!cancelEditing ||
+      target.isContentEditable ||
+      ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
     // Select all, copy, paste... of a text being edited stay with the text.
     const ownsEditing =
       typing &&
@@ -197,6 +218,11 @@ function onFrameLoad() {
         e.preventDefault();
         return;
       }
+    }
+    if (e.key === "Escape" && cancelEditing) {
+      e.preventDefault();
+      cancelEditing();
+      return;
     }
     if (target.isContentEditable) return;
     if (e.key === "Delete" || e.key === "Backspace") {
@@ -562,7 +588,7 @@ onBeforeUnmount(() => {
           class="hve-box selected"
           :style="px(box)"
         >
-          <span v-if="tag && index === 0" class="hve-box-tag">
+          <span v-if="tag && index === 0" class="hve-box-tag" :class="{ inside: box.top < 20 }">
             <!-- The tag, the handle and the menu are the parts of the box that take the mouse. -->
             <!-- Left to right: the tag, the handle to move it, the menu of actions. -->
             {{ tag }}

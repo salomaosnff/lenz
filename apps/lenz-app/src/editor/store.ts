@@ -24,6 +24,17 @@ export interface OpenOptions {
   locked?: boolean;
 }
 
+/** Writes a tab's content to where it came from, if anywhere. Rejects when the write fails. */
+type Persister = (id: string, content: string) => Promise<void>;
+let persister: Persister | undefined;
+let onForget: ((id: string) => void) | undefined;
+
+/** Lets the workspace store write saved tabs to its file system. */
+export function setTabPersister(persist: Persister, forget?: (id: string) => void) {
+  persister = persist;
+  onForget = forget;
+}
+
 const basename = (path: string) => path.split("/").pop() ?? path;
 
 export const useEditorStore = defineStore("editor", () => {
@@ -66,6 +77,7 @@ export const useEditorStore = defineStore("editor", () => {
     const index = tabs.value.findIndex((t) => t.id === id);
     if (index === -1) return;
     forgetHistory(id);
+    onForget?.(id);
     tabs.value.splice(index, 1);
     if (activeId.value === id) {
       // Same as VSCode: prefer the tab that took the closed one's place, else the previous.
@@ -74,24 +86,37 @@ export const useEditorStore = defineStore("editor", () => {
   }
 
   function closeOthers(id: string) {
-    tabs.value.filter((t) => t.id !== id).forEach((t) => forgetHistory(t.id));
+    tabs.value
+      .filter((t) => t.id !== id)
+      .forEach((t) => {
+        forgetHistory(t.id);
+        onForget?.(t.id);
+      });
     tabs.value = tabs.value.filter((t) => t.id === id);
     activeId.value = tabs.value[0]?.id ?? null;
   }
 
   function closeAll() {
-    tabs.value.forEach((t) => forgetHistory(t.id));
+    tabs.value.forEach((t) => {
+      forgetHistory(t.id);
+      onForget?.(t.id);
+    });
     tabs.value = [];
     activeId.value = null;
   }
 
-  function save(id: string | null = activeId.value) {
+  /** Writes the tab to where it came from, if anywhere. A failed write leaves it unsaved. */
+  async function save(id: string | null = activeId.value) {
     const tab = tabs.value.find((t) => t.id === id);
-    if (tab) tab.saved = tab.content;
+    if (!tab) return;
+    // What was written is what counts as saved, even if the user types while it is being written.
+    const content = tab.content;
+    await persister?.(tab.id, content);
+    tab.saved = content;
   }
 
-  function saveAll() {
-    tabs.value.forEach((t) => (t.saved = t.content));
+  async function saveAll() {
+    await Promise.all(tabs.value.filter(isDirty).map((t) => save(t.id)));
   }
 
   function move(from: number, to: number) {

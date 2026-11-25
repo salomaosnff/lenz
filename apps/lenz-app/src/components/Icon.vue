@@ -9,9 +9,13 @@ const props = defineProps<{
 }>();
 
 const icon = computed(() => (props.name.includes(":") ? props.name : `lucide:${props.name}`));
+
+// The icon set is registered offline (see src/icons.ts), so nothing is fetched. Until it is
+// there the icon has nothing to draw and renders no element, which the `class` given to this
+// component could not be passed on to (Vue warns): a blank box takes its place.
 </script>
 
 <template>
-  <!-- The icon set is registered offline (see src/icons.ts), so nothing is fetched. -->
-  <Icon :key="String(iconsReady)" :icon="icon" />
+  <Icon v-if="iconsReady" :icon="icon" />
+  <span v-else class="inline-block" aria-hidden="true" />
 </template>

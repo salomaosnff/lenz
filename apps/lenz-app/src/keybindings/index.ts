@@ -197,6 +197,13 @@ export function hideWhenLetGo(event: MouseEvent) {
   if (!held && keyHint.value) hideHints();
 }
 
+/**
+ * The element that really got the key. Inside a shadow root (where the extensions' panels live)
+ * `event.target` is only the element that hosts it, so a field there would not look like one.
+ */
+const originOf = (event: KeyboardEvent): EventTarget | null =>
+  event.composedPath?.()[0] ?? event.target;
+
 /** Ctrl/Cmd + these keys select, copy, cut, paste and undo text: a field keeps them. */
 const TEXT_EDITING = new Set(["a", "c", "x", "v", "z", "y"]);
 
@@ -222,7 +229,7 @@ export function handleKeydown(event: KeyboardEvent): boolean {
   if (keybindingsPaused.value) return false;
   const chord = chordOf(event);
   if (!chord) return false;
-  if (isTyping(event.target, chord)) return false;
+  if (isTyping(originOf(event), chord)) return false;
 
   // Escape gives up a sequence that was started.
   if (pending.length && chord.key === "escape" && !chord.ctrl && !chord.alt && !chord.meta) {

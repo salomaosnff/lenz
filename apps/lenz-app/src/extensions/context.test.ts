@@ -1,11 +1,17 @@
 import { afterEach, describe, expect, it } from "vite-plus/test";
 import { availableCommands, declareCommand, executeCommand } from "../commands";
 import { setContextKey } from "../context";
-import { getEditorProvidersFor, getViewProvider } from "../providers";
+import { createPinia, setActivePinia } from "pinia";
+import { useEditorStore } from "../editor/store";
+import { getEditorProvider, getEditorProvidersFor, getViewProvider } from "../providers";
+import { allTools } from "../agent-tools";
+import { declareTool } from "../agent-tools/extension-tools";
 import { createExtensionContext } from "./context";
 
 const contributes = {
   commands: [{ command: "ext.go", title: "Ir", category: "Ext", icon: "lucide:x", when: "a" }],
+  tools: [{ name: "ext.look", description: "Looks." }],
+  pages: [{ id: "ext.game", title: "Jogo", icon: "lucide:gamepad-2" }],
   views: { explorer: [{ id: "ext.tree", name: "Árvore" }] },
   editors: [
     {
@@ -22,6 +28,7 @@ const make = () => {
   const context = createExtensionContext("ext", () => undefined, [], contributes);
   // What the loader does with the manifest, before the extension runs.
   disposables.push(declareCommand("ext", contributes.commands[0]!));
+  disposables.push(declareTool("ext", contributes.tools[0]!));
   return context;
 };
 afterEach(() =>
@@ -51,6 +58,20 @@ describe("what an extension can register", () => {
       when: "a",
     });
     setContextKey("a", undefined);
+  });
+
+  it("a tool that is declared, which an agent can then call", async () => {
+    const context = make();
+    disposables.push(context.tools.registerTool({ name: "ext.look", execute: () => "seen" }));
+    const tool = allTools().find((t) => t.name === "ext.look")!;
+    expect(await tool.execute({})).toBe("seen");
+  });
+
+  it("refuses a tool that is not declared", () => {
+    const context = make();
+    expect(() => context.tools.registerTool({ name: "ext.sneaky", execute: () => 1 })).toThrow(
+      /does not declare in contributes.tools/,
+    );
   });
 
   it("refuses a command that is not declared, even with a title", () => {
@@ -123,6 +144,37 @@ describe("what an extension can register", () => {
         resolveEditor: () => ({ type: "vue-component", component: {} as never }),
       }),
     ).toThrow(/does not declare.*editors/);
+  });
+});
+
+describe("pages", () => {
+  const view = () => ({ type: "vue-component" as const, component: {} as never });
+
+  it("opens a tab that is not a file, shown by the page provider", () => {
+    const context = make();
+    setActivePinia(createPinia());
+    disposables.push(context.pages.registerPageProvider({ id: "ext.game", resolvePage: view }));
+    context.pages.open("ext.game");
+    const editor = useEditorStore();
+    expect(editor.activeTab).toMatchObject({
+      name: "Jogo",
+      icon: "lucide:gamepad-2",
+      editorId: "page:ext.game",
+      locked: true,
+    });
+    expect(getEditorProvider("page:ext.game")).toBeDefined();
+    // It never offers itself as an editor for a file.
+    expect(getEditorProvidersFor("page:ext.game").length).toBe(0);
+    expect(getEditorProvidersFor("a.txt").some((p) => p.id === "page:ext.game")).toBe(false);
+  });
+
+  it("refuses a page that is not declared", () => {
+    const context = make();
+    setActivePinia(createPinia());
+    expect(() => context.pages.registerPageProvider({ id: "ext.x", resolvePage: view })).toThrow(
+      /does not declare.*pages/,
+    );
+    expect(() => context.pages.open("ext.x")).toThrow(/does not declare.*pages/);
   });
 });
 
