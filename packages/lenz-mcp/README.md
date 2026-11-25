@@ -12,15 +12,19 @@ carries the calls. Nothing works while no tab is connected.
 
 ## Use
 
-1. Build it (`vp run build` in this package, or `vp run -r build` at the root).
-2. Add it to the client, for example Claude Code:
+1. Add it to the client, for example Claude Code:
 
    ```sh
-   claude mcp add lenz -- node /path/to/packages/lenz-mcp/dist/cli.mjs
+   claude mcp add lenz -- npx -y lenz-mcp
    ```
 
-3. In Lenz, turn on **Servidor MCP** in the settings (it is off by default). The status there
+   Other clients take the same command (`npx -y lenz-mcp`) in their MCP server settings.
+
+2. In Lenz, turn on **Servidor MCP** in the settings (it is off by default). The status there
    shows when the tab is connected.
+
+Requires Node 22.18 or newer. To run it from this repository, build it (`vp run build` in this
+package, or `vp run -r build` at the root) and point the client at `node packages/lenz-mcp/dist/cli.mjs`.
 
 ## Options
 
