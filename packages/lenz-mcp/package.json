@@ -1,6 +1,6 @@
 {
   "name": "lenz-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An MCP server that gives agents the tools of a Lenz tab open in the browser.",
   "license": "MIT",
   "bin": {
